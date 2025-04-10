@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "81092737274",
+    "project_id": "currensee-app-70ce6",
+    "storage_bucket": "currensee-app-70ce6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81092737274:android:3ab272b7ef9044a300b143",
+        "android_client_info": {
+          "package_name": "com.example.currensee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDatezqrirDZPql3OvDGPum_7Pkgqj38EM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
