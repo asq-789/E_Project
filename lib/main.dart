@@ -32,6 +32,10 @@ initialRoute: '/Currensee',
         '/signup': (context) => Signup(),
        '/home':(context)=> HomeScreen(),
         '/currencies':(context)=> CurrencyList(),
+          '/help': (context) => HomeScreen(),    
+           // '/settings': (context) => SettingsScreen(),     
+          
+
    } );
   }
 }
