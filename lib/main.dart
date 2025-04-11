@@ -1,5 +1,6 @@
 import 'package:currensee/firebase_options.dart';
 import 'package:currensee/loaderpage.dart';
+import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/home.dart';
 import 'package:currensee/screens/login.dart';
 import 'package:currensee/screens/signup.dart';
@@ -29,7 +30,8 @@ initialRoute: '/Currensee',
        '/Currensee': (context) => Currensee(),
        '/login': (context) =>  Login(),
         '/signup': (context) => Signup(),
-        //'/home':(context)=> HomeScreen(),
+       '/home':(context)=> HomeScreen(),
+        '/currencies':(context)=> CurrencyList(),
    } );
   }
 }

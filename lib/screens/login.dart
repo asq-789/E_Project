@@ -14,36 +14,52 @@ class _LoginState extends State<Login> {
 
 final _formKey = GlobalKey<FormState>();
 
+ bool isLoading = false;
+
 login()async{
    if (_formKey.currentState!.validate()) {
+setState(() {
+        isLoading = true; 
+      });
+
   try {
   final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
     email: emailController.text.trim(),
     password: passwordController.text.trim(),
   );
-  Navigator.pushReplacementNamed(context, '/home');
-} on FirebaseAuthException catch (e) {
-  if (e.code == 'user-not-found') {
-    print('No user found for that email.');
-    ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("No user found for that email.")));
-  } else if (e.code == 'wrong-password') {
-    print('Wrong password provided for that user.');
-     ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Wrong password provided.")));
-  }
-} catch (e) {
-  print(e.toString());
-   ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("An error occurred")),
+ ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login successful!')),
         );
-}
+
+  Navigator.pushReplacementNamed(context, '/home');
+
+} on FirebaseAuthException catch (e) {
+
+  String errorMsg;
+  if (e.code == 'user-not-found') {
+     errorMsg = 'No user found with this email.';
+  } else if (e.code == 'wrong-password') {
+    errorMsg = 'Incorrect password.';
+  }else{
+     errorMsg = 'Login failed. Please try again.';
+  }
+ ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg)),
+        );
+
+} catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("An error occurred")));
+      }
+finally {
+        setState(() => isLoading = false); 
+      }
 
 }}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(
@@ -51,16 +67,20 @@ login()async{
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Login",style: TextStyle(fontSize: 32,fontWeight: FontWeight.bold),),
-              SizedBox(height: 40,),
+                           Text("Login", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+    SizedBox(height: 40),
               TextFormField(
                 controller: emailController,
+                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   label: Text("Email"),
                   hintText: "Enter Your Email",
                   border: OutlineInputBorder(),
+                
+                 
                 ),
-                  validator: (value) {
+                 
+                   validator: (value) {
                   if (value == null || value.isEmpty) return 'Email is required';
                   if (!value.contains('@')) return 'Enter a valid email';
                   return null;
@@ -83,15 +103,27 @@ login()async{
                
               ),
               SizedBox(height: 40,),
-              ElevatedButton(onPressed: (){
-          login();
-              }, child: Text("Login")),
-                              SizedBox(height: 20,),
 
+               isLoading
+                  ? const CircularProgressIndicator()
+                  :
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: login,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF388E3C),
+  
+    ), 
+    child: Text("Login", style: TextStyle(fontSize: 16, color: Colors.white)),
+  ),
+),
+
+SizedBox(height: 20,),
               GestureDetector(onTap: (){
             Navigator.pushNamed(context, "/signup");
           },
-          child: Text("Don't have an account?... Sign up"),),
+          child: Text("Don't have an account?... Sign up", style: TextStyle(color: Colors.blue)),),
              
               
             ],

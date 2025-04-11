@@ -10,50 +10,58 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController numberController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
   final TextEditingController countryController = TextEditingController();
+bool isLoading = false;
 
   // Signup logic
   signup() async {
     if (_formKey.currentState!.validate()) {
+
       if (passwordController.text != confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Passwords do not match")),
         );
         return;
       }
+ setState(() => isLoading = true);
 
       try {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
+          email: emailController.text,
+          password: passwordController.text,
         );
 
-        // Clear fields after successful signup
         emailController.clear();
         numberController.clear();
         countryController.clear();
         passwordController.clear();
         confirmPasswordController.clear();
 
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/login');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
+           print('The password provided is too weak.');
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("The password provided is too weak.")));
         } else if (e.code == 'email-already-in-use') {
+          print('The account already exists for that email.');
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("The account already exists for that email.")));
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("An error occurred")));
       }
+      finally {
+      setState(() => isLoading = false); 
+    }
     }
   }
 
@@ -65,8 +73,9 @@ class _SignupState extends State<Signup> {
         child: Form(
           key: _formKey,
           child: ListView(
+           
             children: [
-              SizedBox(height: 50),
+           
               Text("Sign Up", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
               SizedBox(height: 40),
 
@@ -156,11 +165,15 @@ class _SignupState extends State<Signup> {
                 },
               ),
               SizedBox(height: 40),
-
-              ElevatedButton(
-                onPressed: signup,
-                child: Text("Sign Up"),
-              ),
+isLoading
+  ? Center(child: CircularProgressIndicator())
+  : ElevatedButton(
+  onPressed: signup,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF388E3C),
+    
+  ), child: Text("Sign Up",style: TextStyle(fontSize: 16, color: Colors.white)), 
+),
               SizedBox(height: 20),
 
               GestureDetector(
