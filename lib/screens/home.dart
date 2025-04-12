@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'package:currensee/helppage.dart';
+import 'package:currensee/screens/Charts.dart';
+import 'package:currensee/screens/contactus.dart';
+import 'package:currensee/screens/currency_list.dart';
+import 'package:currensee/screens/feedback.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -71,12 +75,52 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+ void _onItemTapped(int index) {
+  setState(() {
+    _selectedIndex = index;
+  });
+  
+  switch (_selectedIndex) {
+    case 0:
     
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+      break;
+    case 1:
+    
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Charts()),
+      );
+      break;
+    case 2:
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CurrencyList()),
+      );
+      break;
+    case 3:
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ContactScreen()),
+      );
+      break;
+    case 4:
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const FeedbackScreen()),
+      );
+      break;
+    default:
+      break;
   }
+}
+
 
   // Show the settings menu
   void _showSettings(BuildContext context) {

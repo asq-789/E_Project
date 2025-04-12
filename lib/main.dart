@@ -4,19 +4,25 @@ import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/home.dart';
 import 'package:currensee/screens/login.dart';
 import 'package:currensee/screens/signup.dart';
+import 'package:currensee/screens/profile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
    WidgetsFlutterBinding.ensureInitialized();
    await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,  
   );
-  runApp(const MyApp());
-}
+ final SharedPreferences prefs = await SharedPreferences.getInstance();
+   bool isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
+  runApp(MyApp(isLoggedIn: isLoggedIn));
+
+  }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key ,required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +30,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Currensee',
       theme: ThemeData(primarySwatch: Colors.indigo),
-      home: Currensee(),
+      home:  isLoggedIn ? HomeScreen() : Login(),
 initialRoute: '/Currensee',
     routes: {
        '/Currensee': (context) => Currensee(),
@@ -32,7 +38,8 @@ initialRoute: '/Currensee',
         '/signup': (context) => Signup(),
        '/home':(context)=> HomeScreen(),
         '/currencies':(context)=> CurrencyList(),
-          '/help': (context) => HomeScreen(),    
+          '/help': (context) => HomeScreen(),   
+           '/profile':(context)=> Profile(), 
            // '/settings': (context) => SettingsScreen(),     
           
 

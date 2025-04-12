@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 
@@ -13,14 +15,15 @@ class _SignupState extends State<Signup> {
 
   final _formKey = GlobalKey<FormState>();
 
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController numberController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
-  final TextEditingController countryController = TextEditingController();
+   TextEditingController usernameController = TextEditingController();
+   TextEditingController emailController = TextEditingController();
+   TextEditingController phoneController = TextEditingController();
+   TextEditingController passwordController = TextEditingController();
+   TextEditingController confirmPasswordController = TextEditingController();
+   TextEditingController countryController = TextEditingController();
 bool isLoading = false;
-
+bool _obscurePassword = true;
+bool _obscureConfirmPassword = true;
   // Signup logic
   signup() async {
     if (_formKey.currentState!.validate()) {
@@ -32,15 +35,24 @@ bool isLoading = false;
         return;
       }
  setState(() => isLoading = true);
-
       try {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
+ 
         );
 
+                  final uid = credential.user!.uid;
+                  
+await FirebaseFirestore.instance.collection('users').doc(uid).set({
+'username':usernameController.text,
+'email' :emailController.text,
+'phone':phoneController.text,
+ 'country': countryController.text, 
+});
+usernameController.clear();
         emailController.clear();
-        numberController.clear();
+        phoneController.clear();
         countryController.clear();
         passwordController.clear();
         confirmPasswordController.clear();
@@ -57,6 +69,7 @@ bool isLoading = false;
               SnackBar(content: Text("The account already exists for that email.")));
         }
       } catch (e) {
+        print("Signup Error: $e");
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("An error occurred")));
       }
       finally {
@@ -79,7 +92,20 @@ bool isLoading = false;
               Text("Sign Up", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
               SizedBox(height: 40),
 
-              // Email
+              TextFormField(
+  controller: usernameController,
+  decoration: InputDecoration(
+    label: Text("Username"),
+    hintText: "Enter your username",
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'Username is required';
+    return null;
+  },
+),
+SizedBox(height: 30),
+
               TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -97,7 +123,7 @@ bool isLoading = false;
 
               // Phone Number
               TextFormField(
-                controller: numberController,
+                controller: phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   label: Text("Phone Number"),
@@ -134,14 +160,21 @@ bool isLoading = false;
               ),
               SizedBox(height: 30),
 
-              // Password
+              
               TextFormField(
                 controller: passwordController,
-                obscureText: true,
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   label: Text("Password"),
                   hintText: "Enter password",
                   border: OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    onPressed: (){
+setState(() {
+  _obscurePassword=!_obscurePassword;
+});
+                    }, icon:Icon( _obscurePassword? Icons.visibility_off : Icons.visibility,
+)),
                 ),
                 validator: (value) {
                   if (value == null || value.length < 6) return 'Minimum 6 characters required';
@@ -149,22 +182,30 @@ bool isLoading = false;
                 },
               ),
               SizedBox(height: 30),
-
-              // Confirm password
-              TextFormField(
-                controller: confirmPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  label: Text("Confirm Password"),
-                  hintText: "Re-enter your password",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Please confirm your password';
-                  return null;
-                },
-              ),
-              SizedBox(height: 40),
+TextFormField(
+  controller: confirmPasswordController,
+  obscureText: _obscureConfirmPassword,
+  decoration: InputDecoration(
+    label: Text("Confirm Password"),
+    hintText: "Re-enter your password",
+    border: OutlineInputBorder(),
+    suffixIcon: IconButton(
+      icon: Icon(
+        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+      ),
+      onPressed: () {
+        setState(() {
+          _obscureConfirmPassword = !_obscureConfirmPassword;
+        });
+      },
+    ),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'Please confirm your password';
+    return null;
+  },
+),
+ SizedBox(height: 40),
 isLoading
   ? Center(child: CircularProgressIndicator())
   : ElevatedButton(
