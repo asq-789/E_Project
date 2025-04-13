@@ -320,7 +320,7 @@ Navigator.push(
           BottomNavigationBarItem(
               icon: Icon(Icons.swap_horiz), label: "Convert"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart), label: "Exchange Rate"),
+              icon: Icon(Icons.bar_chart), label: "Charts"),
           BottomNavigationBarItem(
               icon: Icon(Icons.list), label: "Currency List"),
           BottomNavigationBarItem(

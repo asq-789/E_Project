@@ -17,10 +17,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     String name = nameController.text;
     String email = emailController.text;
     String feedback = feedbackController.text;
-    if (name.isEmpty || email.isEmpty || feedback.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all fields")));
-      return;
-    }
+   if (name.isEmpty || email.isEmpty || feedback.isEmpty) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all fields")));
+  return;
+}
+
+bool isValidEmail = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+if (!isValidEmail) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter a valid email")));
+  return;
+}
+
     try {
       await FirebaseFirestore.instance.collection('feedbacks').add({
         'name': name,
@@ -76,7 +83,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               prefixIcon: Icon(Icons.message_outlined),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 40),
           ElevatedButton(
             onPressed: sendFeedback,
             style: ElevatedButton.styleFrom(
@@ -84,8 +91,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             ),
             child: Center(child: Text("Send", style: TextStyle(fontSize: 16, color: Colors.white))),
           ),
-          SizedBox(height: 40),
-          Text("Users Feedbacks", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 30),
+          Divider(thickness: 1, color: Colors.grey.shade400),
+SizedBox(height: 30),
+
+        
+Center(
+  child: Text(
+    "Users Feedbacks",
+    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: const Color(0xFF388E3C)),
+  ),
+),
           SizedBox(height: 20),
           SizedBox(
             height: 400,
