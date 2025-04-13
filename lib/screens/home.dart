@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
       
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const CurrencyList()),
+       MaterialPageRoute(builder: (context) => const CurrencyList()),
       );
       break;
     case 3:
