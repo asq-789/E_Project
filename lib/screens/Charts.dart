@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:currensee/screens/currencyhistory.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
+import 'package:currensee/screens/bars.dart'; // Bars widget
 
 class Charts extends StatefulWidget {
   const Charts({super.key});
@@ -15,20 +17,13 @@ class _ChartsState extends State<Charts> {
   List<String> availableCurrencies = [];
   String selectedCurrency = 'USD';
   double selectedRate = 1.0;
-  final TextEditingController _searchController = TextEditingController(text: 'USD');
-
+//When the screen loads fetch data
   @override
   void initState() {
     super.initState();
     fetchRates(selectedCurrency);
   }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
+//call functions and hit api
   Future<void> fetchRates(String base) async {
     var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$base');
     var response = await http.get(url);
@@ -41,7 +36,7 @@ class _ChartsState extends State<Charts> {
       currencyRates = parsedRates;
       availableCurrencies = rates.keys.toList();
       selectedCurrency = base;
-      selectedRate = 1.0;
+      selectedRate = parsedRates[selectedCurrency] ?? 1.0;
     });
   }
 
@@ -62,19 +57,21 @@ class _ChartsState extends State<Charts> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Currency Chart',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: themeColor,
+        title: const Text('Currency Charts'),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
+            tooltip: 'Currency History',
             onPressed: () {
-              // TODO: Implement history navigation
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Currencyhistory()),
+              );
             },
           ),
         ],
+        backgroundColor: themeColor,
+        foregroundColor: Colors.white,
       ),
       body: currencyRates.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -85,7 +82,7 @@ class _ChartsState extends State<Charts> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Exchange Rates top 10 Currencies',
+                      'Exchange Rates Top 10 Currencies',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -94,28 +91,26 @@ class _ChartsState extends State<Charts> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Search bar
-                    TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        labelText: 'Search Currency',
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: () {
-                            final currency = _searchController.text.toUpperCase();
-                            if (availableCurrencies.contains(currency)) {
-                              fetchRates(currency);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Currency not found')),
-                              );
-                            }
-                          },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
+                    // Searchable Dropdown
+                    Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        return availableCurrencies
+                            .where((c) => c.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                            .toList();
+                      },
+                      fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Select Base Currency',
+                          ),
+                        );
+                      },
+                      onSelected: (value) {
+                        fetchRates(value);
+                      },
                     ),
 
                     const SizedBox(height: 16),
