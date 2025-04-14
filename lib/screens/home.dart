@@ -218,7 +218,7 @@ Widget build(BuildContext context) {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: currencies.isEmpty
-            ? Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
             : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
