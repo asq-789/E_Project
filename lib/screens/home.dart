@@ -4,7 +4,9 @@ import 'package:currensee/screens/Charts.dart';
 import 'package:currensee/screens/contactus.dart';
 import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/feedback.dart';
+import 'package:currensee/screens/history.dart';
 import 'package:currensee/screens/profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -31,6 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     getcurrencies();
   }
+
+conversionsHistory()async{
+User? user = FirebaseAuth.instance.currentUser;
+if(user != null){
+  try{
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('history').add({
+'from_currency':fromCurrency,
+'to_currency': toCurrency,
+  'rate': rate,
+'total': total, 
+  'timestamp': FieldValue.serverTimestamp(),
+    });
+  }catch(e){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+  }
+}
+}
+
 
   Future<void> getcurrencies() async {
     try {
@@ -69,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
         rate = data['conversion_rates'][toCurrency];
         total = amount * rate;
       });
+      await conversionsHistory();
     } catch (e) {
       print("Error converting rate: $e");
     }
@@ -132,12 +153,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.history),
-                    title: Text('History'),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+  leading: Icon(Icons.history),
+  title: Text('History'),
+  onTap: () {
+    Navigator.pop(context);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
+  },
+),
+
                   ListTile(
                     leading: Icon(Icons.favorite_border),
                     title: Text('Liked Currencies'),
