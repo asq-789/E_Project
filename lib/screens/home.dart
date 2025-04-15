@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/helppage.dart';
 import 'package:currensee/screens/Charts.dart';
 import 'package:currensee/screens/contactus.dart';
@@ -25,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double total = 0.0;
   TextEditingController amountController = TextEditingController();
   List<String> currencies = [];
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
   bool notificationsEnabled = false;
 
   @override
@@ -105,29 +106,29 @@ if(user != null){
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
 
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-        break;
-      case 1:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const Charts()));
-        break;
-      case 2:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const CurrencyList()));
-        break;
-      case 3:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactScreen()));
-        break;
-      case 4:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const FeedbackScreen()));
-        break;
-    }
-  }
+  //   switch (_selectedIndex) {
+  //     case 0:
+  //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+  //       break;
+  //     case 1:
+  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const Charts()));
+  //       break;
+  //     case 2:
+  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const CurrencyList()));
+  //       break;
+  //     case 3:
+  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactScreen()));
+  //       break;
+  //     case 4:
+  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const FeedbackScreen()));
+  //       break;
+  //   }
+  // }
 
  void _showSettings(BuildContext context) {
   showModalBottomSheet(
@@ -212,7 +213,8 @@ if(user != null){
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    appBar: AppBar(
+    appBar: 
+    AppBar(
       backgroundColor: const Color(0xFF388E3C),
       title: Text("Currensee", style: TextStyle(color: Colors.white)),
       actions: [
@@ -312,20 +314,7 @@ Widget build(BuildContext context) {
               ),
       ),
       //bottom bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF388E3C),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: "Convert"),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Charts"),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: "Currency List"),
-          BottomNavigationBarItem(icon: Icon(Icons.contact_mail), label: "Contact Us"),
-          BottomNavigationBarItem(icon: Icon(Icons.feedback), label: "Feedback"),
-        ],
-      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }
