@@ -32,7 +32,7 @@ String nextUpdate = '';
   }
   Future<Map<String, dynamic>> getData() async {
     var url = Uri.parse(
-        'https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/USD');
+        'https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/PKR');
     var response = await http.get(url);
     var data = jsonDecode(response.body);
    

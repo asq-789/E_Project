@@ -26,11 +26,11 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
       try {
         final data = jsonDecode(response.body);
 
-        if (data['rates'] != null) {
-          print('Data found: ${data['rates']}'); // Print the rates data for debugging
+        if (data['quotes'] != null) {
+          print('Data found: ${data['quotes']}'); // Print the rates data for debugging
 
           setState(() {
-            rates = data['rates'];
+            rates = data['quotes'];
           });
         } else {
           print( 'No rates found in response');
