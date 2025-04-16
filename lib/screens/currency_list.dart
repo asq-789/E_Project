@@ -1,14 +1,20 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 String formatDate(String dateStr) {
   try {
     final parts = dateStr.split(',')[1].trim().split(' ');
-    return "${parts[0]} ${parts[1]} ${parts[2]}"; // "13 Apr 2025"
+    return "${parts[0]} ${parts[1]} ${parts[2]}"; 
   } catch (e) {
-    return dateStr; // fallback
+    return dateStr; 
   }
 }
+
+  List<String> globalLikedCurrencies =[];
 
 class CurrencyList extends StatefulWidget {
   const CurrencyList({super.key});
@@ -23,16 +29,32 @@ String lastUpdated = '';
 String nextUpdate = '';
 
  late Future<Map<String, dynamic>> _currencyFuture;
+ 
+Future<void> fetchLikedCurrencies() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
 
+  final snapshot = await FirebaseFirestore.instance
+      .collection('liked_currencies')
+      .doc(user.uid)
+      .collection('currencies')
+      .get();
+
+  setState(() {
+    likedCurrencies = snapshot.docs.map((doc) => doc.id).toList();
+    globalLikedCurrencies = likedCurrencies;
+  });
+}
 
   @override
   void initState() {
     super.initState();
     _currencyFuture = getData();
+      fetchLikedCurrencies();
   }
   Future<Map<String, dynamic>> getData() async {
     var url = Uri.parse(
-        'https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/PKR');
+        'https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/USD');
     var response = await http.get(url);
     var data = jsonDecode(response.body);
    
@@ -41,10 +63,11 @@ String nextUpdate = '';
   nextUpdate = formatDate(data['time_next_update_utc'] ?? '');
 });
 
-
-
     return data['conversion_rates'];
   }
+
+
+List<String> likedCurrencies = globalLikedCurrencies;
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +126,7 @@ String nextUpdate = '';
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Card(
-                             elevation: 3, // adds slight shadow
+                             elevation: 3, 
   shadowColor: Colors.green.shade100,
                    shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(10),
@@ -135,10 +158,55 @@ Text("Next Update: $nextUpdate", style: TextStyle(fontSize: 10, color: Colors.gr
                                     ],
                                   ),
  IconButton(
-  icon: Icon(Icons.favorite_border),
-  onPressed: () {
-    // for button press
-  },
+ 
+  icon: Icon(
+     likedCurrencies.contains(currency.key)?
+      Icons.favorite:
+    Icons.favorite_border,
+    color: likedCurrencies.contains(currency.key)? Colors.red: null,),
+ onPressed: () async {
+  final user = FirebaseAuth.instance.currentUser;
+
+  if (user == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please log in first")),
+    );
+    return;
+  }
+
+  final currencyCode = currency.key;
+  final value = currency.value;
+  final isLiked = likedCurrencies.contains(currencyCode);
+
+
+setState(() {
+  if (isLiked) {
+    globalLikedCurrencies.remove(currencyCode);
+  } else {
+    globalLikedCurrencies.add(currencyCode);
+  }
+});
+
+  final docRef = FirebaseFirestore.instance
+      .collection('liked_currencies')
+      .doc(user.uid)
+      .collection('currencies')
+      .doc(currencyCode);
+
+  if (isLiked) {
+    await docRef.delete();
+  } else {
+    await docRef.set({
+      'name': currencyCode,
+      'value': value.toString(),
+      'symbol': "USD", // you can later adjust if you want to show PKR
+      'lastUpdated': lastUpdated,
+      'nextUpdate': nextUpdate,
+    });
+  }
+}
+
+  ,
 ),
 
                                 ],
@@ -161,6 +229,7 @@ Text("Next Update: $nextUpdate", style: TextStyle(fontSize: 10, color: Colors.gr
           },
         ),
       ),
+        bottomNavigationBar: BottomNavBar(),
     );
   }
 }

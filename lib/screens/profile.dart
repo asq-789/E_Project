@@ -28,7 +28,7 @@ class _ProfileState extends State<Profile> {
       if (userDoc.exists) {
         final userData = userDoc.data();
         setState(() {
-          username = userData?['name'];
+          username = userData?['username'];
           email = userData?['email'];
           phone = userData?['phone'];
           country = userData?['country'];
@@ -68,7 +68,7 @@ class _ProfileState extends State<Profile> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                         Text(" Name: $username", style: TextStyle(fontSize: 18)),
+                         Text("Username: $username", style: TextStyle(fontSize: 18)),
                     SizedBox(height: 16),
                     Text(" Email: $email", style: TextStyle(fontSize: 18)),
                     SizedBox(height: 16),

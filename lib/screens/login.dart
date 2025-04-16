@@ -15,7 +15,7 @@ class _LoginState extends State<Login> {
 final _formKey = GlobalKey<FormState>();
 
  bool isLoading = false;
-
+bool _obscurePassword = true;
 login()async{
    if (_formKey.currentState!.validate()) {
 setState(() {
@@ -80,20 +80,32 @@ finally {
                  
                 ),
                  
-                   validator: (value) {
-                  if (value == null || value.isEmpty) return 'Email is required';
-                  if (!value.contains('@')) return 'Enter a valid email';
-                  return null;
-                }, 
+                validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+               
+                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
+                  return 'Please enter a valid email address';
+                }
+                return null;
+              }, 
               ),
               SizedBox(height: 40,),
               TextFormField(
                 controller: passwordController,
-                obscureText: true,
+                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   label: Text("Password"),
                   hintText: "Enter Your Password",
                   border: OutlineInputBorder(),
+                   suffixIcon: IconButton(
+                    onPressed: (){
+setState(() {
+  _obscurePassword=!_obscurePassword;
+});
+                    }, icon:Icon( _obscurePassword? Icons.visibility_off : Icons.visibility,
+)),
                 ),
                  validator: (value) {
                   if (value == null || value.isEmpty) return 'Password is required';
