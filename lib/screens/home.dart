@@ -6,6 +6,7 @@ import 'package:currensee/screens/contactus.dart';
 import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/feedback.dart';
 import 'package:currensee/screens/history.dart';
+import 'package:currensee/screens/marketnews.dart';
 import 'package:currensee/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -221,6 +222,9 @@ Widget build(BuildContext context) {
         IconButton(
           icon: Icon(Icons.trending_up, color: Colors.white),
           onPressed: () {
+            Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const  CurrencyMarket()),);
             print("Market Trends Clicked");
           },
         ),
