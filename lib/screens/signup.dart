@@ -114,10 +114,15 @@ SizedBox(height: 30),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Email is required';
-                  if (!value.contains('@')) return 'Enter a valid email';
-                  return null;
-                },
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+               
+                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
+                  return 'Please enter a valid email address';
+                }
+                return null;
+              },
               ),
               SizedBox(height: 30),
 
