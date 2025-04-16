@@ -6,6 +6,7 @@ import 'package:currensee/screens/contactus.dart';
 import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/feedback.dart';
 import 'package:currensee/screens/history.dart';
+import 'package:currensee/screens/liked_currencies.dart';
 import 'package:currensee/screens/marketnews.dart';
 import 'package:currensee/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -168,6 +169,8 @@ if(user != null){
                     title: Text('Liked Currencies'),
                     onTap: () {
                       Navigator.pop(context);
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
+
                       print("Liked Currencies clicked");
                     },
                   ),

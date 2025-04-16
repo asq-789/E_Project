@@ -10,7 +10,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  String? username, email, phone, country;
+  String? username, email, phone, country, baseCurrency;
   bool isLoading = true;
 
   @override
@@ -32,6 +32,7 @@ class _ProfileState extends State<Profile> {
           email = userData?['email'];
           phone = userData?['phone'];
           country = userData?['country'];
+          baseCurrency = userData?['baseCurrency'];
           isLoading = false;
         });
       }
@@ -74,8 +75,10 @@ class _ProfileState extends State<Profile> {
                     SizedBox(height: 16),
                     Text("Phone: $phone", style: TextStyle(fontSize: 18)),
                     SizedBox(height: 16),
-                    Text(" Currency: $country", style: TextStyle(fontSize: 18)),
-                      ],
+                    Text(" Country: $country", style: TextStyle(fontSize: 18)),
+                       SizedBox(height: 16),
+                    Text(" Currency: $baseCurrency", style: TextStyle(fontSize: 18)),
+                     ],
                     )
                    
                   ],

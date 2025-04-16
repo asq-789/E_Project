@@ -41,7 +41,6 @@ initialRoute: '/Currensee',
        '/home':(context)=> HomeScreen(),
         '/currencies':(context)=> CurrencyList(),
           '/help': (context) => HomeScreen(),   
-           '/profile':(context)=> Profile(), 
            '/exchangeratehistory':(context) => Currencyhistory(),
               
           
