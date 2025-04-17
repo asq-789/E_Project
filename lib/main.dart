@@ -32,8 +32,8 @@ class MyApp extends StatelessWidget {
       title: 'Currensee',
       theme: ThemeData(primarySwatch: Colors.indigo),
     // home:Currencyhistory(),
-    // home:  isLoggedIn ? HomeScreen() : Login(),
-initialRoute: '/Currensee',
+     home:  isLoggedIn ? HomeScreen() : Login(),
+initialRoute: '/login',
     routes: {
      '/Currensee': (context) => Currensee(),
        '/login': (context) =>  Login(),

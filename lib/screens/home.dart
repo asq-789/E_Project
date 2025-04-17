@@ -227,7 +227,7 @@ Widget build(BuildContext context) {
           onPressed: () {
             Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const  CurrencyMarket()),);
+      MaterialPageRoute(builder: (context) => const  MarketNewsPage()),);
             print("Market Trends Clicked");
           },
         ),

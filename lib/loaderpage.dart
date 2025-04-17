@@ -15,12 +15,20 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
   void initState() {
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3), // Total loading time
+      duration: const Duration(seconds: 2), // Total loading time
     )..addListener(() {
         setState(() {});
       });
 
     controller.forward(); // Start animation
+
+    // Navigate to login page after the loading is complete
+    Future.delayed(const Duration(seconds: 2), () {
+      if (controller.isCompleted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    });
+
     super.initState();
   }
 
@@ -39,80 +47,40 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Display Logo in the center
-            Image.asset(
-              'public/assets/images/logogreen.png', 
-              height: 150, 
+            // Stack to display logo with circular loader
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Circular Progress Indicator
+                SizedBox(
+                  height: 150,
+                  width: 150,
+                  child: CircularProgressIndicator(
+                    value: controller.value,
+                    strokeWidth: 8,
+                    backgroundColor: Colors.grey[300],
+                    color: const Color(0xFF388E3C),
+                  ),
+                ),
+                // Logo in the center
+                Image.asset(
+                  'public/assets/images/logogreen.png',
+                  height: 100,
+                ),
+              ],
             ),
             const SizedBox(height: 50),
-            
-          
+
+            // Welcome text
             const Text(
               'Welcome to CurrenSee Converter',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Fredoka', // change this
+                fontFamily: 'Fredoka', 
                 color: Color(0xFF388E3C), 
               ),
             ),
-            const SizedBox(height: 30),
-
-            // Loading bar
-            LinearProgressIndicator(
-              borderRadius: BorderRadius.circular(20),
-              value: controller.value,
-              minHeight: 12,
-              backgroundColor: Colors.grey[300],
-              color: const Color(0xFF388E3C), 
-            ),
-            const SizedBox(height: 30),
-
-            // Show Login and Signup buttons 
-            if (controller.value == 1.0)
-              Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/login');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF388E3C),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15), 
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30), 
-                      ),
-                      foregroundColor: Colors.white, 
-                      textStyle: const TextStyle(
-                        fontSize: 18, 
-                        fontWeight: FontWeight.bold, 
-                        fontFamily: 'Fredoka', 
-                      ),
-                    ),
-                    child: const Text("Login"),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/signup');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF388E3C), 
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30), 
-                      ),
-                      foregroundColor: Colors.white, 
-                      textStyle: const TextStyle(
-                        fontSize: 18, 
-                        fontWeight: FontWeight.bold, 
-                        fontFamily: 'Fredoka',
-                      ),
-                    ),
-                    child: const Text("Signup"),
-                  ),
-                ],
-              ),
           ],
         ),
       ),

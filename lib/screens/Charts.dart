@@ -17,13 +17,17 @@ class _ChartsState extends State<Charts> {
   List<String> availableCurrencies = [];
   String selectedCurrency = 'USD';
   double selectedRate = 1.0;
-//When the screen loads fetch data
+  Map<String, dynamic>? rates; // history
+  List<FlSpot> historicalDataPoints = [];
+
   @override
   void initState() {
     super.initState();
     fetchRates(selectedCurrency);
+    print('initState called. Fetching data...');
+    hitAPI();
   }
-//call functions and hit api
+
   Future<void> fetchRates(String base) async {
     var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$base');
     var response = await http.get(url);
@@ -38,6 +42,45 @@ class _ChartsState extends State<Charts> {
       selectedCurrency = base;
       selectedRate = parsedRates[selectedCurrency] ?? 1.0;
     });
+  }
+
+  Future<void> hitAPI() async {
+    print('Sending API request...');
+
+    final response = await http.get(
+      Uri.parse("https://api.exchangerate.host/historical?access_key=4ad007e6d6703362a5dfc278358a7f00&date=2005-02-01"),
+    );
+
+    if (response.statusCode == 200) {
+      print('API Response: ${response.body}');
+
+      try {
+        final data = jsonDecode(response.body);
+
+        if (data['quotes'] != null) {
+          print('Data found: ${data['quotes']}');
+          
+          // Generate historical chart data
+          List<FlSpot> spots = [];
+          int index = 0;
+          data['quotes'].forEach((key, value) {
+            spots.add(FlSpot(index.toDouble(), value.toDouble()));
+            index++;
+          });
+
+          setState(() {
+            rates = data['quotes'];
+            historicalDataPoints = spots;
+          });
+        } else {
+          print('No rates found in response');
+        }
+      } catch (e) {
+        print('Error decoding response: $e');
+      }
+    } else {
+      print("Request failed with status: ${response.statusCode}");
+    }
   }
 
   @override
@@ -91,8 +134,7 @@ class _ChartsState extends State<Charts> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Searchable Dropdown
-                    Autocomplete<String>(
+                    Autocomplete<String>(  // Autocomplete widget for currency
                       optionsBuilder: (TextEditingValue textEditingValue) {
                         return availableCurrencies
                             .where((c) => c.toLowerCase().contains(textEditingValue.text.toLowerCase()))
@@ -110,12 +152,14 @@ class _ChartsState extends State<Charts> {
                       },
                       onSelected: (value) {
                         fetchRates(value);
+
                       },
+                      
                     ),
+
 
                     const SizedBox(height: 16),
 
-                    // Info box
                     Container(
                       padding: const EdgeInsets.all(16),
                       width: chartWidth,
@@ -148,7 +192,6 @@ class _ChartsState extends State<Charts> {
 
                     const SizedBox(height: 16),
 
-                    // Chart
                     SizedBox(
                       width: chartWidth,
                       height: chartHeight,
@@ -213,6 +256,72 @@ class _ChartsState extends State<Charts> {
                         ),
                       ),
                     ),
+
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Historical Data - 2005-02-01',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
+                    if (historicalDataPoints.isEmpty)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      SizedBox(
+                        width: chartWidth,
+                        height: chartHeight,
+                        child: LineChart(
+                          LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              getDrawingHorizontalLine: (_) => FlLine(
+                                color: themeColor.withOpacity(0.2),
+                                strokeWidth: 1,
+                              ),
+                            ),
+                            titlesData: FlTitlesData(
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 40,
+                                  getTitlesWidget: (value, _) => Text(
+                                    value.toStringAsFixed(0),
+                                    style: const TextStyle(fontSize: 10),
+                                  ),
+                                ),
+                              ),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, _) {
+                                    return RotatedBox(
+                                      quarterTurns: 1,
+                                      child: Text(
+                                        'Day ${value.toInt() + 1}',
+                                        style: const TextStyle(fontSize: 10),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            ),
+                            borderData: FlBorderData(show: false),
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: historicalDataPoints,
+                                isCurved: true,
+                                color: themeColor,
+                                barWidth: 4,
+                                dotData: FlDotData(show: false),
+                                belowBarData: BarAreaData(show: false),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
