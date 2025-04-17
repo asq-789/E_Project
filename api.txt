@@ -1,0 +1,4 @@
+news:
+https://api.marketaux.com/v1/news/all?countries=us&filter_entities=true&limit=10&published_after=2025-04-16T04:25&api_token=aUAqtGqWX1ZWkfoMD9ChpNR1HraCK6TxYc1qyqNc
+Trends:
+https://api.marketaux.com/v1/entity/trending/aggregation?countries=us,ca&min_doc_count=10&published_after=2025-04-16T04:29&language=en&api_token=aUAqtGqWX1ZWkfoMD9ChpNR1HraCK6TxYc1qyqNc
