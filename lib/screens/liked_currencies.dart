@@ -65,7 +65,7 @@ class _LikedCurrrenciesState extends State<LikedCurrrencies> {
               ),
               SizedBox(height: 7),
               Text(
-                "1 USD = ${data['value']} ${data['symbol']}",
+               "1 ${data['symbol']} = ${data['value']} ${data['name']}",
                 style: TextStyle(fontSize: 12, color: Colors.grey[700]),
               ),
               SizedBox(height: 5),

@@ -102,7 +102,7 @@ class _CurrencyListState extends State<CurrencyList> {
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: (value) {
-                setState(() {});  // Only update the UI on search change
+                setState(() {});  
               },
             ),
             SizedBox(height: 10),
@@ -179,7 +179,7 @@ class _CurrencyListState extends State<CurrencyList> {
                                   await docRef.set({
                                     'name': currencyCode,
                                     'value': value.toString(),
-                                    'symbol': "USD",
+                                    'symbol': baseCurrency,
                                     'lastUpdated': lastUpdated,
                                     'nextUpdate': nextUpdate,
                                   });

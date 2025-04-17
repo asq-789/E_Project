@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:country_picker/country_picker.dart';
+// import 'package:country_picker/country_picker.dart';
 import 'package:http/http.dart' as http;
 
 class Signup extends StatefulWidget {
@@ -43,7 +42,7 @@ String? selectedCurrency;
    TextEditingController phoneController = TextEditingController();
    TextEditingController passwordController = TextEditingController();
    TextEditingController confirmPasswordController = TextEditingController();
-   TextEditingController countryController = TextEditingController();
+  //  TextEditingController countryController = TextEditingController();
       TextEditingController currencyController = TextEditingController();
 
 bool isLoading = false;
@@ -74,12 +73,12 @@ await FirebaseFirestore.instance.collection('users').doc(uid).set({
 'email' :emailController.text,
 'phone':phoneController.text,
 'baseCurrency': currencyController.text,
- 'country': countryController.text, 
+//  'country': countryController.text, 
 });
 usernameController.clear();
         emailController.clear();
         phoneController.clear();
-        countryController.clear();
+        // countryController.clear();
          currencyController.clear();
         passwordController.clear();
         confirmPasswordController.clear();
@@ -171,29 +170,29 @@ SizedBox(height: 30),
               SizedBox(height: 30),
 
               // Country picker
-              TextFormField(
-                readOnly: true,
-                controller: countryController,
-                onTap: () {
-                  showCountryPicker(
-                    context: context,
-                    showPhoneCode: false,
-                    onSelect: (Country country) {
-                      countryController.text = "${country.flagEmoji} ${country.name}";
-                    },
-                  );
-                },
-                decoration: InputDecoration(
-                  labelText: "Select Country",
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.arrow_drop_down),
-                ),
-                validator: (value) => value!.isEmpty ? "Please select your country" : null,
-              ),
+              // TextFormField(
+              //   readOnly: true,
+              //   controller: countryController,
+              //   onTap: () {
+              //     showCountryPicker(
+              //       context: context,
+              //       showPhoneCode: false,
+              //       onSelect: (Country country) {
+              //         countryController.text = "${country.flagEmoji} ${country.name}";
+              //       },
+              //     );
+              //   },
+              //   decoration: InputDecoration(
+              //     labelText: "Select Country",
+              //     border: OutlineInputBorder(),
+              //     suffixIcon: Icon(Icons.arrow_drop_down),
+              //   ),
+              //   validator: (value) => value!.isEmpty ? "Please select your country" : null,
+              // ),
 
 
 
-              SizedBox(height: 30),
+              // SizedBox(height: 30),
 
 Autocomplete<String>(
   optionsBuilder: (TextEditingValue textEditingValue) {
