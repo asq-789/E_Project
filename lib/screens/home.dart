@@ -117,99 +117,99 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void swapCurrencies() {
-    setState(() {
-      String temp = fromCurrency;
-      fromCurrency = toCurrency;
-      toCurrency = temp;
-      total = 0.0;
-      rate = 0.0;
-    });
-  }
+ 
 
-  void _showSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.person),
-                      title: Text('Profile'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.history),
-                      title: Text('History'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.favorite_border),
-                      title: Text('Liked Currencies'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.notifications),
-                      title: Text('Notifications'),
-                      trailing: Switch(
-                        value: notificationsEnabled,
-                        onChanged: (bool value) {
-                          setState(() {
-                            notificationsEnabled = value;
-                          });
-                        },
-                      ),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.help),
-                      title: Text('Help Center'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text('Logout'),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        await FirebaseAuth.instance.signOut();
-                        Navigator.restorablePopAndPushNamed(context, "/login");
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  // void _showSettings(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     builder: (BuildContext context) {
+  //       return DraggableScrollableSheet(
+  //         expand: false,
+  //         builder: (context, scrollController) {
+  //           return SingleChildScrollView(
+  //             controller: scrollController,
+  //             child: Padding(
+  //               padding: const EdgeInsets.all(20),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   ListTile(
+  //                     leading: Icon(Icons.person),
+  //                     title: Text('Profile'),
+  //                     onTap: () {
+  //                       Navigator.pop(context);
+  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+  //                     },
+  //                   ),
+  //                   ListTile(
+  //                     leading: Icon(Icons.history),
+  //                     title: Text('History'),
+  //                     onTap: () {
+  //                       Navigator.pop(context);
+  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
+  //                     },
+  //                   ),
+  //                   ListTile(
+  //                     leading: Icon(Icons.favorite_border),
+  //                     title: Text('Liked Currencies'),
+  //                     onTap: () {
+  //                       Navigator.pop(context);
+  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
+  //                     },
+  //                   ),
+  //                   ListTile(
+  //                     leading: Icon(Icons.notifications),
+  //                     title: Text('Notifications'),
+  //                     trailing: Switch(
+  //                       value: notificationsEnabled,
+  //                       onChanged: (bool value) {
+  //                         setState(() {
+  //                           notificationsEnabled = value;
+  //                         });
+  //                       },
+  //                     ),
+  //                   ),
+  //                   ListTile(
+  //                     leading: Icon(Icons.help),
+  //                     title: Text('Help Center'),
+  //                     onTap: () {
+  //                       Navigator.pop(context);
+  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
+  //                     },
+  //                   ),
+  //                   ListTile(
+  //                     leading: Icon(Icons.logout),
+  //                     title: Text('Logout'),
+  //                     onTap: () async {
+  //                       Navigator.pop(context);
+  //                       await FirebaseAuth.instance.signOut();
+  //                       Navigator.restorablePopAndPushNamed(context, "/login");
+  //                     },
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   // Appbar
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+             leading: Builder(
+    builder: (context) => IconButton(
+      icon: Icon(Icons.menu, color: Colors.white),
+      onPressed: () {
+        Scaffold.of(context).openDrawer();
+      },
+    ),
+  ),
         backgroundColor: const Color(0xFF388E3C),
         title: Text("Currensee", style: TextStyle(color: Colors.white)),
         actions: [
@@ -231,12 +231,81 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
           ),
-          IconButton(
-            icon: Icon(Icons.settings, color: Colors.white),
-            onPressed: () => _showSettings(context),
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.settings, color: Colors.white),
+          //   onPressed: () => _showSettings(context),
+          // ),
         ],
       ),
+      drawer: Drawer(
+  child: ListView(
+    padding: EdgeInsets.zero,
+    children: <Widget>[
+      DrawerHeader(
+        decoration: BoxDecoration(
+          color: Color(0xFF388E3C),
+        ),
+        child: Center(
+          child: Text(
+            'Currensee',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+            ),
+          ),
+        ),
+      ),
+      ListTile(
+        leading: Icon(Icons.person),
+        title: Text('Profile'),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.history),
+        title: Text('History'),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.favorite),
+        title: Text('Liked Currencies'),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
+        },
+      ),
+      SwitchListTile(
+        secondary: Icon(Icons.notifications),
+        title: Text('Notifications'),
+        value: notificationsEnabled,
+        onChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.help),
+        title: Text('Help Center'),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
+        },
+      ),
+   
+      ListTile(
+        leading: Icon(Icons.logout),
+        title: Text('Logout'),
+        onTap: () async {
+          await FirebaseAuth.instance.signOut();
+          Navigator.restorablePopAndPushNamed(context, "/login");
+        },
+      ),
+    ],
+  ),
+),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: currencies.isEmpty
@@ -277,7 +346,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         ),
-                        Icon(Icons.swap_horiz, size: 40),
+                        SizedBox(width: 5,),
+                        Icon(Icons.arrow_forward, size: 22),
+                         SizedBox(width: 5,),
                         Expanded(
                           child: DropdownButtonFormField<String>(
                             value: currencies.contains(toCurrency) ? toCurrency : null,
@@ -371,14 +442,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               top: 6,
                               right: 6,
                               child: InkWell(
-                                onTap: () {
+                                                               onTap: () {
                                   setState(() {
                                     rate = 0.0;
                                     total = 0.0;
                                     isSaved = false;
+                                    amountController.clear();
                                   });
                                 },
-                                child: Icon(Icons.close, color: Colors.grey, size: 18,),
+                                child: Icon(Icons.close, color: Colors.grey),
                               ),
                             ),
                           ],
@@ -388,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+           bottomNavigationBar: BottomNavBar(),
     );
   }
 }
