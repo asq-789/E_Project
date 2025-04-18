@@ -23,7 +23,7 @@ List<String> currencyList = [];
 void initState() {
   super.initState();
   fetchUserData();
-  getCurrencyData(); // fetch currency list
+  getCurrencyData(); 
 }
 
 Future<void> getCurrencyData() async {

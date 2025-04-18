@@ -1,10 +1,6 @@
 import 'dart:convert';
 import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/helppage.dart';
-import 'package:currensee/screens/Charts.dart';
-import 'package:currensee/screens/contactus.dart';
-import 'package:currensee/screens/currency_list.dart';
-import 'package:currensee/screens/feedback.dart';
 import 'package:currensee/screens/history.dart';
 import 'package:currensee/screens/liked_currencies.dart';
 import 'package:currensee/screens/marketnews.dart';
@@ -22,38 +18,62 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  double amount = 0.0;
   String fromCurrency = 'USD';
   String toCurrency = 'PKR';
   double rate = 0.0;
   double total = 0.0;
+  bool isSaved = false;
+
   TextEditingController amountController = TextEditingController();
   List<String> currencies = [];
-  // int _selectedIndex = 0;
   bool notificationsEnabled = false;
 
   @override
   void initState() {
     super.initState();
     getcurrencies();
+    fetchUserData();
   }
 
-conversionsHistory()async{
-User? user = FirebaseAuth.instance.currentUser;
-if(user != null){
-  try{
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('history').add({
-'from_currency':fromCurrency,
-'to_currency': toCurrency,
-  'rate': rate,
-'total': total, 
-  'timestamp': FieldValue.serverTimestamp(),
-    });
-  }catch(e){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+  Future<void> fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        DocumentSnapshot snapshot =
+            await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (snapshot.exists && snapshot.data() != null) {
+          var data = snapshot.data() as Map<String, dynamic>;
+          String? base = data['baseCurrency'];
+          if (base != null && base.isNotEmpty) {
+            setState(() {
+              fromCurrency = base;
+            });
+          }
+        }
+      } catch (e) {
+        print("Error loading base currency: $e");
+      }
+    }
   }
-}
-}
 
+  conversionsHistory() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('history').add({
+          'amount': amount,
+          'from_currency': fromCurrency,
+          'to_currency': toCurrency,
+          'rate': rate.toStringAsFixed(2),  // Rounded to 2 decimal places
+          'total': total.toStringAsFixed(2),  // Rounded to 2 decimal places
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      }
+    }
+  }
 
   Future<void> getcurrencies() async {
     try {
@@ -83,7 +103,7 @@ if(user != null){
 
   getRateAndConvert() async {
     if (amountController.text.isEmpty) return;
-    double amount = double.tryParse(amountController.text) ?? 0.0;
+    amount = double.tryParse(amountController.text) ?? 0.0;
     try {
       var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$fromCurrency');
       var response = await http.get(url);
@@ -92,7 +112,6 @@ if(user != null){
         rate = data['conversion_rates'][toCurrency];
         total = amount * rate;
       });
-      await conversionsHistory();
     } catch (e) {
       print("Error converting rate: $e");
     }
@@ -108,145 +127,116 @@ if(user != null){
     });
   }
 
-  // void _onItemTapped(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //   });
-
-  //   switch (_selectedIndex) {
-  //     case 0:
-  //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-  //       break;
-  //     case 1:
-  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const Charts()));
-  //       break;
-  //     case 2:
-  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const CurrencyList()));
-  //       break;
-  //     case 3:
-  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactScreen()));
-  //       break;
-  //     case 4:
-  //       Navigator.push(context, MaterialPageRoute(builder: (context) => const FeedbackScreen()));
-  //       break;
-  //   }
-  // }
-
- void _showSettings(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (BuildContext context) {
-      return DraggableScrollableSheet(
-        expand: false,
-        builder: (context, scrollController) {
-          return SingleChildScrollView(
-            controller: scrollController,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('Profile'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
-                    },
-                  ),
-                  ListTile(
-  leading: Icon(Icons.history),
-  title: Text('History'),
-  onTap: () {
-    Navigator.pop(context);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
-  },
-),
-
-                  ListTile(
-                    leading: Icon(Icons.favorite_border),
-                    title: Text('Liked Currencies'),
-                    onTap: () {
-                      Navigator.pop(context);
-                                            Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
-
-                      print("Liked Currencies clicked");
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.notifications),
-                    title: Text('Notifications'),
-                    trailing: Switch(
-                      value: notificationsEnabled,
-                      onChanged: (bool value) {
-                        setState(() {
-                          notificationsEnabled = value;
-                        });
+  void _showSettings(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.person),
+                      title: Text('Profile'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
                       },
                     ),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.help),
-                    title: Text('Help Center'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text('Logout'),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.restorablePopAndPushNamed(context, "/login");
-                    },
-                  ),
-                ],
+                    ListTile(
+                      leading: Icon(Icons.history),
+                      title: Text('History'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.favorite_border),
+                      title: Text('Liked Currencies'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.notifications),
+                      title: Text('Notifications'),
+                      trailing: Switch(
+                        value: notificationsEnabled,
+                        onChanged: (bool value) {
+                          setState(() {
+                            notificationsEnabled = value;
+                          });
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.help),
+                      title: Text('Help Center'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await FirebaseAuth.instance.signOut();
+                        Navigator.restorablePopAndPushNamed(context, "/login");
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
-
-// Appbar
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: 
-    AppBar(
-      backgroundColor: const Color(0xFF388E3C),
-      title: Text("Currensee", style: TextStyle(color: Colors.white)),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.trending_up, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const  MarketNewsPage()),);
-            print("Market Trends Clicked");
+            );
           },
-        ),
-        IconButton(
-          icon: Icon(Icons.notifications, color: Colors.white),
-          onPressed: () {
-            setState(() {
-              notificationsEnabled = !notificationsEnabled;
-            });
-          },
-        ),
-        // Removed the like (favorite_border) icon
-        IconButton(
-          icon: Icon(Icons.settings, color: Colors.white),
-          onPressed: () => _showSettings(context),
-        ),
-      ],
-    ),
+        );
+      },
+    );
+  }
 
+  // Appbar
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF388E3C),
+        title: Text("Currensee", style: TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.trending_up, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MarketNewsPage()),
+              );
+              print("Market Trends Clicked");
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                notificationsEnabled = !notificationsEnabled;
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white),
+            onPressed: () => _showSettings(context),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: currencies.isEmpty
@@ -306,21 +296,98 @@ Widget build(BuildContext context) {
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(
-                      onPressed: getRateAndConvert,
+                      onPressed: () {
+                        if (amountController.text.isEmpty || double.tryParse(amountController.text) == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Please enter a valid amount")),
+                          );
+                          return;
+                        }
+
+                        getRateAndConvert();
+                      },
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF388E3C)),
                       child: Text("Convert", style: TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                     SizedBox(height: 20),
-                    if (rate != 0.0) ...[
-                      Text("Rate: $rate", style: TextStyle(fontSize: 20)),
-                      SizedBox(height: 10),
-                      Text('Total: ${total.toStringAsFixed(3)}', style: TextStyle(fontSize: 30)),
-                    ],
+                    if (rate != 0.0 && !isSaved)
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "1 $fromCurrency = ${rate.toStringAsFixed(2)} $toCurrency",
+                                          style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          "$amount $fromCurrency = ${total.toStringAsFixed(2)} $toCurrency",
+                                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 11.0, left: 10.0),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: OutlinedButton(
+                                        onPressed: () async {
+                                          await conversionsHistory();
+                                          setState(() {
+                                            isSaved = true;
+                                          });
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text("Conversion saved!")),
+                                          );
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(color: Color(0xFF388E3C)),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "Save",
+                                          style: TextStyle(color: Color(0xFF388E3C)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    rate = 0.0;
+                                    total = 0.0;
+                                    isSaved = false;
+                                  });
+                                },
+                                child: Icon(Icons.close, color: Colors.grey, size: 18,),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
       ),
-      //bottom bar
       bottomNavigationBar: BottomNavBar(),
     );
   }
