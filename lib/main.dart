@@ -1,5 +1,6 @@
 import 'package:currensee/firebase_options.dart';
 import 'package:currensee/loaderpage.dart';
+import 'package:currensee/screens/TrendsPage.dart';
 import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/currencyhistory.dart';
 import 'package:currensee/screens/home.dart';
@@ -42,6 +43,7 @@ initialRoute: '/login',
         '/currencies':(context)=> CurrencyList(),
           '/help': (context) => HomeScreen(),   
            '/exchangeratehistory':(context) => Currencyhistory(),
+           '/Trend':(context) => Trendspage(),
               
           
 

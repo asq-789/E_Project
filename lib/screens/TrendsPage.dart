@@ -1,246 +1,293 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 
-final List<Map<String, dynamic>> marketTrends = [
-  {
-    "coin": "Bitcoin",
-    "status": "Top",
-    "price": 55000,
-    "change": 5.4,
-    "description": "Bitcoin continues to dominate the market with positive trends.",
-    "date": "2025-04-17"
-  },
-  {
-    "coin": "Ethereum",
-    "status": "Top",
-    "price": 3000,
-    "change": 3.1,
-    "description": "Ethereum's price continues to rise as more institutions adopt blockchain technology.",
-    "date": "2025-04-17"
-  },
-  {
-    "coin": "Dogecoin",
-    "status": "Low",
-    "price": 0.5,
-    "change": -2.1,
-    "description": "Dogecoin has faced a drop in value due to low market sentiment.",
-    "date": "2025-04-17"
-  },
-  {
-    "coin": "Ripple (XRP)",
-    "status": "Low",
-    "price": 1.0,
-    "change": -4.5,
-    "description": "XRP's value has declined due to ongoing legal issues and market uncertainty.",
-    "date": "2025-04-16"
-  },
-  // Add more market trend data here...
-];
-
 class Trendspage extends StatefulWidget {
-  const Trendspage({Key? key}) : super(key: key);
+  const Trendspage({super.key});
 
   @override
-  State<Trendspage> createState() => _MarketNewsPageState();
+  State<Trendspage> createState() => TrendspageState();
 }
 
-class _MarketNewsPageState extends State<Trendspage> {
+class TrendspageState extends State<Trendspage> {
+  List<dynamic> detailedCoins = [];
   bool isLoading = true;
-  int selectedIndex = 0; // 0 for Articles, 1 for Trends
+  Map<String, dynamic>? marketData;
+  int selectedIndex = 0; // 0 for Coins, 1 for Market Analysis
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
+    fetchTrendingDetailedCoins();
+    fetchMarketData();
+  }
+
+  Future<void> fetchTrendingDetailedCoins() async {
+    try {
+      var urlTrending = Uri.parse('https://api.coingecko.com/api/v3/search/trending');
+      var responseTrending = await http.get(urlTrending);
+
+      if (responseTrending.statusCode == 200) {
+        var data = jsonDecode(responseTrending.body);
+        var coins = data['coins'] as List<dynamic>;
+
+        List<String> coinIds = coins.map((coin) => coin['item']['id'].toString()).toList();
+        String idsParam = coinIds.join(',');
+
+        var urlDetails = Uri.parse(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=$idsParam&sparkline=true&price_change_percentage=7d',
+        );
+        var responseDetails = await http.get(urlDetails);
+
+        if (responseDetails.statusCode == 200) {
+          setState(() {
+            detailedCoins = jsonDecode(responseDetails.body);
+            isLoading = false;
+          });
+        } else {
+          throw Exception('Failed to load detailed data');
+        }
+      } else {
+        throw Exception('Failed to load trending list');
+      }
+    } catch (e) {
+      print('Error fetching coins: $e');
       setState(() {
         isLoading = false;
       });
-    });
+    }
   }
 
-  // Generate sample data for chart (price changes over time for a specific coin)
-  List<FlSpot> getChartData() {
-    return [
-      FlSpot(0, 5000),
-      FlSpot(1, 5100),
-      FlSpot(2, 5200),
-      FlSpot(3, 5300),
-      FlSpot(4, 5400),
-      FlSpot(5, 5500),
-      FlSpot(6, 5400),
-      FlSpot(7, 5500),
-    ];
+  Future<void> fetchMarketData() async {
+    try {
+      final response = await http.get(Uri.parse('https://api.coingecko.com/api/v3/global'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          marketData = data['data'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching global market data: $e');
+    }
+  }
+
+  Widget buildMarketAnalysis() {
+    if (marketData == null) return const SizedBox();
+
+    double marketCap = marketData!['total_market_cap']['usd'];
+    double marketCapChange = marketData!['market_cap_change_percentage_24h_usd'];
+    double btcDominance = marketData!['market_cap_percentage']['btc'];
+
+    return Card(
+      margin: const EdgeInsets.all(15),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "📊 Market Overview",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+
+            // Total Market Cap
+            Row(
+              children: [
+                Icon(Icons.attach_money, color: Colors.green, size: 18),
+                const SizedBox(width: 5),
+                Text(
+                  "Total Market Value",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Text(
+              "The total value of all cryptocurrencies combined is \$${marketCap.toStringAsFixed(0)}",
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 10),
+
+            // 24h Market Cap Change
+            Row(
+              children: [
+                Icon(
+                  marketCapChange > 0 ? Icons.trending_up : Icons.trending_down,
+                  color: marketCapChange > 0 ? Colors.green : Colors.red,
+                  size: 18,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  "24h Market Change",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Text(
+              "The market cap has changed by ${marketCapChange.toStringAsFixed(2)}% in the last 24 hours.",
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 10),
+
+            // BTC Dominance
+            Row(
+              children: [
+                Icon(Icons.currency_bitcoin, color: Colors.orange, size: 18),
+                const SizedBox(width: 5),
+                Text(
+                  "Bitcoin Dominance",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Text(
+              "Bitcoin currently makes up ${btcDominance.toStringAsFixed(2)}% of the entire crypto market.",
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCoinTile(dynamic coin) {
+    List<dynamic> prices = coin['sparkline_in_7d']['price'];
+    double startPrice = prices.first;
+    double endPrice = prices.last;
+    bool isUp = endPrice >= startPrice;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Coin Image
+            Image.network(coin['image'], width: 40, height: 40),
+
+            const SizedBox(width: 10),
+
+            // Coin Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${coin['name']} (${coin['symbol'].toUpperCase()})",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text("Price: \$${coin['current_price']}"),
+                  Text("24h Change: ${coin['price_change_percentage_24h'].toStringAsFixed(2)}%"),
+                  Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2)}%"),
+                  Text("Market Cap: \$${coin['market_cap']}"),
+                  Text("Rank: #${coin['market_cap_rank']}"),
+                ],
+              ),
+            ),
+
+            // Chart with label
+            Column(
+              children: [
+                const Text(
+                  "7D Trend",
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 5),
+                buildSparklineChart(prices, isUp),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildSparklineChart(List<dynamic> sparklineData, bool isUp) {
+    List<FlSpot> spots = sparklineData
+        .asMap()
+        .entries
+        .map((entry) => FlSpot(entry.key.toDouble(), entry.value.toDouble()))
+        .toList();
+
+    return Container(
+      height: 60,
+      width: 100,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(show: false),
+          titlesData: FlTitlesData(show: false),
+          borderData: FlBorderData(show: false),
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              color: isUp ? Colors.green : Colors.red,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cryptocurrency Market Trends'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Column(
-        children: [
-          // Toggle Buttons for Articles and Trends
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ToggleButtons(
+        title: Row(
+          children: [
+            const Text("Trending Coins"),
+            const SizedBox(width: 10),
+            ToggleButtons(
               isSelected: [selectedIndex == 0, selectedIndex == 1],
               onPressed: (index) {
                 setState(() {
                   selectedIndex = index;
                 });
               },
+              selectedColor: Colors.white,  // Highlighted button text color
+              selectedBorderColor: Colors.green,  // Border color when selected
+              fillColor: Colors.green,  // Fill color for selected button
+              color: Colors.black,  // Default text color
+              borderRadius: BorderRadius.circular(8),
               children: const [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Articles'),
+                  child: Text('Coins'),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Trends'),
+                  child: Text('Market Analysis'),
                 ),
               ],
             ),
-          ),
-
-          // Display content based on selected index
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : selectedIndex == 0
-                    ? ListView.builder(
-                        itemCount: 5, // Adjust based on your article data
+          ],
+        ),
+        backgroundColor: Colors.blue, // AppBar background color
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : detailedCoins.isEmpty
+              ? const Center(child: Text("No coin data available"))
+              : Column(
+                  children: [
+                    if (selectedIndex == 1) buildMarketAnalysis(), // Show Market Analysis if selected
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        itemCount: detailedCoins.length,
                         itemBuilder: (context, index) {
-                          return Card(
-                            margin: const EdgeInsets.all(10),
-                            elevation: 5,
-                            child: ListTile(
-                              title: Text(
-                                "Article Title ${index + 1}",
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                              subtitle: const Text(
-                                  "Article description goes here."),
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Article Title'),
-                                      content: const Text('Article content here.'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Close'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      )
-                    : ListView.builder(
-                        itemCount: marketTrends.length,
-                        itemBuilder: (context, index) {
-                          final trend = marketTrends[index];
-                          return Card(
-                            margin: const EdgeInsets.all(10),
-                            elevation: 5,
-                            child: ListTile(
-                              title: Text(
-                                trend['coin'],
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                              subtitle: Text(
-                                "${trend['description']} | Price: \$${trend['price']} | Change: ${trend['change']}%",
-                              ),
-                              trailing: Icon(
-                                trend['status'] == "Top"
-                                    ? Icons.trending_up
-                                    : Icons.trending_down,
-                                color: trend['status'] == "Top"
-                                    ? Colors.green
-                                    : Colors.red,
-                              ),
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text(trend['coin']),
-                                      content: Text(trend['description']),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Close'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          );
+                          return buildCoinTile(detailedCoins[index]);
                         },
                       ),
-          ),
-          // Chart Section
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Price Trend for Bitcoin',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-          ),
-          SizedBox(
-            height: 300,
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(show: true),
-                titlesData: FlTitlesData(show: true),
-                borderData: FlBorderData(show: true),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: getChartData(),
-                    isCurved: true,
-                    color: Colors.blueAccent,
-                    belowBarData: BarAreaData(show: true),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Analysis Section
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Market Analysis',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'The market for Bitcoin is currently on an upward trend with institutional investors showing greater interest in adopting cryptocurrency as an asset class. Ethereum is also gaining ground, especially with the increasing number of decentralized finance projects being built on its blockchain. However, coins like Dogecoin and XRP are facing downward pressure due to market volatility and regulatory concerns.',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
-      ),
+                    ),
+                  ],
+                ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Trendspage(),
-  ));
 }

@@ -1,8 +1,7 @@
 import 'package:currensee/screens/TrendsPage.dart';
 import 'package:flutter/material.dart';
 
-
-//articles and news
+// Articles and news
 final List<Map<String, dynamic>> marketNews = [
   {
     "title": "USD to EUR Exchange Rate Drops",
@@ -209,8 +208,6 @@ final List<Map<String, dynamic>> marketNews = [
     "date": "2025-04-04"
   }
 ];
-
-
 class MarketNewsPage extends StatefulWidget {
   const MarketNewsPage({Key? key}) : super(key: key);
 
@@ -234,6 +231,16 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Automatically navigate to Trendspage if Trends tab is selected
+    if (selectedIndex == 1) {
+      Future.delayed(Duration.zero, () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Trendspage()),
+        );
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Currency Market News'),
@@ -264,25 +271,9 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
             ),
           ),
 
-          // Navigate to the TrendsPage when the user selects the "Trends" tab
-          selectedIndex == 1
-              ? GestureDetector(
-                  onTap: () {
-                    // Navigate to the TrendsPage when the "Trends" option is clicked
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Trendspage()),
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text(
-                      'Go to Trends',
-                      style: TextStyle(fontSize: 18, color: Colors.blue),
-                    ),
-                  ),
-                )
-              : Expanded(
+          // Render Articles
+          selectedIndex == 0
+              ? Expanded(
                   child: isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ListView.builder(
@@ -295,7 +286,8 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                               child: ListTile(
                                 title: Text(news['title'],
                                     style: const TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.bold)),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
                                 subtitle: Text(news['description']),
                                 trailing: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -329,7 +321,8 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                             );
                           },
                         ),
-                ),
+                )
+              : Container(), // This part won't be visible since it's handled by navigation directly to Trendspage
         ],
       ),
     );
