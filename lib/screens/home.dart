@@ -450,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     amountController.clear();
                                   });
                                 },
-                                child: Icon(Icons.close, color: Colors.grey),
+                                child: Icon(Icons.close, color: Colors.grey,size: 16,),
                               ),
                             ),
                           ],
