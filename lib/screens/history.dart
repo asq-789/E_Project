@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:currensee/components/my_appbar.dart';
 class History extends StatefulWidget {
   const History({super.key});
 
@@ -11,6 +11,7 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
+    bool notificationsEnabled = false;
 
 Future<void> deleteHistoryItem(String documentId) async {
   try {
@@ -33,10 +34,21 @@ Future<void> deleteHistoryItem(String documentId) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu, color: Colors.white)),
-        backgroundColor: const Color(0xFF388E3C),
-        title: Text("Conversions History", style: TextStyle(color: Colors.white)),
+       appBar:  CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
      
       body: Padding(

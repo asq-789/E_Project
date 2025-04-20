@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:currensee/screens/currency_list.dart';
+import 'package:currensee/components/my_appbar.dart';
 
 class LikedCurrrencies extends StatefulWidget {
   const LikedCurrrencies({super.key});
@@ -11,13 +11,26 @@ class LikedCurrrencies extends StatefulWidget {
 }
 
 class _LikedCurrrenciesState extends State<LikedCurrrencies> {
+      bool notificationsEnabled = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(onPressed: (){}, icon: Icon(Icons.menu),color: Colors.white,),
-         backgroundColor: const Color(0xFF388E3C), 
-        title: Text('Likes',style: TextStyle(color: Colors.white),),
+      appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
      body: Padding(
        padding: const EdgeInsets.all(20),

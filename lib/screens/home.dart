@@ -1,10 +1,6 @@
 import 'dart:convert';
 import 'package:currensee/components/bottom_navbar.dart';
-import 'package:currensee/helppage.dart';
-import 'package:currensee/screens/history.dart';
-import 'package:currensee/screens/liked_currencies.dart';
-import 'package:currensee/screens/marketnews.dart';
-import 'package:currensee/screens/profile.dart';
+import 'package:currensee/components/my_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -118,194 +114,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
  
-
-  // void _showSettings(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     builder: (BuildContext context) {
-  //       return DraggableScrollableSheet(
-  //         expand: false,
-  //         builder: (context, scrollController) {
-  //           return SingleChildScrollView(
-  //             controller: scrollController,
-  //             child: Padding(
-  //               padding: const EdgeInsets.all(20),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   ListTile(
-  //                     leading: Icon(Icons.person),
-  //                     title: Text('Profile'),
-  //                     onTap: () {
-  //                       Navigator.pop(context);
-  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
-  //                     },
-  //                   ),
-  //                   ListTile(
-  //                     leading: Icon(Icons.history),
-  //                     title: Text('History'),
-  //                     onTap: () {
-  //                       Navigator.pop(context);
-  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
-  //                     },
-  //                   ),
-  //                   ListTile(
-  //                     leading: Icon(Icons.favorite_border),
-  //                     title: Text('Liked Currencies'),
-  //                     onTap: () {
-  //                       Navigator.pop(context);
-  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
-  //                     },
-  //                   ),
-  //                   ListTile(
-  //                     leading: Icon(Icons.notifications),
-  //                     title: Text('Notifications'),
-  //                     trailing: Switch(
-  //                       value: notificationsEnabled,
-  //                       onChanged: (bool value) {
-  //                         setState(() {
-  //                           notificationsEnabled = value;
-  //                         });
-  //                       },
-  //                     ),
-  //                   ),
-  //                   ListTile(
-  //                     leading: Icon(Icons.help),
-  //                     title: Text('Help Center'),
-  //                     onTap: () {
-  //                       Navigator.pop(context);
-  //                       Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
-  //                     },
-  //                   ),
-  //                   ListTile(
-  //                     leading: Icon(Icons.logout),
-  //                     title: Text('Logout'),
-  //                     onTap: () async {
-  //                       Navigator.pop(context);
-  //                       await FirebaseAuth.instance.signOut();
-  //                       Navigator.restorablePopAndPushNamed(context, "/login");
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
   // Appbar
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-             leading: Builder(
-    builder: (context) => IconButton(
-      icon: Icon(Icons.menu, color: Colors.white),
-      onPressed: () {
-        Scaffold.of(context).openDrawer();
-      },
-    ),
-  ),
-        backgroundColor: const Color(0xFF388E3C),
-        title: Text("Currensee", style: TextStyle(color: Colors.white)),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.trending_up, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MarketNewsPage()),
-              );
-              print("Market Trends Clicked");
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {
-              setState(() {
-                notificationsEnabled = !notificationsEnabled;
-              });
-            },
-          ),
-          // IconButton(
-          //   icon: Icon(Icons.settings, color: Colors.white),
-          //   onPressed: () => _showSettings(context),
-          // ),
-        ],
-      ),
-      drawer: Drawer(
-  child: ListView(
-    padding: EdgeInsets.zero,
-    children: <Widget>[
-      DrawerHeader(
-        decoration: BoxDecoration(
-          color: Color(0xFF388E3C),
-        ),
-        child: Center(
-          child: Text(
-            'Currensee',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 26,
-            ),
-          ),
-        ),
-      ),
-      ListTile(
-        leading: Icon(Icons.person),
-        title: Text('Profile'),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+      appBar:  CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
         },
       ),
-      ListTile(
-        leading: Icon(Icons.history),
-        title: Text('History'),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => History()));
-        },
-      ),
-      ListTile(
-        leading: Icon(Icons.favorite),
-        title: Text('Liked Currencies'),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies()));
-        },
-      ),
-      SwitchListTile(
-        secondary: Icon(Icons.notifications),
-        title: Text('Notifications'),
-        value: notificationsEnabled,
-        onChanged: (bool value) {
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
           setState(() {
             notificationsEnabled = value;
           });
         },
       ),
-      ListTile(
-        leading: Icon(Icons.help),
-        title: Text('Help Center'),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage()));
-        },
-      ),
-   
-      ListTile(
-        leading: Icon(Icons.logout),
-        title: Text('Logout'),
-        onTap: () async {
-          await FirebaseAuth.instance.signOut();
-          Navigator.restorablePopAndPushNamed(context, "/login");
-        },
-      ),
-    ],
-  ),
-),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: currencies.isEmpty

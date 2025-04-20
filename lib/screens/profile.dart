@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:currensee/components/my_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +15,9 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   String? username, email, phone, baseCurrency;
   bool isLoading = true;
+    bool notificationsEnabled = false;
+bool showEditIcons = false;
+
 
  Map<String, dynamic> currencyMap = {};
 List<String> currencyList = [];
@@ -173,10 +176,21 @@ editCurrency() => showEditDialog('baseCurrency', baseCurrency ?? '');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu, color: Colors.white)),
-        backgroundColor: const Color(0xFF388E3C),
-        title: Text("Profile", style: TextStyle(color: Colors.white)),
+     appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
       body: isLoading
   ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
