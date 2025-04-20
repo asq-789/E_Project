@@ -1,9 +1,6 @@
 import 'dart:convert';
-<<<<<<< HEAD
 import 'package:currensee/components/bottom_navbar.dart';
-=======
 import 'package:cloud_firestore/cloud_firestore.dart';
->>>>>>> 94f3f0275a5afb158cf90cde0f5905045558524c
 import 'package:currensee/screens/currencyhistory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -366,8 +363,9 @@ String baseCurrency = '';
                 ),
               ),
             ),
-                       bottomNavigationBar: BottomNavBar(),
+          bottomNavigationBar: BottomNavBar(),
 
     );
   }
 }
+//2.9bam
