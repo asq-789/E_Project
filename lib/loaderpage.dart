@@ -11,26 +11,47 @@ class Currensee extends StatefulWidget {
 class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
   late AnimationController controller;
 
-  @override
-  void initState() {
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2), // Total loading time
-    )..addListener(() {
-        setState(() {});
-      });
+@override
 
-    controller.forward(); // Start animation
+void initState() {
+  super.initState();
 
-    // Navigate to login page after the loading is complete
-    Future.delayed(const Duration(seconds: 2), () {
-      if (controller.isCompleted) {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
+  controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 3),
+  )..addListener(() {
+      setState(() {});
     });
 
-    super.initState();
-  }
+  controller.forward(); 
+
+  Future.delayed(const Duration(seconds: 3), () {
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
+  });
+}
+
+  // @override
+  // void initState() {
+  //   controller = AnimationController(
+  //     vsync: this,
+  //     duration: const Duration(seconds: 2), // Total loading time
+  //   )..addListener(() {
+  //       setState(() {});
+  //     });
+
+  //   controller.forward(); // Start animation
+
+  //   // Navigate to login page after the loading is complete
+  //   Future.delayed(const Duration(seconds: 2), () {
+  //     if (controller.isCompleted) {
+  //       Navigator.pushReplacementNamed(context, '/login');
+  //     }
+  //   });
+
+  //   super.initState();
+  // }
 
   @override
   void dispose() {

@@ -1,6 +1,11 @@
 import 'dart:convert';
+<<<<<<< HEAD
 import 'package:currensee/components/bottom_navbar.dart';
+=======
+import 'package:cloud_firestore/cloud_firestore.dart';
+>>>>>>> 94f3f0275a5afb158cf90cde0f5905045558524c
 import 'package:currensee/screens/currencyhistory.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
@@ -14,20 +19,52 @@ class Charts extends StatefulWidget {
 }
 
 class _ChartsState extends State<Charts> {
+
+ TextEditingController searchController = TextEditingController();
+
   Map<String, double> currencyRates = {};
   List<String> availableCurrencies = [];
-  String selectedCurrency = 'USD';
+  String selectedCurrency = '';
   double selectedRate = 1.0;
   Map<String, dynamic>? rates; // history
   List<FlSpot> historicalDataPoints = [];
 
+//base currency work
+String baseCurrency = '';
+
+
   @override
   void initState() {
     super.initState();
-    fetchRates(selectedCurrency);
-    print('initState called. Fetching data...');
+    // fetchRates(selectedCurrency);
+    fetchCurrencyData().then((ratesData) {
+    if (baseCurrency.isNotEmpty) {
+      fetchRates(baseCurrency);
+    }
+  });
+    // print('initState called. Fetching data...');
     hitAPI();
   }
+
+  //base currency work
+  Future<Map<String, dynamic>> fetchCurrencyData() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return {};
+
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (!doc.exists || !doc.data()!.containsKey('baseCurrency')) return {};
+
+    final currency = doc['baseCurrency'];
+    baseCurrency = currency;
+    selectedCurrency = currency;
+     searchController.text = baseCurrency;
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$currency');
+    final response = await http.get(url);
+    final data = jsonDecode(response.body);
+
+    return data['conversion_rates'];
+  }
+
 
   Future<void> fetchRates(String base) async {
     var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$base');
@@ -41,7 +78,7 @@ class _ChartsState extends State<Charts> {
       currencyRates = parsedRates;
       availableCurrencies = rates.keys.toList();
       selectedCurrency = base;
-      selectedRate = parsedRates[selectedCurrency] ?? 1.0;
+       selectedRate = parsedRates[base] ?? 1.0;
     });
   }
 
@@ -53,13 +90,13 @@ class _ChartsState extends State<Charts> {
     );
 
     if (response.statusCode == 200) {
-      print('API Response: ${response.body}');
+      // print('API Response: ${response.body}');
 
       try {
         final data = jsonDecode(response.body);
 
         if (data['quotes'] != null) {
-          print('Data found: ${data['quotes']}');
+          // print('Data found: ${data['quotes']}');
           
           // Generate historical chart data
           List<FlSpot> spots = [];
@@ -142,7 +179,7 @@ class _ChartsState extends State<Charts> {
                             .toList();
                       },
                       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                        return TextField(
+                          return TextField(
                           controller: controller,
                           focusNode: focusNode,
                           decoration: const InputDecoration(
@@ -151,11 +188,13 @@ class _ChartsState extends State<Charts> {
                           ),
                         );
                       },
-                      onSelected: (value) {
-                        fetchRates(value);
-
-                      },
-                      
+                      //added
+                     onSelected: (value) {
+  setState(() {
+    selectedCurrency = value;
+  });
+  fetchRates(value);
+},      
                     ),
 
 
