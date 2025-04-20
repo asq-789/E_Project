@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
+import 'package:currensee/components/my_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -156,6 +158,7 @@ class Currencyhistory extends StatefulWidget {
 
 class _CurrencyhistoryState extends State<Currencyhistory> {
   Map<String, dynamic>? rates;
+  bool notificationsEnabled = false;
 
   Future<void> hitAPI() async {
     print('Sending API request...');
@@ -196,10 +199,22 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
     const themeColor = Color(0xFF388E3C);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('USD Based Previous Currency'),
-        backgroundColor: themeColor,
-        foregroundColor: Colors.white,
+      
+    appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
       body: rates == null
           ? const Center(child: CircularProgressIndicator())
@@ -252,6 +267,8 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
                     );
                   },
                 ),
+                           bottomNavigationBar: BottomNavBar(),
+
     );
   }
 }

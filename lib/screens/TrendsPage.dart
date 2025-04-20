@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
+import 'package:currensee/components/my_appbar.dart';
+import 'package:currensee/screens/marketnews.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
@@ -15,6 +18,7 @@ class TrendspageState extends State<Trendspage> {
   bool isLoading = true;
   Map<String, dynamic>? marketData;
   int selectedIndex = 0; // 0 for Coins, 1 for Market Analysis
+  bool notificationsEnabled = false;
 
   @override
   void initState() {
@@ -93,16 +97,11 @@ class TrendspageState extends State<Trendspage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-
-            // Total Market Cap
             Row(
               children: [
                 Icon(Icons.attach_money, color: Colors.green, size: 18),
                 const SizedBox(width: 5),
-                Text(
-                  "Total Market Value",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text("Total Market Value", style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             Text(
@@ -110,8 +109,6 @@ class TrendspageState extends State<Trendspage> {
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
-
-            // 24h Market Cap Change
             Row(
               children: [
                 Icon(
@@ -120,10 +117,7 @@ class TrendspageState extends State<Trendspage> {
                   size: 18,
                 ),
                 const SizedBox(width: 5),
-                Text(
-                  "24h Market Change",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text("24h Market Change", style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             Text(
@@ -131,16 +125,11 @@ class TrendspageState extends State<Trendspage> {
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
-
-            // BTC Dominance
             Row(
               children: [
                 Icon(Icons.currency_bitcoin, color: Colors.orange, size: 18),
                 const SizedBox(width: 5),
-                Text(
-                  "Bitcoin Dominance",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text("Bitcoin Dominance", style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             Text(
@@ -166,12 +155,8 @@ class TrendspageState extends State<Trendspage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Coin Image
             Image.network(coin['image'], width: 40, height: 40),
-
             const SizedBox(width: 10),
-
-            // Coin Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,14 +173,9 @@ class TrendspageState extends State<Trendspage> {
                 ],
               ),
             ),
-
-            // Chart with label
             Column(
               children: [
-                const Text(
-                  "7D Trend",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                ),
+                const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 5),
                 buildSparklineChart(prices, isUp),
               ],
@@ -213,62 +193,53 @@ class TrendspageState extends State<Trendspage> {
         .map((entry) => FlSpot(entry.key.toDouble(), entry.value.toDouble()))
         .toList();
 
-    return Container(
-      height: 60,
-      width: 100,
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            LineChartBarData(
-              spots: spots,
-              isCurved: true,
-              color: isUp ? Colors.green : Colors.red,
-              belowBarData: BarAreaData(show: false),
-              dotData: FlDotData(show: false),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double chartWidth = constraints.maxWidth > 120 ? 100 : constraints.maxWidth * 0.8;
+        double chartHeight = constraints.maxHeight > 70 ? 60 : constraints.maxHeight * 0.6;
+
+        return SizedBox(
+          height: chartHeight,
+          width: chartWidth,
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(show: false),
+              titlesData: FlTitlesData(show: false),
+              borderData: FlBorderData(show: false),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: true,
+                  color: isUp ? Colors.green : Colors.red,
+                  belowBarData: BarAreaData(show: false),
+                  dotData: FlDotData(show: false),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Text("Trending Coins"),
-            const SizedBox(width: 10),
-            ToggleButtons(
-              isSelected: [selectedIndex == 0, selectedIndex == 1],
-              onPressed: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-              selectedColor: Colors.white,  // Highlighted button text color
-              selectedBorderColor: Colors.green,  // Border color when selected
-              fillColor: Colors.green,  // Fill color for selected button
-              color: Colors.black,  // Default text color
-              borderRadius: BorderRadius.circular(8),
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Coins'),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Market Analysis'),
-                ),
-              ],
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue, // AppBar background color
+      appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -276,7 +247,58 @@ class TrendspageState extends State<Trendspage> {
               ? const Center(child: Text("No coin data available"))
               : Column(
                   children: [
-                    if (selectedIndex == 1) buildMarketAnalysis(), // Show Market Analysis if selected
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Digital Currensee",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 1, 22, 36),
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                         ToggleButtons(
+  isSelected: [selectedIndex == 0, selectedIndex == 1, selectedIndex == 2],
+  onPressed: (index) {
+    setState(() {
+      selectedIndex = index;
+    });
+    // News page
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MarketNewsPage()), 
+      );
+    }
+  },
+  selectedColor: Colors.white,
+  selectedBorderColor: Colors.green,
+  fillColor: Colors.green,
+  color: Colors.black,
+  borderRadius: BorderRadius.circular(8),
+  children: const [
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text('Coins'),
+    ),
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text('Market Analysis'),
+    ),
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text('News'),
+    ),
+  ],
+),
+
+                        ],
+                      ),
+                    ),
+                    if (selectedIndex == 1) buildMarketAnalysis(),
                     Expanded(
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -288,6 +310,8 @@ class TrendspageState extends State<Trendspage> {
                     ),
                   ],
                 ),
+                           bottomNavigationBar: BottomNavBar(),
+
     );
   }
 }

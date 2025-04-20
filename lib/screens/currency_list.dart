@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:currensee/components/bottom_navbar.dart';
+import 'package:currensee/components/my_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,6 +29,8 @@ class _CurrencyListState extends State<CurrencyList> {
   String baseCurrency = ""; 
   String lastUpdated = '';
   String nextUpdate = '';
+    bool notificationsEnabled = false;
+
 
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -63,10 +66,21 @@ class _CurrencyListState extends State<CurrencyList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu, color: Colors.white)),
-        backgroundColor: const Color(0xFF388E3C),
-        title: Text("All Currencies", style: TextStyle(color: Colors.white)),
+     appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
    body: Padding(
   padding: EdgeInsets.symmetric(horizontal: 20),

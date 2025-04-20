@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/screens/currencyhistory.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -326,6 +327,8 @@ class _ChartsState extends State<Charts> {
                 ),
               ),
             ),
+                       bottomNavigationBar: BottomNavBar(),
+
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:currensee/components/bottom_navbar.dart';
+import 'package:currensee/components/my_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,45 +11,55 @@ class FeedbackScreen extends StatefulWidget {
 }
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
+  bool notificationsEnabled = false;
 
-final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
-
-  TextEditingController fullnameController= TextEditingController();
+  TextEditingController fullnameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController feedbackController = TextEditingController();
 
   sendFeedback() async {
-      if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
+      String fullname = fullnameController.text;
+      String email = emailController.text;
+      String feedback = feedbackController.text;
 
-    String fullname = fullnameController.text;
-    String email = emailController.text;
-    String feedback = feedbackController.text;
-  
-
-    try {
-      await FirebaseFirestore.instance.collection('feedbacks').add({
-        'fullname': fullname,
-        'email': email,
-        'feedback': feedback,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feedback sent successfully")));
-      fullnameController.clear();
-      emailController.clear();
-      feedbackController.clear();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      try {
+        await FirebaseFirestore.instance.collection('feedbacks').add({
+          'fullname': fullname,
+          'email': email,
+          'feedback': feedback,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feedback sent successfully")));
+        fullnameController.clear();
+        emailController.clear();
+        feedbackController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      }
     }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu, color: Colors.white)),
-        backgroundColor: const Color(0xFF388E3C),
-        title: Text("Feedback", style: TextStyle(color: Colors.white)),
+      appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
       body: Form(
         key: _formKey,
@@ -56,15 +67,24 @@ final _formKey = GlobalKey<FormState>();
           padding: const EdgeInsets.all(16),
           children: [
             SizedBox(height: 20),
+            Text(
+              "Feedback",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF388E3C),
+              ),
+            ),
+            SizedBox(height: 20),
             TextFormField(
               controller: fullnameController,
               decoration: InputDecoration(
                 label: Text('Fullname'),
                 hintText: 'Enter Your Fullname',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person_outlined,color: Color(0xFF388E3C)),
+                prefixIcon: Icon(Icons.person_outlined, color: Color(0xFF388E3C)),
               ),
-               validator: (value) {
+              validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your fullname';
                 }
@@ -78,13 +98,13 @@ final _formKey = GlobalKey<FormState>();
                 label: Text('Email'),
                 hintText: 'Enter Your Email',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email_outlined,color: Color(0xFF388E3C)),
+                prefixIcon: Icon(Icons.email_outlined, color: Color(0xFF388E3C)),
               ),
-               validator: (value) {
+              validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
                 }
-               
+
                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
                   return 'Please enter a valid email address';
                 }
@@ -99,9 +119,9 @@ final _formKey = GlobalKey<FormState>();
                 label: Text('Feedback'),
                 hintText: 'Write Feedback',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.feedback_outlined,color: Color(0xFF388E3C)),
+                prefixIcon: Icon(Icons.feedback_outlined, color: Color(0xFF388E3C)),
               ),
-                validator: (value) {
+              validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your message';
                 }
@@ -116,17 +136,15 @@ final _formKey = GlobalKey<FormState>();
               ),
               child: Center(child: Text("Send", style: TextStyle(fontSize: 16, color: Colors.white))),
             ),
-              SizedBox(height: 30),
+            SizedBox(height: 30),
             Divider(thickness: 1, color: Colors.grey.shade400),
-        SizedBox(height: 30),
-        
-          
-        Center(
-          child: Text(
-            "Users Feedbacks",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: const Color(0xFF388E3C)),
-          ),
-        ),
+            SizedBox(height: 30),
+            Center(
+              child: Text(
+                "Users Feedbacks",
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: const Color(0xFF388E3C)),
+              ),
+            ),
             SizedBox(height: 20),
             SizedBox(
               height: 400,
@@ -171,7 +189,7 @@ final _formKey = GlobalKey<FormState>();
           ],
         ),
       ),
-        bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

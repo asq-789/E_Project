@@ -1,3 +1,5 @@
+import 'package:currensee/components/bottom_navbar.dart';
+import 'package:currensee/components/my_appbar.dart';
 import 'package:currensee/screens/TrendsPage.dart';
 import 'package:flutter/material.dart';
 
@@ -208,6 +210,7 @@ final List<Map<String, dynamic>> marketNews = [
     "date": "2025-04-04"
   }
 ];
+
 class MarketNewsPage extends StatefulWidget {
   const MarketNewsPage({Key? key}) : super(key: key);
 
@@ -218,11 +221,12 @@ class MarketNewsPage extends StatefulWidget {
 class _MarketNewsPageState extends State<MarketNewsPage> {
   bool isLoading = true;
   int selectedIndex = 0; // 0 for Articles, 1 for Trends
+  bool notificationsEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         isLoading = false;
       });
@@ -242,35 +246,68 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Currency Market News'),
-        backgroundColor: Colors.blueAccent,
+      appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
       body: Column(
         children: [
-          // Toggle Buttons for Articles and Trends
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ToggleButtons(
-              isSelected: [selectedIndex == 0, selectedIndex == 1],
-              onPressed: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Articles'),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "News",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 1, 22, 36),
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+                // Toggle Buttons for Articles and Trends
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Trends'),
+                  padding: const EdgeInsets.all(8.0),
+                  child: ToggleButtons(
+                    isSelected: [selectedIndex == 0, selectedIndex == 1],
+                    onPressed: (index) {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                    },
+                    selectedColor: Colors.white,
+                            selectedBorderColor: Colors.green,
+                            fillColor: Colors.green,
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(8),
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Text('News'),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Text('Trends'),
+                              ),
+                            ],
+                    
+                  ),
                 ),
               ],
             ),
           ),
-
           // Render Articles
           selectedIndex == 0
               ? Expanded(
@@ -283,11 +320,16 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                             return Card(
                               margin: const EdgeInsets.all(10),
                               elevation: 5,
+                              color: Theme.of(context).cardColor, // Updated to theme color
                               child: ListTile(
-                                title: Text(news['title'],
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
+                                title: Text(
+                                  news['title'],
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).textTheme.headlineLarge!.color, // Updated to theme color
+                                  ),
+                                ),
                                 subtitle: Text(news['description']),
                                 trailing: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -325,12 +367,24 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
               : Container(), // This part won't be visible since it's handled by navigation directly to Trendspage
         ],
       ),
+                 bottomNavigationBar: BottomNavBar(),
+
     );
   }
 }
 
 void main() {
   runApp(MaterialApp(
+    theme: ThemeData(
+      primaryColor: Colors.blue, // Set the primary color for the app
+      scaffoldBackgroundColor: Colors.grey[100], // Set background color for the scaffold
+      textTheme: TextTheme(
+        headlineLarge: TextStyle(color: Colors.black), // Text style for titles
+        bodyMedium: TextStyle(color: Colors.black87), // Body text style
+      ),
+      cardColor: Colors.white, // Card background color
+      buttonTheme: ButtonThemeData(buttonColor: Colors.blue), // Button color
+    ),
     home: MarketNewsPage(),
   ));
 }
