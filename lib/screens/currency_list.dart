@@ -42,7 +42,7 @@ class _CurrencyListState extends State<CurrencyList> {
     final currency = doc['baseCurrency'];
     baseCurrency = currency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 

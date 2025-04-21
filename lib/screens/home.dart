@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getcurrencies() async {
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/USD');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/USD');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getRate() async {
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$fromCurrency');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (amountController.text.isEmpty) return;
     amount = double.tryParse(amountController.text) ?? 0.0;
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$fromCurrency');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {

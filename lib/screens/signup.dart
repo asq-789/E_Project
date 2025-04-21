@@ -19,7 +19,7 @@ class _SignupState extends State<Signup> {
   }
 
   Future<void> getData() async {
-    var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/USD');
+    var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/USD');
     var response = await http.get(url);
     var data = jsonDecode(response.body);
     setState(() {
