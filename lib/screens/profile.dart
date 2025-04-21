@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/components/my_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -275,6 +276,7 @@ editCurrency() => showEditDialog('baseCurrency', baseCurrency ?? '');
                   ),
                 ),
               ),
+               bottomNavigationBar: BottomNavBar(),
     );
   }
 }

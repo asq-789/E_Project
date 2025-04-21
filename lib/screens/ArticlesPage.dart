@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -52,7 +53,7 @@ getProducts()async{
           },
         ),
       ),
-
+ bottomNavigationBar: BottomNavBar(),
     );
   }
 }

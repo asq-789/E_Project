@@ -90,7 +90,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
+               SizedBox(height: 20),
               Text(
                 "Give Us Your Feedback",
                 style: TextStyle(
@@ -100,14 +100,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
+               SizedBox(height: 30),
               TextFormField(
                 controller: fullnameController,
                 decoration: _inputDecoration('Full Name', Icons.person_outline),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter your fullname' : null,
               ),
-              const SizedBox(height: 20),
+               SizedBox(height: 20),
               TextFormField(
                 controller: emailController,
                 decoration: _inputDecoration('Email Address', Icons.email_outlined),
@@ -119,7 +119,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+               SizedBox(height: 20),
               TextFormField(
                 controller: feedbackController,
                 maxLines: 5,
@@ -127,7 +127,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter your message' : null,
               ),
-              const SizedBox(height: 30),
+               SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

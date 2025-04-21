@@ -91,14 +91,57 @@ class _SignupState extends State<Signup> {
     }
   }
 
+  InputDecoration _inputDecoration(String label, String hint, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Color(0xFF388E3C)),
+      hintText: hint,
+       hintStyle: TextStyle(color: Colors.grey[600], fontSize: 15),
+      suffixIcon: Icon(icon, color: Colors.grey,size:18),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Color(0xFF388E3C)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Color(0xFF388E3C), width: 1.5),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView( 
+            child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24), bottom: Radius.circular(24)),
+             boxShadow: [
+                BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 12,
+                  spreadRadius: 4,
+                  offset: Offset(0, 6),
+                ),
+              ], ),
         padding: const EdgeInsets.all(24.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+
         child: Form(
           key: _formKey,
           child: Column(
+           
             mainAxisSize: MainAxisSize.min,
             children: [
              Align(
@@ -114,18 +157,28 @@ Align(
     "Hello there, create a profile",
     style: TextStyle(fontSize: 18, color: Colors.black),
   ),
+),SizedBox(height: 40), 
+       Container(
+  decoration: BoxDecoration(
+    color: const Color.fromARGB(255, 196, 233, 199),
+    borderRadius: BorderRadius.circular(70),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.grey.withOpacity(0.6),
+        spreadRadius: 1,
+        blurRadius: 8,
+        offset: const Offset(0, 5),
+      ),
+    ],
+  ),
+  padding: const EdgeInsets.all(22),
+  child: Icon(Icons.mobile_screen_share_outlined, color: Color.fromARGB(255, 64, 160, 69), size: 80),
 ),
-
               SizedBox(height: 40),
 
               TextFormField(
                 controller: usernameController,
-                decoration: InputDecoration(
-                  label: Text("Username", style: TextStyle(color: Color(0xFF388E3C))),
-                  hintText: "Enter your username",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey)),
-                  suffixIcon: Icon(Icons.person, color: Colors.grey, size: 18),
-                ),
+                decoration:  _inputDecoration('Username', 'Enter your username', Icons.person),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Username is required';
                   return null;
@@ -135,12 +188,7 @@ Align(
 
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(
-                  label: Text("Email", style: TextStyle(color: Color(0xFF388E3C))),
-                  hintText: "Enter your email",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey)),
-                  suffixIcon: Icon(Icons.email, color: Colors.grey, size: 18),
-                ),
+                decoration:  _inputDecoration('Email', 'Enter your email', Icons.email),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Please enter your email';
                   if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
@@ -154,12 +202,7 @@ Align(
               TextFormField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  label: Text("Phone Number", style: TextStyle(color: Color(0xFF388E3C))),
-                  hintText: "Enter your phone number",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey)),
-                  suffixIcon: Icon(Icons.phone, color: Colors.grey, size: 18),
-                ),
+                decoration: _inputDecoration('Phone Number', 'Enter your phone number', Icons.phone),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Phone number is required';
                   if (value.length < 10) return 'Enter a valid phone number';
@@ -180,12 +223,7 @@ Align(
     return TextFormField(
       controller: fieldController,
       focusNode: focusNode,
-      decoration: InputDecoration(
-        labelText: "Select Currency",
-        labelStyle: TextStyle(color: Color(0xFF388E3C)),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey)),
-        suffixIcon: Icon(Icons.currency_exchange, color: Colors.grey, size: 18),
-      ),
+      decoration: _inputDecoration('Currency', 'Select your currency', Icons.currency_exchange),
       validator: (value) => value == null || value.isEmpty ? "Please select your currency" : null,
     );
   },
@@ -224,51 +262,53 @@ Align(
 ),
   SizedBox(height: 30),
 
-              TextFormField(
-                controller: passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  label: Text("Password", style: TextStyle(color: Color(0xFF388E3C))),
-                  hintText: "Enter password",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey)),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.length < 6) return 'Minimum 6 characters required';
-                  return null;
-                },
-              ),
-              SizedBox(height: 30),
+        TextFormField(
+  controller: passwordController,
+  obscureText: _obscurePassword,
+  decoration: _inputDecoration('Password', 'Enter password', Icons.lock).copyWith(
+    suffixIcon: IconButton(
+      onPressed: () {
+        setState(() {
+          _obscurePassword = !_obscurePassword;
+        });
+      },
+      icon: Icon(
+        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+        color: Colors.grey,
+        size: 18,
+      ),
+    ),
+  ),
+  validator: (value) {
+    if (value == null || value.length < 6) return 'Minimum 6 characters required';
+    return null;
+  },
+),
+     SizedBox(height: 30),
 
-              TextFormField(
-                controller: confirmPasswordController,
-                obscureText: _obscureConfirmPassword,
-                decoration: InputDecoration(
-                  label: Text("Confirm Password", style: TextStyle(color: Color(0xFF388E3C))),
-                  hintText: "Re-enter your password",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey)),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-                    onPressed: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
-                    },
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Please confirm your password';
-                  return null;
-                },
-              ),
-              SizedBox(height: 40),
+         TextFormField(
+  controller: confirmPasswordController,
+  obscureText: _obscureConfirmPassword,
+  decoration: _inputDecoration('Confirm Password', 'Re-enter password', Icons.lock_outline).copyWith(
+    suffixIcon: IconButton(
+      onPressed: () {
+        setState(() {
+          _obscureConfirmPassword = !_obscureConfirmPassword;
+        });
+      },
+      icon: Icon(
+        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+        color: Colors.grey,
+        size: 18,
+      ),
+    ),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'Please confirm your password';
+    return null;
+  },
+),
+     SizedBox(height: 40),
 
              isLoading
   ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
@@ -285,7 +325,7 @@ Align(
       ),
     ),
 
-              SizedBox(height: 20),
+              SizedBox(height: 30),
 
              Row(
   mainAxisAlignment: MainAxisAlignment.center,
@@ -295,15 +335,16 @@ Align(
     GestureDetector(
       onTap: () => Navigator.pushNamed(context, "/login"),
       child: Text("Login", style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.bold)),
-    ),
-  ],
-),
-
-              SizedBox(height: 30),
-            ],
-          ),
+   ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),       SizedBox(height: 30),
+           ],
         ),
       ),
     );
   }
-}
+   }
