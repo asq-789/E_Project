@@ -75,7 +75,7 @@ Future<void> getCurrencyData() async {
     builder: (context) {
       return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Edit Currency'),
+        title: Text('Edit Currency',style: TextStyle(color:Color(0xFF388E3C),fontWeight:FontWeight.w500 ),),
         content: DropdownButtonFormField<String>(
           value: selectedCurrency,
           items: currencyList.map((currency) {
@@ -89,17 +89,29 @@ Future<void> getCurrencyData() async {
               selectedCurrency = value!;
             });
           },
-          decoration: InputDecoration(
-            labelText: "Select new currency",
-            border: OutlineInputBorder(),
-          ),
+         decoration: InputDecoration(
+  labelText: "Select new currency",
+  labelStyle: TextStyle(color: Color(0xFF388E3C)), 
+  border: OutlineInputBorder(
+    borderSide: BorderSide(color: Color(0xFF388E3C)), 
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Color(0xFF388E3C), width: 2), 
+  ),
+),
+
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            child: Text('Cancel',style: TextStyle(color:Color(0xFF388E3C) ),),
           ),
           ElevatedButton(
+             style: ElevatedButton.styleFrom(
+    backgroundColor: Color(0xFF388E3C), 
+    foregroundColor: Colors.white, 
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  ),
             onPressed: () async {
               final uid = FirebaseAuth.instance.currentUser?.uid;
               if (uid != null) {
@@ -112,7 +124,7 @@ Future<void> getCurrencyData() async {
                 });
               }
 
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); 
             },
             child: Text('Update'),
           ),
@@ -129,20 +141,32 @@ else {
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('Edit $field'),
+          title: Text('Edit $field',style: TextStyle(color:Color(0xFF388E3C),fontWeight:FontWeight.w500 ),),
           content: TextField(
             controller: controller,
-            decoration: InputDecoration(
-              labelText: "New $field",
-              border: OutlineInputBorder(),
-            ),
+           decoration: InputDecoration(
+  labelText: "New $field",
+  labelStyle: TextStyle(color: Color(0xFF388E3C)),
+  border: OutlineInputBorder(
+    borderSide: BorderSide(color: Color(0xFF388E3C)), 
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Color(0xFF388E3C), width: 2), 
+  ),
+),
+
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: Text('Cancel',style: TextStyle(color:Color(0xFF388E3C) ),),
             ),
             ElevatedButton(
+               style: ElevatedButton.styleFrom(
+    backgroundColor: Color(0xFF388E3C), 
+    foregroundColor: Colors.white, 
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  ),
               onPressed: () async {
                 final uid = FirebaseAuth.instance.currentUser?.uid;
                 if (uid != null) {
@@ -174,109 +198,117 @@ editPhone() => showEditDialog('phone', phone ?? '');
 editCurrency() => showEditDialog('baseCurrency', baseCurrency ?? '');
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-     appBar: CustomAppBar(
-        notificationsEnabled: notificationsEnabled,
-        onToggleNotifications: () {
-          setState(() {
-            notificationsEnabled = !notificationsEnabled;
-          });
-        },
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: CustomAppBar(
+      notificationsEnabled: notificationsEnabled,
+      onToggleNotifications: () {
+        setState(() {
+          notificationsEnabled = !notificationsEnabled;
+        });
+      },
+    ),
+    drawer: CustomDrawer(
+      notificationsEnabled: notificationsEnabled,
+      onNotificationsChanged: (bool value) {
+        setState(() {
+          notificationsEnabled = value;
+        });
+      },
+    ),
+    body: isLoading
+        ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              children: [
+                SizedBox(height: 15,),
+           Container(
+  decoration: BoxDecoration(
+    shape: BoxShape.circle,
+    boxShadow: [
+      BoxShadow(
+       color: Colors.grey.withOpacity(0.6),
+        spreadRadius: 1,
+        blurRadius: 8,
+        offset: const Offset(0, 5), 
       ),
-      drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
-      ),
-      body: isLoading
-  ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
-  :  Padding(
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundColor: Color.fromARGB(255, 238, 240, 238),
-                        child: Icon(
-                          Icons.person,
-                          size: 80,
-                          color: Color(0xFF388E3C),
-                        ),
-                      ),
-                      SizedBox(height: 30),
+    ],
+  ),
+  child: CircleAvatar(
+    radius: 60,
+    backgroundColor: const Color.fromARGB(255, 196, 233, 199),
+    child: Icon(
+      Icons.person,
+      size: 80,
+      color: Color(0xFF388E3C),
+    ),
+  ),
+),
 
-                      Column(
-                  
-                        children: [
-                          Row(
-                             mainAxisAlignment: MainAxisAlignment.center, 
-                            children: [
-                              Text(
-                                "Username: $username",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 15),
-                             IconButton(onPressed: editUsername,
-                              icon: Icon(Icons.edit , color:  Color(0xFF388E3C),)) ,
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                             mainAxisAlignment: MainAxisAlignment.center, 
-                            children: [
-                              Text(
-                                " Email: $email",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 15),
-                             IconButton(onPressed: editEmail,
-                              icon: Icon(Icons.edit, color:  Color(0xFF388E3C),)) ,
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                             mainAxisAlignment: MainAxisAlignment.center, 
-                            children: [
-                              Text(
-                                "Phone: $phone",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 15),
-
-                            IconButton(onPressed:editPhone,
-                             icon: Icon(Icons.edit, color:  Color(0xFF388E3C),)) ,
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                             mainAxisAlignment: MainAxisAlignment.center, 
-                            children: [
-                              Text(
-                                " Currency: $baseCurrency",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 15),
-
-                            IconButton(onPressed: 
-                               editCurrency
-                             , icon: Icon(Icons.edit, color:  Color(0xFF388E3C),)) ,
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
+                SizedBox(height: 25),
+                Text(
+                  username ?? 'User',
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF388E3C),
                   ),
                 ),
+                SizedBox(height: 30),
+
+                // User Detail Cards
+                buildProfileCard("Username", username ?? '', editUsername),
+                buildProfileCard("Email", email ?? '', editEmail),
+                buildProfileCard("Phone", phone ?? '', editPhone),
+                buildProfileCard("Base Currency", baseCurrency ?? '', editCurrency),
+              ],
+            ),
+          ),
+    bottomNavigationBar: BottomNavBar(),
+  );
+}
+}
+Widget buildProfileCard(String label, String value, VoidCallback onEdit) {
+  return Card(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevation: 4,
+    margin: EdgeInsets.symmetric(vertical: 12),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: "$label :  ",
+                  
+                    style: TextStyle(
+                      fontSize: 18, 
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF388E3C), 
+                    ),
+                  ),
+                  TextSpan(
+                    text: value,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
               ),
-               bottomNavigationBar: BottomNavBar(),
-    );
-  }
+            ),
+          ),
+          IconButton(
+            onPressed: onEdit,
+            icon: Icon(Icons.edit, color: Color(0xFF388E3C)),
+          ),
+        ],
+      ),
+    ),
+  );
 }
