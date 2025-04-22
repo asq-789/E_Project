@@ -60,6 +60,7 @@ messageController.clear();}
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Contact",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

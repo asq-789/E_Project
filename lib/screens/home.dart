@@ -120,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar:  CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Currency Converter",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

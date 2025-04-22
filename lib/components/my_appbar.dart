@@ -9,12 +9,14 @@ import 'package:currensee/helppage.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool notificationsEnabled;
   final VoidCallback onToggleNotifications;
+   String title="";
   
 
-  const CustomAppBar({
+   CustomAppBar({
     super.key,
     required this.notificationsEnabled,
     required this.onToggleNotifications,
+    required this.title,
   });
 
   @override
@@ -32,7 +34,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       backgroundColor: const Color(0xFF388E3C),
-      title: const Text("Currensee", style: TextStyle(color: Colors.white)),
+      title:  Text(title, style: TextStyle(color: Colors.white)),
       actions: [
         IconButton(
           icon: const Icon(Icons.trending_up, color: Colors.white),

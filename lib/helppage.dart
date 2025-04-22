@@ -97,6 +97,7 @@ class _HelpPageState extends State<HelpPage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Help Center",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

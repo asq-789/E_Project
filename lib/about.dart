@@ -47,6 +47,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "About Us",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

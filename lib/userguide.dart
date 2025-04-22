@@ -47,6 +47,7 @@ class _UserGuidePageState extends State<UserGuidePage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "User GUIDE",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

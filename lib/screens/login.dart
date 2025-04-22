@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -17,6 +18,7 @@ class _LoginState extends State<Login> {
   bool _obscurePassword = true;
 
   login() async {
+       final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (_formKey.currentState!.validate()) {
       setState(() => isLoading = true);
 
@@ -25,12 +27,13 @@ class _LoginState extends State<Login> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-
+  prefs.setBool("isLoggedIn",true);
+  print(prefs.getBool("isLoggedIn"));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
 
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/');
       } on FirebaseAuthException catch (e) {
         String errorMsg = e.code == 'user-not-found'
             ? 'No user found with this email.'

@@ -68,6 +68,7 @@ class _CurrencyListState extends State<CurrencyList> {
     return Scaffold(
      appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Currency List",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

@@ -19,6 +19,7 @@ class _LikedCurrrenciesState extends State<LikedCurrrencies> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Liked Currencies",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

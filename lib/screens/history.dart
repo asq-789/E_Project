@@ -37,6 +37,7 @@ Future<void> deleteHistoryItem(String documentId) async {
     return Scaffold(
        appBar:  CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "History",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

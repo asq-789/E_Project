@@ -203,6 +203,7 @@ Widget build(BuildContext context) {
   return Scaffold(
     appBar: CustomAppBar(
       notificationsEnabled: notificationsEnabled,
+       title: "Profile",
       onToggleNotifications: () {
         setState(() {
           notificationsEnabled = !notificationsEnabled;

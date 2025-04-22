@@ -248,6 +248,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Market News",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

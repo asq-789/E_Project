@@ -69,6 +69,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+        title:"Feedback",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;
