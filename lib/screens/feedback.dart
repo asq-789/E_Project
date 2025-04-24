@@ -41,13 +41,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     }
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
+ InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
+      labelStyle: TextStyle(color: Color(0xFF388E3C)),
       prefixIcon: Icon(icon, color: Color(0xFF388E3C)),
       filled: true,
-      fillColor: Colors.white,
-      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      fillColor: Color(0xFFF9F9F9),
+      contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Color(0xFF388E3C)),
@@ -62,6 +63,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -87,20 +89,32 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-               SizedBox(height: 20),
-              Text(
-                "Give Us Your Feedback",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF388E3C),
-                ),
-                textAlign: TextAlign.center,
-              ),
+               SizedBox(height: 15),
+             Text(
+  "Give Us Your Feedback",
+  style: TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    color: Color(0xFF388E3C),
+  ),
+  textAlign: TextAlign.center,
+),
+SizedBox(height: 4),
+Text(
+  "Your feedback is valuable to us. Help us improve!",
+  style: TextStyle(
+    fontSize: 15,
+     fontStyle: FontStyle.italic, 
+    color: Colors.black54,
+  ),
+  textAlign: TextAlign.center,
+),
+
+
                SizedBox(height: 30),
               TextFormField(
                 controller: fullnameController,
@@ -129,95 +143,206 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     value!.isEmpty ? 'Please enter your message' : null,
               ),
                SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: sendFeedback,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF388E3C),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text("Send",
-                      style: TextStyle(fontSize: 16, color: Colors.white)),
-                ),
-              ),
+         Container(
+  decoration: BoxDecoration(
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.2),
+        spreadRadius: 1,
+        blurRadius: 8,
+        offset: Offset(0, 4), 
+      ),
+    ],
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: sendFeedback,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF388E3C),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 0, 
+      ),
+      child: const Text(
+        "Send",
+        style: TextStyle(fontSize: 16, color: Colors.white),
+      ),
+    ),
+  ),
+),
+
               const SizedBox(height: 40),
-              Divider(thickness: 1, color: Colors.grey.shade300),
-              const SizedBox(height: 20),
+
+Column(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    Text(
+      "Users Feedbacks",
+      style: TextStyle(
+        fontSize: 26,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF388E3C),
+      ),
+      textAlign: TextAlign.center,
+    ),
+    const SizedBox(height: 6),
+    Text(
+      "See what others are saying about our app",
+      style: TextStyle(
+        fontSize: 15,
+        color: Colors.black54,
+        fontStyle: FontStyle.italic,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  ],
+),
+const SizedBox(height: 20),
+
+
+StreamBuilder(
+  stream: FirebaseFirestore.instance
+      .collection('feedbacks')
+      .orderBy('timestamp', descending: true)
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 60),
+        child: Center(
+          child: CircularProgressIndicator(color: Color(0xFF388E3C)),
+        ),
+      );
+    }
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: Text("No feedbacks submitted yet.")),
+      );
+    }
+return Column(
+  children: snapshot.data!.docs.map((doc) {
+    var data = doc.data() as Map;
+    Timestamp timestamp = data['timestamp'] ?? Timestamp.now();
+    DateTime date = timestamp.toDate();
+    String formattedDate = "${date.day}/${date.month}/${date.year}";
+    String name = data['fullname'] ?? '';
+    String initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+
+    int stars = data['stars'] ?? 5; 
+
+return Container(
+  width: double.infinity,
+  margin: const EdgeInsets.symmetric(vertical: 10),
+  padding: const EdgeInsets.all(16),
+  decoration: BoxDecoration(
+    color: const Color.fromARGB(255, 245, 243, 243),
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: const Color.fromARGB(255, 223, 222, 222)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black12,
+        blurRadius: 8,
+        offset: Offset(2, 4),
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: Color(0xFF388E3C),
+            child: Text(
+              initial,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(width: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                "Users Feedbacks",
+                name,
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                   color: Color(0xFF388E3C),
                 ),
-                textAlign: TextAlign.start,
               ),
-              const SizedBox(height: 20),
-              StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('feedbacks')
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 60),
-                      child: Center(
-                        child: CircularProgressIndicator(color: Color(0xFF388E3C)),
-                      ),
-                    );
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Center(child: Text("No feedbacks submitted yet.")),
-                    );
-                  }
-                  return Column(
-                    children: snapshot.data!.docs.map((doc) {
-                      var data = doc.data() as Map;
-                      Timestamp timestamp = data['timestamp'] ?? Timestamp.now();
-                      DateTime date = timestamp.toDate();
-                      String formattedDate =
-                          "${date.day}/${date.month}/${date.year}";
-                      return Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        child: Material(
-                          elevation: 4,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("${data['fullname'] ?? ''}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 16)),
-                                const SizedBox(height: 4),
-                                Text("Email: ${data['email'] ?? ''}",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black54)),
-                                const SizedBox(height: 8),
-                                Text(data['feedback'] ?? '',
-                                    style: TextStyle(fontSize: 14)),
-                                const SizedBox(height: 8),
-                                Text("Date: $formattedDate",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
+              SizedBox(height: 2),
+              Text(
+                "Email: ${data['email'] ?? ''}",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
               ),
+            ],
+          ),
+        ],
+      ),
+      SizedBox(height: 8),
+      Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '“ ${data['feedback'] ?? ''} ”',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Date: $formattedDate",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                Row(
+                  children: List.generate(
+                    5,
+                    (index) => Icon(
+                      Icons.star,
+                      color: index < stars
+                          ? Color(0xFF388E3C)
+                          : Colors.grey.shade300,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+);
+}).toList(),
+);
+
+},
+),
+
             ],
           ),
         ),

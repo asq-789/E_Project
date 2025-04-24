@@ -31,14 +31,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Currensee',
       theme: ThemeData(primarySwatch: Colors.indigo),
-    
-     home:  isLoggedIn ? HomeScreen() : Login(),
-initialRoute: '/Currensee',
+    // home: HomeScreen(),
+    home:  isLoggedIn ? HomeScreen() : Login(),
+// initialRoute: '/Currensee',
     routes: {
      '/Currensee': (context) => Currensee(),
        '/login': (context) =>  Login(),
         '/signup': (context) => Signup(),
-      //  '/home':(context)=> isLoggedIn ? HomeScreen() : Login(),
+     
         '/currencies':(context)=> isLoggedIn ? CurrencyList() : Login(),
           '/help': (context) => HomeScreen(),   
            '/exchangeratehistory':(context) => isLoggedIn ? Currencyhistory() : Login(),

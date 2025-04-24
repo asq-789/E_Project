@@ -78,62 +78,94 @@ itemBuilder: (context, index) {
   var timestamp = conversion['timestamp'].toDate();
   String formattedDate = DateFormat.yMMMd().add_jm().format(timestamp);
 
-  return Card(
-    margin: const EdgeInsets.only(bottom: 20),
-    elevation: 2,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Amount: $amount',
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-              SizedBox(height: 6),
-              Text(
-                '$fromCurrency → $toCurrency',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              SizedBox(height: 6),
-              Text(
-                'Rate: $rate',
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-              Text(
-                'Total: $total',
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-              SizedBox(height: 6),
-              Text(
-                formattedDate,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
-        
-          Positioned(
-            top: 2,
-            right: 2,
-            child: IconButton(
-              onPressed: () {
-                deleteHistoryItem(conversion.id);
-              },
-              icon: Icon(
-                Icons.close, 
-                color: Colors.grey[700],size: 18,
+return Card(
+  margin: const EdgeInsets.only(bottom: 16),
+  elevation: 4,
+  shadowColor: Colors.grey.withOpacity(0.2),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(16),
+  ),
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Amount: $amount',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '$fromCurrency → $toCurrency',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color(0xFF388E3C),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text('Rate: ',
+                          style: TextStyle(color: Colors.black54)),
+                      SizedBox(width: 4),
+                      Text('$rate', style: TextStyle(color: Colors.black87)),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text('Total: ',
+                          style: TextStyle(color: Colors.black54)),
+                      SizedBox(width: 4),
+                      Text('$total', style: TextStyle(color: Colors.black87)),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    deleteHistoryItem(conversion.id);
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    size: 18,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  formattedDate,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     ),
-  );
+  ),
+);
+
 },
 );
            }),
