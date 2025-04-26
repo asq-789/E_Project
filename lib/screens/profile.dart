@@ -249,14 +249,24 @@ Widget build(BuildContext context) {
 ),
 
                 SizedBox(height: 25),
-                Text(
-                  username ?? 'User',
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF388E3C),
-                  ),
-                ),
+                           Text(
+  username ?? 'User',
+  style: TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
+      ),
+    ],
+  ),
+  textAlign: TextAlign.center,
+),
+               
                 SizedBox(height: 30),
 
                 // User Detail Cards
@@ -267,7 +277,7 @@ Widget build(BuildContext context) {
               ],
             ),
           ),
-    bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
   );
 }
 }

@@ -104,11 +104,24 @@ class _ContactScreenState extends State<ContactScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 15),
-              Text(
-                "Contact Us",
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF388E3C)),
-                textAlign: TextAlign.center,
-              ),
+               Text(
+  "Contact Us",
+  style: TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
+      ),
+    ],
+  ),
+  textAlign: TextAlign.center,
+),
+
               SizedBox(height: 4),
               Text(
                 "We’d love to hear from you. Reach out any time!",
@@ -116,75 +129,114 @@ class _ContactScreenState extends State<ContactScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () => _launchURL('tel:+921234567890'),
-                          borderRadius: BorderRadius.circular(30),
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Color(0xFF388E3C),
-                              child: Icon(Icons.phone, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Text("Phone", style: TextStyle(color: Color(0xFF388E3C))),
-                        Text("+92 123 4567890", style: TextStyle(fontSize: 12)),
-                      ],
+         Row(
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  children: [
+    Expanded(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => _launchURL('tel:+921234567890'),
+            borderRadius: BorderRadius.circular(30),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
                     ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () => _launchURL('mailto:contact@email.com'),
-                          borderRadius: BorderRadius.circular(30),
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Color(0xFF388E3C),
-                              child: Icon(Icons.email, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Text("Email", style: TextStyle(color: Color(0xFF388E3C))),
-                        Text("contact@email.com", style: TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () => _launchURL('https://www.currensee.app'),
-                          borderRadius: BorderRadius.circular(30),
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Color(0xFF388E3C),
-                              child: Icon(Icons.language, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Text("Website", style: TextStyle(color: Color(0xFF388E3C))),
-                        Text("currensee.app", style: TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Color(0xFF388E3C),
+                  child: Icon(Icons.phone, color: Colors.white),
+                ),
               ),
-              const SizedBox(height: 30),
+            ),
+          ),
+          SizedBox(height: 6),
+          Text("Phone", style: TextStyle(color: Color(0xFF388E3C))),
+          Text("+92 123 4567890", style: TextStyle(fontSize: 12)),
+        ],
+      ),
+    ),
+    Expanded(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => _launchURL('mailto:contact@email.com'),
+            borderRadius: BorderRadius.circular(30),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Color(0xFF388E3C),
+                  child: Icon(Icons.email, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 6),
+          Text("Email", style: TextStyle(color: Color(0xFF388E3C))),
+          Text("contact@email.com", style: TextStyle(fontSize: 12)),
+        ],
+      ),
+    ),
+    Expanded(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => _launchURL('https://www.currensee.app'),
+            borderRadius: BorderRadius.circular(30),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Color(0xFF388E3C),
+                  child: Icon(Icons.language, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 6),
+          Text("Website", style: TextStyle(color: Color(0xFF388E3C))),
+          Text("currensee.app", style: TextStyle(fontSize: 12)),
+        ],
+      ),
+    ),
+  ],
+),
+SizedBox(height: 30),
 
               TextFormField(
                 controller: fullnameController,
@@ -219,10 +271,10 @@ class _ContactScreenState extends State<ContactScreen> {
   decoration: BoxDecoration(
     boxShadow: [
       BoxShadow(
-        color: Colors.black.withOpacity(0.2),
+        color: const Color.fromARGB(255, 56, 56, 56).withOpacity(0.2),
         spreadRadius: 1,
         blurRadius: 8,
-        offset: Offset(0, 4), // changes position of shadow
+        offset: Offset(0, 4), 
       ),
     ],
     borderRadius: BorderRadius.circular(12),
@@ -235,9 +287,9 @@ class _ContactScreenState extends State<ContactScreen> {
         backgroundColor: const Color(0xFF388E3C),
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(90),
         ),
-        elevation: 0, // no native elevation, we use custom shadow instead
+        elevation: 0, 
       ),
       child: const Text(
         "Send",
@@ -251,7 +303,7 @@ class _ContactScreenState extends State<ContactScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 3), 
     );
   }
 }

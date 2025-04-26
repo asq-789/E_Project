@@ -363,7 +363,7 @@ String baseCurrency = '';
                 ),
               ),
             ),
-          bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 1), 
 
     );
   }

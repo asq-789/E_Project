@@ -3,6 +3,7 @@ import 'package:currensee/faqs.dart';
 import 'package:currensee/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:currensee/components/my_appbar.dart';
+
 class UserGuidePage extends StatefulWidget {
   const UserGuidePage({super.key});
 
@@ -12,42 +13,15 @@ class UserGuidePage extends StatefulWidget {
 
 class _UserGuidePageState extends State<UserGuidePage> {
   int _selectedIndex = 0;
-   bool notificationsEnabled = false;
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navigate to the corresponding page based on selected index
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const HomeScreen())); // Home Screen
-        break;
-      case 1:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const FaqPage())); // FAQs Page
-        break;
-      case 2:
-        // Add your destination page for Currency List
-        break;
-      case 3:
-        // Add your destination page for Contact Us
-        break;
-      case 4:
-        // Add your destination page for Feedback
-        break;
-      default:
-        break;
-    }
-  }
+  bool notificationsEnabled = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Background safed clean
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
-         title: "User GUIDE",
+        title: "User Guide",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;
@@ -61,40 +35,128 @@ class _UserGuidePageState extends State<UserGuidePage> {
             notificationsEnabled = value;
           });
         },
-      ), body: SingleChildScrollView(
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(25), 
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      "Explore the Features of Currensee",
+                    
+  style: TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
+      ),
+    ],
+  ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "Your go-to app for seamless currency conversion.",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black54,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+           
+                  ],
+                ),
+              ),
+              SizedBox(height: 30),
+              GuideCard(
+                title: "Currency Conversion",
+                description:
+                    "Easily convert currencies by selecting the 'From' and 'To' currencies and entering the amount. Press 'Convert' to see the result instantly.",
+              ),
+              GuideCard(
+                title: "Swap Currencies",
+                description:
+                    "Tap the swap icon between the currency dropdowns to quickly swap 'From' and 'To' currencies.",
+              ),
+              GuideCard(
+                title: "Notifications",
+                description:
+                    "Enable notifications in settings to stay updated on significant exchange rate changes.",
+              ),
+              GuideCard(
+                title: "Settings & Preferences",
+                description:
+                    "Customize your preferences, manage notifications, and access your profile and conversion history.",
+              ),
+              GuideCard(
+                title: "Help & Support",
+                description:
+                    "Visit the Help Center from settings for FAQs or contact customer support directly for assistance.",
+              ),
+              SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
+    );
+  }
+}
+
+class GuideCard extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const GuideCard({
+    super.key,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Color(0xFF388E3C).withOpacity(0.3),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 30),
-            // Guide Content
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Welcome to the Currensee User Guide! Here you will find instructions on how to use the app.",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF388E3C),
               ),
             ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "1. **Currency Conversion:**\n"
-                "You can easily convert currencies by selecting the 'From' and 'To' currencies and entering the amount. Then, press 'Convert'. The result will be shown instantly.\n\n"
-                "2. **Swap Currencies:**\n"
-                "To swap the 'From' and 'To' currencies, tap the swap icon between the two currency dropdowns.\n\n"
-                "3. **Notifications:**\n"
-                "You can enable notifications in the settings to get notified about significant changes in the exchange rate.\n\n"
-                "4. **Settings & Preferences:**\n"
-                "Customize your preferences, including turning notifications on/off and accessing your profile or history.\n\n"
-                "5. **Help & Support:**\n"
-                "Access the Help Center from the settings menu to get answers to common questions or contact customer support for further assistance.",
-                style: TextStyle(fontSize: 16),
+            SizedBox(height: 10),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+                height: 1.5,
               ),
             ),
-            const SizedBox(height: 30),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

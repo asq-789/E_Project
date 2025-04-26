@@ -109,34 +109,28 @@ class _CurrencyListState extends State<CurrencyList> {
   children: [
     const SizedBox(height: 20),
     
-    const Text(
-      "Select Currencies",
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF388E3C),
-      ),
-    ),
-    const SizedBox(height: 10),
 
-    TextField(
-      controller: searchController,
-      decoration: InputDecoration(
-        hintText: "Search",
-        hintStyle: TextStyle(color: Colors.grey[600]),
-        prefixIcon: Icon(Icons.search, color: Color(0xFF388E3C)),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade300),
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+          hintText: "Search",
+          hintStyle: TextStyle(color: Colors.grey[600]),
+          prefixIcon: Icon(Icons.search, color: Color(0xFF388E3C)),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF388E3C)),
+          ),
         ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF388E3C)),
-        ),
+        onChanged: (value) {
+          setState(() {});
+        },
       ),
-      onChanged: (value) {
-        setState(() {});
-      },
     ),
-    const SizedBox(height: 10),
+    const SizedBox(height: 15),
 
             Expanded(
               child: ListView.builder(
@@ -150,20 +144,20 @@ class _CurrencyListState extends State<CurrencyList> {
                       shadowColor: Colors.green.shade100,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(18),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(currency.key, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                Text(currency.key, style: TextStyle(fontSize: 19,letterSpacing: 2, fontWeight: FontWeight.bold)),
                                 SizedBox(height: 7),
                                 Text(
                                   "1 $baseCurrency = ${currency.value.toString()} ${currency.key}",
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[700])
+                                  style: TextStyle(fontSize: 14, color: Color(0xFF388E3C), fontWeight: FontWeight.bold)
                                 ),
-                                SizedBox(height: 5),
+                                SizedBox(height: 7),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -180,7 +174,7 @@ class _CurrencyListState extends State<CurrencyList> {
       ? Icons.favorite
       : Icons.favorite_border,
   color: likedCurrencies.contains(currency.key)
-      ? Color(0xFF388E3C) // our theme green
+      ? Color(0xFF388E3C) 
       : null,
 ),
 
@@ -239,7 +233,7 @@ class _CurrencyListState extends State<CurrencyList> {
     },
   ),
 ),
-  bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 2), 
     );
   }
  }

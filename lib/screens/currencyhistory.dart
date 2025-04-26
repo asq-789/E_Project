@@ -155,7 +155,7 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
                 ],
               ),
             ),
-      bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
     );
   }
 }

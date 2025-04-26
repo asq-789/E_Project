@@ -311,7 +311,7 @@ class TrendspageState extends State<Trendspage> {
                     ),
                   ],
                 ),
-                           bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
 
     );
   }

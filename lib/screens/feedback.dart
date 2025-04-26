@@ -12,34 +12,48 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   bool notificationsEnabled = false;
+  int selectedStars = 0; 
+
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController fullnameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController feedbackController = TextEditingController();
 
-  sendFeedback() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseFirestore.instance.collection('feedbacks').add({
-          'fullname': fullnameController.text,
-          'email': emailController.text,
-          'feedback': feedbackController.text,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Feedback sent successfully")),
-        );
-        fullnameController.clear();
-        emailController.clear();
-        feedbackController.clear();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
-        );
-      }
+sendFeedback() async {
+  if (selectedStars == 0) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please select stars before submitting.")),
+    );
+    return; // Stop further execution
+  }
+
+  if (_formKey.currentState!.validate()) {
+    try {
+      await FirebaseFirestore.instance.collection('feedbacks').add({
+        'fullname': fullnameController.text,
+        'email': emailController.text,
+        'feedback': feedbackController.text,
+        'stars': selectedStars,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Feedback sent successfully")),
+      );
+      fullnameController.clear();
+      emailController.clear();
+      feedbackController.clear();
+      setState(() {
+        selectedStars = 0;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     }
   }
+}
 
  InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
@@ -94,15 +108,24 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
                SizedBox(height: 15),
-             Text(
+     Text(
   "Give Us Your Feedback",
   style: TextStyle(
     fontSize: 26,
     fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
     color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
+      ),
+    ],
   ),
   textAlign: TextAlign.center,
 ),
+
 SizedBox(height: 4),
 Text(
   "Your feedback is valuable to us. Help us improve!",
@@ -134,7 +157,7 @@ Text(
                   return null;
                 },
               ),
-               SizedBox(height: 20),
+                   SizedBox(height: 20),
               TextFormField(
                 controller: feedbackController,
                 maxLines: 5,
@@ -142,8 +165,36 @@ Text(
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter your message' : null,
               ),
-               SizedBox(height: 30),
-         Container(
+              SizedBox(height: 20),
+
+Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Column(
+      children: [
+     
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (index) {
+            return IconButton(
+              icon: Icon(
+                Icons.star,
+                color: index < selectedStars ? Color(0xFF388E3C) : Colors.grey.shade300,
+              ),
+              onPressed: () {
+                setState(() {
+                  selectedStars = index + 1;
+                });
+              },
+            );
+          }),
+        ),
+      ],
+    ),
+  ],
+),
+SizedBox(height: 30),
+     Container(
   decoration: BoxDecoration(
     boxShadow: [
       BoxShadow(
@@ -163,7 +214,7 @@ Text(
         backgroundColor: const Color(0xFF388E3C),
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(90),
         ),
         elevation: 0, 
       ),
@@ -181,14 +232,23 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.center,
   children: [
     Text(
-      "Users Feedbacks",
-      style: TextStyle(
-        fontSize: 26,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF388E3C),
+  "Users Feedback",
+  style: TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
       ),
-      textAlign: TextAlign.center,
-    ),
+    ],
+  ),
+  textAlign: TextAlign.center,
+),
+
     const SizedBox(height: 6),
     Text(
       "See what others are saying about our app",
@@ -313,21 +373,18 @@ return Container(
                 Text(
                   "Date: $formattedDate",
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[700],
+                                       fontSize: 12,
+                    color: Colors.grey,
                   ),
                 ),
                 Row(
-                  children: List.generate(
-                    5,
-                    (index) => Icon(
+                  children: List.generate(5, (index) {
+                    return Icon(
                       Icons.star,
-                      color: index < stars
-                          ? Color(0xFF388E3C)
-                          : Colors.grey.shade300,
                       size: 18,
-                    ),
-                  ),
+                      color: index < stars ? Color(0xFF388E3C) : Colors.grey.shade300,
+                    );
+                  }),
                 ),
               ],
             ),
@@ -337,17 +394,17 @@ return Container(
     ],
   ),
 );
-}).toList(),
+  }).toList(),
 );
-
-},
+  },
 ),
+
 
             ],
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 4), 
     );
   }
 }

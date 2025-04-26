@@ -368,7 +368,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
               : Container(), // This part won't be visible since it's handled by navigation directly to Trendspage
         ],
       ),
-                 bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
 
     );
   }

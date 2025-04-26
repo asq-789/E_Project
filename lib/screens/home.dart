@@ -15,13 +15,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   double amount = 0.0;
-  String fromCurrency = 'USD';
+  String fromCurrency = '';
   String toCurrency = 'PKR';
   double rate = 0.0;
   double total = 0.0;
 
   TextEditingController amountController = TextEditingController();
   List<String> currencies = [];
+    List<String> likedCurrencies = [];
+
   bool notificationsEnabled = false;
 
   @override
@@ -32,24 +34,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchUserData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-        if (snapshot.exists && snapshot.data() != null) {
-          var data = snapshot.data() as Map<String, dynamic>;
-          String? base = data['baseCurrency'];
-          if (base != null && base.isNotEmpty) {
-            setState(() {
-              fromCurrency = base;
-            });
-          }
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (snapshot.exists && snapshot.data() != null) {
+        var data = snapshot.data() as Map<String, dynamic>;
+        String? base = data['baseCurrency'];
+        List<dynamic>? liked = data['likedCurrencies']; // Assuming liked currencies are saved in a list field
+
+        if (base != null && base.isNotEmpty) {
+          setState(() {
+            fromCurrency = base;
+          });
         }
-      } catch (e) {
-        print("Error loading base currency: $e");
+        if (liked != null) {
+          setState(() {
+            likedCurrencies = List<String>.from(liked);
+          });
+        }
       }
+    } catch (e) {
+      print("Error loading user data: $e");
     }
   }
+}
 
   Future<void> conversionsHistory() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -103,8 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
   return InputDecoration(
     labelText: label,
     labelStyle: TextStyle(
-      fontWeight: FontWeight.w600,
-      color: Color(0xFF388E3C), // Applied theme color here
+      fontWeight: FontWeight.w500,
+      color: Color(0xFF388E3C), 
     ),
     prefixIcon: Icon(icon, color: Color(0xFF388E3C)),
     filled: true,
@@ -164,6 +173,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+     List<String> combinedCurrencies = [
+    ...likedCurrencies,
+    ...currencies.where((currency) => !likedCurrencies.contains(currency)),
+  ];
+
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
@@ -191,7 +205,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(height: 20),
-                      Center(child: Text("Welcome to Currensee! 💱", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
+                      Center(child: 
+                          Text(
+  "Welcome to Currensee! 💱",
+  style: TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
+      ),
+    ],
+  ),
+  textAlign: TextAlign.center,
+),
+
+                      ),
                       Center(child: Text("Ready to convert some currencies?", style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]))),
                       SizedBox(height: 30),
                       TextField(
@@ -206,9 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: DropdownButtonFormField<String>(
                               value: currencies.contains(fromCurrency) ? fromCurrency : null,
                               decoration: _inputDecoration("From", Icons.arrow_downward),
-                              items: currencies.map((currency) {
-                                return DropdownMenuItem(value: currency, child: Text(currency));
-                              }).toList(),
+                              items: combinedCurrencies.map((currency) {
+  return DropdownMenuItem(value: currency, child: Text(currency));
+}).toList(),
+
                               onChanged: (newValue) {
                                 setState(() {
                                   fromCurrency = newValue!;
@@ -223,17 +257,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: DropdownButtonFormField<String>(
                               value: currencies.contains(toCurrency) ? toCurrency : null,
                               decoration: _inputDecoration("To", Icons.arrow_upward),
-                              items: currencies.map((currency) {
-                                return DropdownMenuItem(
-  value: currency,
-  child: Text(
-    currency,
-    overflow: TextOverflow.ellipsis,
-    style: TextStyle(fontWeight: FontWeight.w500),
-  ),
-);
+                              items: combinedCurrencies.map((currency) {
+  return DropdownMenuItem(value: currency, child: Text(currency,  overflow: TextOverflow.ellipsis,
+    style: TextStyle(fontWeight: FontWeight.w500),));
+}).toList(),
 
-                              }).toList(),
+  
                               onChanged: (newValue) {
                                 setState(() {
                                   toCurrency = newValue!;
@@ -256,21 +285,22 @@ class _HomeScreenState extends State<HomeScreen> {
     backgroundColor: const Color(0xFF388E3C),
     padding: const EdgeInsets.symmetric(vertical: 16),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(90),
     ),
     elevation: 4,
     shadowColor: const Color(0x55388E3C), // soft green glow
   ),
-  child: const Text(
-    "Convert",
-    style: TextStyle(
-      fontSize: 16,
-      color: Colors.white,
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.5,
-    ),
+ child: const Text(
+  "Convert",
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
   ),
 ),
+),
+
+
  SizedBox(height: 30),
                  
 Container(
@@ -291,14 +321,23 @@ Container(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Center(
-        child: Text(
-          "Top Currencies",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF388E3C),
-          ),
-        ),
+        child:            Text(
+  "Top Currencies",
+  style: TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
+    shadows: [
+      Shadow(
+        offset: Offset(2, 2),
+        blurRadius: 3,
+        color: const Color.fromARGB(66, 114, 114, 113),
+      ),
+    ],
+  ),
+  textAlign: TextAlign.center,
+),
       ),
       SizedBox(height: 10),
       FutureBuilder(
@@ -356,7 +395,7 @@ Container(
                 ),
               ),
     
-      bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
     );
   }
 }

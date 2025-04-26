@@ -53,7 +53,7 @@ getProducts()async{
           },
         ),
       ),
- bottomNavigationBar: BottomNavBar(),
+bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
     );
   }
 }

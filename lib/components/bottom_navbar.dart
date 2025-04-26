@@ -5,15 +5,27 @@ import 'package:currensee/screens/feedback.dart';
 import 'package:currensee/screens/home.dart';
 import 'package:flutter/material.dart';
 
+
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({super.key});
+  final int currentIndex;
+  const BottomNavBar({super.key, required this.currentIndex});
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
 }
 
+
+
 class _BottomNavBarState extends State<BottomNavBar> {
-   int _selectedIndex = 0;
+
+
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.currentIndex; 
+  }
      void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -52,6 +64,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(icon: Icon(Icons.contact_mail), label: "Contact Us"),
           BottomNavigationBarItem(icon: Icon(Icons.feedback), label: "Feedback"),
         ],
-      );();
+      );
   }
 }
