@@ -76,6 +76,7 @@ class FaqPage extends StatelessWidget {
 }
 
 class FaqItem extends StatelessWidget {
+  
   final String question;
   final String answer;
 
