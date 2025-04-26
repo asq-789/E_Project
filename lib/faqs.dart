@@ -1,3 +1,4 @@
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:flutter/material.dart';
 
 class FaqPage extends StatelessWidget {
@@ -71,7 +72,7 @@ class FaqPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+     bottomNavigationBar: BottomNavBar(),);
   }
 }
 

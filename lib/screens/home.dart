@@ -19,7 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String toCurrency = 'PKR';
   double rate = 0.0;
   double total = 0.0;
-  bool isSaved = false;
 
   TextEditingController amountController = TextEditingController();
   List<String> currencies = [];
@@ -36,8 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        DocumentSnapshot snapshot =
-            await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
         if (snapshot.exists && snapshot.data() != null) {
           var data = snapshot.data() as Map<String, dynamic>;
           String? base = data['baseCurrency'];
@@ -53,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  conversionsHistory() async {
+  Future<void> conversionsHistory() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
@@ -61,8 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
           'amount': amount,
           'from_currency': fromCurrency,
           'to_currency': toCurrency,
-          'rate': rate.toStringAsFixed(2),  // Rounded to 2 decimal places
-          'total': total.toStringAsFixed(2),  // Rounded to 2 decimal places
+          'rate': rate.toStringAsFixed(2),
+          'total': total.toStringAsFixed(2),
           'timestamp': FieldValue.serverTimestamp(),
         });
       } catch (e) {
@@ -73,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getcurrencies() async {
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/USD');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/USD');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -84,42 +82,92 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> getRate() async {
-    try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$fromCurrency');
-      var response = await http.get(url);
-      var data = jsonDecode(response.body);
-      setState(() {
-        rate = data["conversion_rates"][toCurrency];
-      });
-    } catch (e) {
-      print("Error fetching rate: $e");
-    }
-  }
-
   getRateAndConvert() async {
     if (amountController.text.isEmpty) return;
     amount = double.tryParse(amountController.text) ?? 0.0;
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$fromCurrency');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
         rate = data['conversion_rates'][toCurrency];
         total = amount * rate;
       });
+      _showConversionPopup();
     } catch (e) {
       print("Error converting rate: $e");
     }
   }
 
- 
-  // Appbar
+  InputDecoration _inputDecoration(String label, IconData icon) {
+  return InputDecoration(
+    labelText: label,
+    labelStyle: TextStyle(
+      fontWeight: FontWeight.w600,
+      color: Color(0xFF388E3C), // Applied theme color here
+    ),
+    prefixIcon: Icon(icon, color: Color(0xFF388E3C)),
+    filled: true,
+    fillColor: Colors.grey[100],
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Color(0xFF388E3C), width: 2),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey[400]!),
+    ),
+  );
+}
+
+ void _showConversionPopup() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text("Conversion Result", style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("1 $fromCurrency = ${rate.toStringAsFixed(2)} $toCurrency",
+                style: TextStyle(color: Colors.grey[700])),
+            SizedBox(height: 10),
+            Text("$amount $fromCurrency = ${total.toStringAsFixed(2)} $toCurrency",
+                style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text("Cancel", style: TextStyle(color: Color(0xFF388E3C))),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton.icon(
+            onPressed: () async {
+              await conversionsHistory();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Conversion saved!")));
+            },
+           
+            label: Text("Save"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF388E3C),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  CustomAppBar(
+      appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+        title: "Currency Converter",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;
@@ -134,161 +182,181 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: currencies.isEmpty
+      body: currencies.isEmpty
             ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
             : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 20),
-                    Text(
-                      "Welcome to Currensee! 💱",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 30),
-                    TextField(
-                      controller: amountController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        label: Text("Amount"),
-                        hintText: "Enter Amount",
-                        border: OutlineInputBorder(),
+                child: Padding(
+                  padding: const EdgeInsets.all(25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 20),
+                      Center(child: Text("Welcome to Currensee! 💱", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
+                      Center(child: Text("Ready to convert some currencies?", style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]))),
+                      SizedBox(height: 30),
+                      TextField(
+                        controller: amountController,
+                        keyboardType: TextInputType.number,
+                        decoration: _inputDecoration("Amount", Icons.attach_money),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            value: currencies.contains(fromCurrency) ? fromCurrency : null,
-                            decoration: InputDecoration(label: Text("From"), border: OutlineInputBorder()),
-                            items: currencies.map((currency) {
-                              return DropdownMenuItem(value: currency, child: Text(currency));
-                            }).toList(),
-                            onChanged: (newValue) {
-                              setState(() {
-                                fromCurrency = newValue!;
-                              });
-                            },
+                      SizedBox(height: 30),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: currencies.contains(fromCurrency) ? fromCurrency : null,
+                              decoration: _inputDecoration("From", Icons.arrow_downward),
+                              items: currencies.map((currency) {
+                                return DropdownMenuItem(value: currency, child: Text(currency));
+                              }).toList(),
+                              onChanged: (newValue) {
+                                setState(() {
+                                  fromCurrency = newValue!;
+                                });
+                              },
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 5,),
-                        Icon(Icons.arrow_forward, size: 22),
-                         SizedBox(width: 5,),
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            value: currencies.contains(toCurrency) ? toCurrency : null,
-                            decoration: InputDecoration(label: Text("To"), border: OutlineInputBorder()),
-                            items: currencies.map((currency) {
-                              return DropdownMenuItem(value: currency, child: Text(currency));
-                            }).toList(),
-                            onChanged: (newValue) {
-                              setState(() {
-                                toCurrency = newValue!;
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (amountController.text.isEmpty || double.tryParse(amountController.text) == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Please enter a valid amount")),
-                          );
-                          return;
-                        }
+                          const SizedBox(width: 10),
+                          Icon(Icons.swap_horiz, color: Colors.grey),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: currencies.contains(toCurrency) ? toCurrency : null,
+                              decoration: _inputDecoration("To", Icons.arrow_upward),
+                              items: currencies.map((currency) {
+                                return DropdownMenuItem(
+  value: currency,
+  child: Text(
+    currency,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(fontWeight: FontWeight.w500),
+  ),
+);
 
-                        getRateAndConvert();
-                      },
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF388E3C)),
-                      child: Text("Convert", style: TextStyle(fontSize: 16, color: Colors.white)),
-                    ),
-                    SizedBox(height: 20),
-                    if (rate != 0.0 && !isSaved)
-                      Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "1 $fromCurrency = ${rate.toStringAsFixed(2)} $toCurrency",
-                                          style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          "$amount $fromCurrency = ${total.toStringAsFixed(2)} $toCurrency",
-                                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 11.0, left: 10.0),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          await conversionsHistory();
-                                          setState(() {
-                                            isSaved = true;
-                                          });
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text("Conversion saved!")),
-                                          );
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          side: BorderSide(color: Color(0xFF388E3C)),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "Save",
-                                          style: TextStyle(color: Color(0xFF388E3C)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              }).toList(),
+                              onChanged: (newValue) {
+                                setState(() {
+                                  toCurrency = newValue!;
+                                });
+                              },
                             ),
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: InkWell(
-                                                               onTap: () {
-                                  setState(() {
-                                    rate = 0.0;
-                                    total = 0.0;
-                                    isSaved = false;
-                                    amountController.clear();
-                                  });
-                                },
-                                child: Icon(Icons.close, color: Colors.grey,size: 16,),
-                              ),
-                            ),
-                          ],
-                        ),
+                          )
+                        ],
                       ),
-                  ],
+                      SizedBox(height: 30),
+                     ElevatedButton(
+  onPressed: () {
+    if (amountController.text.isEmpty || double.tryParse(amountController.text) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a valid amount")));
+      return;
+    }
+    getRateAndConvert();
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF388E3C),
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    elevation: 4,
+    shadowColor: const Color(0x55388E3C), // soft green glow
+  ),
+  child: const Text(
+    "Convert",
+    style: TextStyle(
+      fontSize: 16,
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.5,
+    ),
+  ),
+),
+ SizedBox(height: 30),
+                 
+Container(
+  decoration: BoxDecoration(
+    color: Color.fromARGB(136, 161, 226, 166), // light theme background
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: const Color.fromARGB(255, 116, 114, 114).withOpacity(0.1),
+        spreadRadius: 2,
+        blurRadius: 8,
+        offset: Offset(0, 3),
+      ),
+    ],
+  ),
+  padding: EdgeInsets.all(16),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Center(
+        child: Text(
+          "Top Currencies",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF388E3C),
+          ),
+        ),
+      ),
+      SizedBox(height: 10),
+      FutureBuilder(
+        future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency')),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));
+          } else if (snapshot.hasError || !snapshot.hasData) {
+            return Text("Failed to load top currencies", style: TextStyle(color: Colors.red));
+          } else {
+            var data = jsonDecode(snapshot.data!.body);
+            Map<String, dynamic> rates = data['conversion_rates'];
+            List<String> topList = ['USD', 'EUR', 'GBP', 'PKR', 'INR'];
+
+            return Column(
+              children: [
+                ...topList.map((code) {
+                  return Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 4, // slight elevation for card shadow
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    child: ListTile(
+                      title: Text(
+                        "1 $fromCurrency = ${rates[code].toStringAsFixed(2)} $code",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      trailing: Icon(Icons.star_border, color: Colors.grey),
+                    ),
+                  );
+                }).toList(),
+                SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/currencies');
+                    },
+                    icon: Icon(Icons.arrow_forward, color: Color(0xFF388E3C)),
+                    label: Text(
+                      "View More",
+                      style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    ],
+  ),
+),
+ ],
+                  ),
                 ),
               ),
-      ),
-           bottomNavigationBar: BottomNavBar(),
+    
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

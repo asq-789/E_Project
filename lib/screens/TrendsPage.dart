@@ -227,6 +227,7 @@ class TrendspageState extends State<Trendspage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Trends",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;

@@ -1,7 +1,8 @@
+import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/faqs.dart';
 import 'package:currensee/screens/home.dart';
 import 'package:flutter/material.dart';
-
+import 'package:currensee/components/my_appbar.dart';
 class UserGuidePage extends StatefulWidget {
   const UserGuidePage({super.key});
 
@@ -11,7 +12,7 @@ class UserGuidePage extends StatefulWidget {
 
 class _UserGuidePageState extends State<UserGuidePage> {
   int _selectedIndex = 0;
-
+   bool notificationsEnabled = false;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -44,27 +45,23 @@ class _UserGuidePageState extends State<UserGuidePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("User Guide", style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF388E3C),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.favorite_border, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.settings, color: Colors.white),
-            onPressed: () {
-              // You can open the settings page or menu
-            },
-          ),
-        ],
+      appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+         title: "User GUIDE",
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
       ),
-      body: SingleChildScrollView(
+      drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
+      ), body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 30),
@@ -97,35 +94,7 @@ class _UserGuidePageState extends State<UserGuidePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF388E3C),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.swap_horiz),
-            label: "Convert",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: "Charts",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: "Currency List",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.contact_mail),
-            label: "Contact Us",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.feedback),
-            label: "Feedback",
-          ),
-        ],
-      ),
+      bottomNavigationBar: BottomNavBar(),
     );
   }
 }

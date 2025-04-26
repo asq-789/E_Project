@@ -42,7 +42,7 @@ class _CurrencyListState extends State<CurrencyList> {
     final currency = doc['baseCurrency'];
     baseCurrency = currency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/6aa43d570c95f0577517c38d/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 
@@ -68,6 +68,7 @@ class _CurrencyListState extends State<CurrencyList> {
     return Scaffold(
      appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
+         title: "Currency List",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;
@@ -104,22 +105,39 @@ class _CurrencyListState extends State<CurrencyList> {
         }).toList();
 
         return Column(
-          children: [
-            SizedBox(height: 20),
-            TextFormField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: "Search",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.horizontal(left: Radius.circular(12), right: Radius.circular(12)),
-                ),
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (value) {
-                setState(() {});  
-              },
-            ),
-            SizedBox(height: 10),
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    const SizedBox(height: 20),
+    
+    const Text(
+      "Select Currencies",
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF388E3C),
+      ),
+    ),
+    const SizedBox(height: 10),
+
+    TextField(
+      controller: searchController,
+      decoration: InputDecoration(
+        hintText: "Search",
+        hintStyle: TextStyle(color: Colors.grey[600]),
+        prefixIcon: Icon(Icons.search, color: Color(0xFF388E3C)),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF388E3C)),
+        ),
+      ),
+      onChanged: (value) {
+        setState(() {});
+      },
+    ),
+    const SizedBox(height: 10),
+
             Expanded(
               child: ListView.builder(
                 itemCount: filteredCurrencies.length,
@@ -157,10 +175,15 @@ class _CurrencyListState extends State<CurrencyList> {
                               ],
                             ),
                             IconButton(
-                              icon: Icon(
-                                likedCurrencies.contains(currency.key) ? Icons.favorite : Icons.favorite_border,
-                                color: likedCurrencies.contains(currency.key) ? Colors.red : null,
-                              ),
+                             icon: Icon(
+  likedCurrencies.contains(currency.key)
+      ? Icons.favorite
+      : Icons.favorite_border,
+  color: likedCurrencies.contains(currency.key)
+      ? Color(0xFF388E3C) // our theme green
+      : null,
+),
+
                               onPressed: () async {
                                 final user = FirebaseAuth.instance.currentUser;
 
@@ -219,4 +242,4 @@ class _CurrencyListState extends State<CurrencyList> {
   bottomNavigationBar: BottomNavBar(),
     );
   }
-}
+ }
