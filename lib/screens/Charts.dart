@@ -1,51 +1,50 @@
-import 'dart:convert';
 import 'package:currensee/components/bottom_navbar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currensee/screens/currencyhistory.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:currensee/screens/bars.dart'; // Bars widget
-import 'package:shared_preferences/shared_preferences.dart';//shared prefences
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Charts extends StatefulWidget {
-  const Charts({super.key});
+  const Charts({Key? key}) : super(key: key);
 
   @override
-  State<Charts> createState() => _ChartsState();
+  _ChartsState createState() => _ChartsState();
 }
 
 class _ChartsState extends State<Charts> {
   TextEditingController searchController = TextEditingController();
+  TextEditingController alertRateController = TextEditingController(); // For setting alert
+  TextEditingController alertCurrencyController = TextEditingController(); // For currency selection
 
   Map<String, double> currencyRates = {};
   List<String> availableCurrencies = [];
   String selectedCurrency = '';
   double selectedRate = 1.0;
-  
 
-  // Base currency work
-  String baseCurrency = ''; // Base currency set at signup
-  Map<String, dynamic>? rates; // history
+  double? alertRate; // For the target rate in the alert
+  String? alertCurrency; // For the target currency in the alert
+
+  String baseCurrency = '';
+  Map<String, dynamic>? rates;
   List<FlSpot> historicalDataPoints = [];
 
-  bool isCurrencyCardVisible = false; // Flag to toggle visibility of the card
-  bool isCrossButtonHovered = false; // Track hover state for the cross button
+  bool isCurrencyCardVisible = false;
+  bool isCrossButtonHovered = false;
 
   @override
   void initState() {
     super.initState();
     fetchCurrencyData().then((ratesData) {
       if (baseCurrency.isNotEmpty) {
-        fetchRates(baseCurrency); // Fetch exchange rates for the base currency
+        fetchRates(baseCurrency);
       }
     });
     hitAPI();
   }
 
-  // Fetch current base currency data from Firebase
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return {};
@@ -65,7 +64,6 @@ class _ChartsState extends State<Charts> {
     return data['conversion_rates'];
   }
 
-  // Fetch exchange rates based on the base currency
   Future<void> fetchRates(String base) async {
     var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$base');
     var response = await http.get(url);
@@ -80,19 +78,15 @@ class _ChartsState extends State<Charts> {
     });
   }
 
-  // Handle user currency selection from Autocomplete
   void handleCurrencySelection(String value) {
     setState(() {
       selectedCurrency = value;
       selectedRate = currencyRates[value] ?? 1.0;
-      isCurrencyCardVisible = true; // Show the card after selection
+      isCurrencyCardVisible = true;
     });
   }
 
-  // Fetch historical data for the base currency
   Future<void> hitAPI() async {
-    print('Sending API request...');
-
     final response = await http.get(
       Uri.parse("https://api.exchangerate.host/historical?access_key=4ad007e6d6703362a5dfc278358a7f00&date=2005-02-01"),
     );
@@ -113,20 +107,100 @@ class _ChartsState extends State<Charts> {
             rates = data['quotes'];
             historicalDataPoints = spots;
           });
-        } else {
-          print('No rates found in response');
         }
       } catch (e) {
         print('Error decoding response: $e');
       }
-    } else {
-      print("Request failed with status: ${response.statusCode}");
+    }
+  }
+
+  // Set alert
+  void showSetAlertDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Set Alert'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Autocomplete widget for selecting currency
+              Autocomplete<String>( 
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  return availableCurrencies
+                      .where((currency) => currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                      .toList();
+                },
+                fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                  return TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Enter Currency (e.g., USD, EUR)',
+                    ),
+                  );
+                },
+                onSelected: (String value) {
+                  alertCurrencyController.text = value;
+                  setState(() {
+                    alertCurrency = value.toUpperCase();
+                  });
+                },
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: alertRateController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Enter target rate',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (alertCurrencyController.text.isNotEmpty && alertRateController.text.isNotEmpty) {
+                  setState(() {
+                    alertRate = double.tryParse(alertRateController.text);
+                    alertCurrency = alertCurrencyController.text.toUpperCase();
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Alert set successfully!')) ,
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter both currency and target rate!')) ,
+                  );
+                }
+              },
+              child: const Text('Set'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Check alert
+  void checkAlert() {
+    if (alertRate != null && alertCurrency != null) {
+      if (selectedCurrency.toUpperCase() == alertCurrency!.toUpperCase() && selectedRate >= alertRate!) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Alert! $alertCurrency has reached $alertRate'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        alertRate = null; // Reset alert after triggered
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Prepare data for the line chart
     var filteredCurrencies = currencyRates.entries.toList();
     filteredCurrencies.sort((a, b) => b.value.compareTo(a.value));
     if (filteredCurrencies.length > 10) {
@@ -175,110 +249,115 @@ class _ChartsState extends State<Charts> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Autocomplete widget for other currencies
-                  // Autocomplete widget for other currencies
-Autocomplete<String>(
-  optionsBuilder: (TextEditingValue textEditingValue) {
-    return availableCurrencies
-        .where((currency) =>
-            currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-        .toList();
-  },
-  fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-    return Column(
-      children: [
-        FocusScope( // Add a FocusScope to manage the focus behavior
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).requestFocus(focusNode); // Ensure focus is handled properly
-            },
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Select Currency',
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        // Show the card when a currency is selected
-        if (isCurrencyCardVisible) 
-          Container(
-            height: 150, // Set height of the card
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: themeColor, // Set background color to green
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: const [BoxShadow(blurRadius: 4, color: Colors.grey)],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: MouseRegion(
-                    onEnter: (_) {
-                      setState(() {
-                        isCrossButtonHovered = true; // On hover, change cross button color
-                      });
-                    },
-                    onExit: (_) {
-                      setState(() {
-                        isCrossButtonHovered = false; // On exit, reset hover state
-                      });
-                    },
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: isCrossButtonHovered ? Colors.red : Colors.white, // Red on hover, white by default
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isCurrencyCardVisible = false; // Hide the card on close
-                        });
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Autocomplete<String>(
+                            optionsBuilder: (TextEditingValue textEditingValue) {
+                              return availableCurrencies
+                                  .where((currency) => currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                                  .toList();
+                            },
+                            fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                              return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Select Currency',
+                                ),
+                              );
+                            },
+                            onSelected: handleCurrencySelection,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        if (alertRate != null)
+                          Text(
+                            'Target Rate: $alertRate',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: themeColor,
+                            ),
+                          )
+                        else
+                          ElevatedButton(
+                            onPressed: showSetAlertDialog,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: themeColor,
+                            ),
+                            child: const Text('Set Alert'),
+                          ),
+                      ],
                     ),
-                  ),
-                ),
-                Text(
-                  'Currency: $selectedCurrency',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // Set text color to white
-                  ),
-                ),
-                const SizedBox(height: 4), // Reduced space between the two texts
-                Text(
-                  'Exchange Rate: ${selectedRate.toStringAsFixed(4)}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.white, // Set text color to white
-                  ),
-                ),
-                const SizedBox(height: 4), // Reduced space between the texts
-                Text(
-                  'Base Currency: $baseCurrency',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white, // Set text color to white
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  },
-  onSelected: handleCurrencySelection,
-),
-
+                    const SizedBox(height: 10),
+                    if (isCurrencyCardVisible)
+                      Container(
+                        height: 150,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: themeColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [BoxShadow(blurRadius: 4, color: Colors.grey)],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: MouseRegion(
+                                onEnter: (_) {
+                                  setState(() {
+                                    isCrossButtonHovered = true;
+                                  });
+                                },
+                                onExit: (_) {
+                                  setState(() {
+                                    isCrossButtonHovered = false;
+                                  });
+                                },
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: isCrossButtonHovered ? Colors.red : Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isCurrencyCardVisible = false;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            Text(
+                              'Currency: $selectedCurrency',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Exchange Rate: ${selectedRate.toStringAsFixed(4)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Base Currency: $baseCurrency',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 16),
-
-                    // Base Currency Info Container
                     Container(
                       padding: const EdgeInsets.all(16),
                       width: chartWidth,
@@ -308,10 +387,7 @@ Autocomplete<String>(
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 12),
-
-                    // Line Chart for Top 10 Currencies
                     SizedBox(
                       width: chartWidth,
                       height: chartHeight,
@@ -376,16 +452,12 @@ Autocomplete<String>(
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 32),
-
-                    // Historical Data Chart
                     const Text(
                       'Historical Data - 2005-02-01',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
-
                     if (historicalDataPoints.isEmpty)
                       const Center(child: CircularProgressIndicator())
                     else
@@ -401,8 +473,7 @@ Autocomplete<String>(
                               LineChartBarData(
                                 spots: historicalDataPoints,
                                 isCurved: true,
-                                color: Colors.blue,
-                                barWidth: 3,
+                                color: themeColor,
                                 belowBarData: BarAreaData(show: false),
                               ),
                             ],
@@ -413,6 +484,7 @@ Autocomplete<String>(
                 ),
               ),
             ),
+      bottomNavigationBar:  BottomNavBar(currentIndex: 1),
     );
   }
 }
