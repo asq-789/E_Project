@@ -17,7 +17,7 @@ class _LikedCurrrenciesState extends State<LikedCurrrencies> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Background white
+      backgroundColor: Colors.white, 
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
         title: "Liked Currencies",

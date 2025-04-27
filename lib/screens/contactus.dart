@@ -79,6 +79,7 @@ class _ContactScreenState extends State<ContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
         title: "Contact",

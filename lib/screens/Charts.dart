@@ -114,75 +114,96 @@ class _ChartsState extends State<Charts> {
     }
   }
 
-  // Set alert
-  void showSetAlertDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Set Alert'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Autocomplete widget for selecting currency
-              Autocomplete<String>( 
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  return availableCurrencies
-                      .where((currency) => currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                      .toList();
-                },
-                fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                  return TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Enter Currency (e.g., USD, EUR)',
-                    ),
-                  );
-                },
-                onSelected: (String value) {
-                  alertCurrencyController.text = value;
-                  setState(() {
-                    alertCurrency = value.toUpperCase();
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: alertRateController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'Enter target rate',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (alertCurrencyController.text.isNotEmpty && alertRateController.text.isNotEmpty) {
-                  setState(() {
-                    alertRate = double.tryParse(alertRateController.text);
-                    alertCurrency = alertCurrencyController.text.toUpperCase();
-                  });
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Alert set successfully!')) ,
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter both currency and target rate!')) ,
-                  );
-                }
+// Set alert
+void showSetAlertDialog() {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Set Alert'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Autocomplete widget for selecting currency
+            Autocomplete<String>( 
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                return availableCurrencies
+                    .where((currency) => currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                    .toList();
               },
-              child: const Text('Set'),
+              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Enter Currency (e.g., USD, EUR)',
+                  ),
+                );
+              },
+              onSelected: (String value) {
+                alertCurrencyController.text = value;
+                setState(() {
+                  alertCurrency = value.toUpperCase();
+                });
+              },
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: alertRateController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                hintText: 'Enter target rate',
+              ),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (alertCurrencyController.text.isNotEmpty && alertRateController.text.isNotEmpty) {
+                setState(() {
+                  alertRate = double.tryParse(alertRateController.text);
+                  alertCurrency = alertCurrencyController.text.toUpperCase();
+                });
+
+                // Save alert to Firestore (inside the user's alerts sub-collection)
+                final uid = FirebaseAuth.instance.currentUser?.uid;
+                if (uid != null) {
+                  // Reference to the user's 'alerts' sub-collection
+                  FirebaseFirestore.instance.collection('users').doc(uid).collection('alerts').add({
+                    'currency': alertCurrency,
+                    'rate': alertRate,
+                    'createdAt': FieldValue.serverTimestamp(), // Save the current timestamp
+                  }).then((_) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Alert set and saved successfully!')),
+                    );
+                  }).catchError((e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('User not authenticated!')),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter both currency and target rate!')),
+                );
+              }
+            },
+            child: const Text('Set'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   // Check alert
   void checkAlert() {

@@ -43,41 +43,41 @@ class _UserGuidePageState extends State<UserGuidePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20),
-              Center(
-                child: Column(
-                  children: [
-                    Text(
-                      "Explore the Features of Currensee",
-                    
-  style: TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.bold,
-    fontStyle: FontStyle.italic,
-    color: Color(0xFF388E3C),
-    shadows: [
-      Shadow(
-        offset: Offset(2, 2),
-        blurRadius: 3,
-        color: const Color.fromARGB(66, 114, 114, 113),
-      ),
-    ],
-  ),
-                      textAlign: TextAlign.center,
+            
+                    Center(
+                      child: Text(
+                        "Explore the Features of Currensee",
+                      
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                          color: Color(0xFF388E3C),
+                          shadows: [
+                            Shadow(
+                              offset: Offset(2, 2),
+                              blurRadius: 3,
+                              color: const Color.fromARGB(66, 114, 114, 113),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                     SizedBox(height: 4),
-                    Text(
-                      "Your go-to app for seamless currency conversion.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black54,
+                    Center(
+                      child: Text(
+                        "Your go-to app for seamless currency conversion.",
+                        style: TextStyle(
+                         fontSize: 15, fontStyle: FontStyle.italic, color: Colors.black54
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
            
-                  ],
-                ),
-              ),
-              SizedBox(height: 30),
+                  
+               
+              SizedBox(height: 25),
               GuideCard(
                 title: "Currency Conversion",
                 description:

@@ -186,10 +186,47 @@ class CustomDrawer extends StatelessWidget {
             icon: Icons.logout,
             text: 'Logout',
             context: context,
-            onTap: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.restorablePopAndPushNamed(context, "/login");
-            },
+            onTap: (){
+              showDialog(context: context, 
+              builder: (BuildContext context){
+                return AlertDialog(
+                   shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 10, 
+                  title: Text('Logout Confirmation',style: TextStyle(color: themeColor),),
+                  content: Text('Are you sure you want to Logout?'),
+                  actions: [
+                    TextButton(onPressed: 
+                    (){
+                      Navigator.of(context).pop();
+                    }, child: Text('Cancel',style: TextStyle(color: themeColor),)
+                    ),
+                    
+                ElevatedButton(
+  onPressed: () {
+    Navigator.of(context).pop();
+    FirebaseAuth.instance.signOut();
+    Navigator.restorablePopAndPushNamed(context, "/login");
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Color(0xFF388E3C),
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  child: const Text('Logout'),
+)
+
+                  ],
+                );
+              });
+            }
+            // onTap: () async {
+            //   await FirebaseAuth.instance.signOut();
+            //   Navigator.restorablePopAndPushNamed(context, "/login");
+            // },
           ),
         ],
       ),

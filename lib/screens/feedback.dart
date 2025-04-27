@@ -12,7 +12,7 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   bool notificationsEnabled = false;
-  int selectedStars = 0; 
+  int selectedStars = 2; 
 
   final _formKey = GlobalKey<FormState>();
 
@@ -25,7 +25,7 @@ sendFeedback() async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Please select stars before submitting.")),
     );
-    return; // Stop further execution
+    return;
   }
 
   if (_formKey.currentState!.validate()) {
@@ -45,7 +45,7 @@ sendFeedback() async {
       emailController.clear();
       feedbackController.clear();
       setState(() {
-        selectedStars = 0;
+        selectedStars = 2;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

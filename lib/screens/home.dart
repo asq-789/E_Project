@@ -179,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
         title: "Currency Converter",
@@ -288,12 +289,12 @@ class _HomeScreenState extends State<HomeScreen> {
       borderRadius: BorderRadius.circular(90),
     ),
     elevation: 4,
-    shadowColor: const Color(0x55388E3C), // soft green glow
+    shadowColor: const Color(0x55388E3C), 
   ),
  child: const Text(
   "Convert",
   style: TextStyle(
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
     color: Colors.white,
   ),
@@ -395,7 +396,7 @@ Container(
                 ),
               ),
     
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+bottomNavigationBar: BottomNavBar(currentIndex: 0), 
     );
   }
 }

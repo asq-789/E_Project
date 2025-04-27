@@ -112,10 +112,10 @@ class FaqItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4, // <-- Shadow add kar di
-      shadowColor: Color(0xFF388E3C).withOpacity(0.5), // Thoda greenish shadow effect
+      elevation: 4, 
+      shadowColor: Color(0xFF388E3C).withOpacity(0.5), 
       margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-      shape: RoundedRectangleBorder( // Thoda rounded look dene ke liye
+      shape: RoundedRectangleBorder( 
         borderRadius: BorderRadius.circular(12),
       ),
       child: Theme(
