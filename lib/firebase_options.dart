@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'currensee-app-70ce6.firebasestorage.app',
     measurementId: 'G-HQ8BX4QN7S',
   );
+
 }

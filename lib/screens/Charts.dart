@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:currensee/screens/bars.dart'; // Bars widget
+import 'package:shared_preferences/shared_preferences.dart';//shared prefences
+
 
 class Charts extends StatefulWidget {
   const Charts({super.key});
@@ -16,34 +18,34 @@ class Charts extends StatefulWidget {
 }
 
 class _ChartsState extends State<Charts> {
-
- TextEditingController searchController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
 
   Map<String, double> currencyRates = {};
   List<String> availableCurrencies = [];
   String selectedCurrency = '';
   double selectedRate = 1.0;
+  
+
+  // Base currency work
+  String baseCurrency = ''; // Base currency set at signup
   Map<String, dynamic>? rates; // history
   List<FlSpot> historicalDataPoints = [];
 
-//base currency work
-String baseCurrency = '';
-
+  bool isCurrencyCardVisible = false; // Flag to toggle visibility of the card
+  bool isCrossButtonHovered = false; // Track hover state for the cross button
 
   @override
   void initState() {
     super.initState();
-    // fetchRates(selectedCurrency);
     fetchCurrencyData().then((ratesData) {
-    if (baseCurrency.isNotEmpty) {
-      fetchRates(baseCurrency);
-    }
-  });
-    // print('initState called. Fetching data...');
+      if (baseCurrency.isNotEmpty) {
+        fetchRates(baseCurrency); // Fetch exchange rates for the base currency
+      }
+    });
     hitAPI();
   }
 
-  //base currency work
+  // Fetch current base currency data from Firebase
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return {};
@@ -54,7 +56,8 @@ String baseCurrency = '';
     final currency = doc['baseCurrency'];
     baseCurrency = currency;
     selectedCurrency = currency;
-     searchController.text = baseCurrency;
+    searchController.text = baseCurrency;
+
     final url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
@@ -62,7 +65,7 @@ String baseCurrency = '';
     return data['conversion_rates'];
   }
 
-
+  // Fetch exchange rates based on the base currency
   Future<void> fetchRates(String base) async {
     var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$base');
     var response = await http.get(url);
@@ -74,11 +77,19 @@ String baseCurrency = '';
     setState(() {
       currencyRates = parsedRates;
       availableCurrencies = rates.keys.toList();
-      selectedCurrency = base;
-       selectedRate = parsedRates[base] ?? 1.0;
     });
   }
 
+  // Handle user currency selection from Autocomplete
+  void handleCurrencySelection(String value) {
+    setState(() {
+      selectedCurrency = value;
+      selectedRate = currencyRates[value] ?? 1.0;
+      isCurrencyCardVisible = true; // Show the card after selection
+    });
+  }
+
+  // Fetch historical data for the base currency
   Future<void> hitAPI() async {
     print('Sending API request...');
 
@@ -87,15 +98,10 @@ String baseCurrency = '';
     );
 
     if (response.statusCode == 200) {
-      // print('API Response: ${response.body}');
-
       try {
         final data = jsonDecode(response.body);
 
         if (data['quotes'] != null) {
-          // print('Data found: ${data['quotes']}');
-          
-          // Generate historical chart data
           List<FlSpot> spots = [];
           int index = 0;
           data['quotes'].forEach((key, value) {
@@ -120,6 +126,7 @@ String baseCurrency = '';
 
   @override
   Widget build(BuildContext context) {
+    // Prepare data for the line chart
     var filteredCurrencies = currencyRates.entries.toList();
     filteredCurrencies.sort((a, b) => b.value.compareTo(a.value));
     if (filteredCurrencies.length > 10) {
@@ -160,7 +167,7 @@ String baseCurrency = '';
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Exchange Rates Top 10 Currencies',
+                      'Exchange Rates - Top 10 Currencies',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -169,34 +176,109 @@ String baseCurrency = '';
                     ),
                     const SizedBox(height: 16),
 
-                    Autocomplete<String>(  // Autocomplete widget for currency
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        return availableCurrencies
-                            .where((c) => c.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                            .toList();
+                    // Autocomplete widget for other currencies
+                  // Autocomplete widget for other currencies
+Autocomplete<String>(
+  optionsBuilder: (TextEditingValue textEditingValue) {
+    return availableCurrencies
+        .where((currency) =>
+            currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+        .toList();
+  },
+  fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+    return Column(
+      children: [
+        FocusScope( // Add a FocusScope to manage the focus behavior
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(focusNode); // Ensure focus is handled properly
+            },
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Select Currency',
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Show the card when a currency is selected
+        if (isCurrencyCardVisible) 
+          Container(
+            height: 150, // Set height of the card
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: themeColor, // Set background color to green
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [BoxShadow(blurRadius: 4, color: Colors.grey)],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: MouseRegion(
+                    onEnter: (_) {
+                      setState(() {
+                        isCrossButtonHovered = true; // On hover, change cross button color
+                      });
+                    },
+                    onExit: (_) {
+                      setState(() {
+                        isCrossButtonHovered = false; // On exit, reset hover state
+                      });
+                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: isCrossButtonHovered ? Colors.red : Colors.white, // Red on hover, white by default
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isCurrencyCardVisible = false; // Hide the card on close
+                        });
                       },
-                      fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                          return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Select Base Currency',
-                          ),
-                        );
-                      },
-                      //added
-                     onSelected: (value) {
-  setState(() {
-    selectedCurrency = value;
-  });
-  fetchRates(value);
-},      
                     ),
-
+                  ),
+                ),
+                Text(
+                  'Currency: $selectedCurrency',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Set text color to white
+                  ),
+                ),
+                const SizedBox(height: 4), // Reduced space between the two texts
+                Text(
+                  'Exchange Rate: ${selectedRate.toStringAsFixed(4)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white, // Set text color to white
+                  ),
+                ),
+                const SizedBox(height: 4), // Reduced space between the texts
+                Text(
+                  'Base Currency: $baseCurrency',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white, // Set text color to white
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  },
+  onSelected: handleCurrencySelection,
+),
 
                     const SizedBox(height: 16),
 
+                    // Base Currency Info Container
                     Container(
                       padding: const EdgeInsets.all(16),
                       width: chartWidth,
@@ -208,7 +290,7 @@ String baseCurrency = '';
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Currency: $selectedCurrency',
+                            'Base Currency: $baseCurrency',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -217,7 +299,7 @@ String baseCurrency = '';
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Exchange Rate: $selectedRate',
+                            'Exchange Rates relative to $baseCurrency',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.white,
@@ -227,8 +309,9 @@ String baseCurrency = '';
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
+                    // Line Chart for Top 10 Currencies
                     SizedBox(
                       width: chartWidth,
                       height: chartHeight,
@@ -295,6 +378,8 @@ String baseCurrency = '';
                     ),
 
                     const SizedBox(height: 32),
+
+                    // Historical Data Chart
                     const Text(
                       'Historical Data - 2005-02-01',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -309,50 +394,15 @@ String baseCurrency = '';
                         height: chartHeight,
                         child: LineChart(
                           LineChartData(
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: false,
-                              getDrawingHorizontalLine: (_) => FlLine(
-                                color: themeColor.withOpacity(0.2),
-                                strokeWidth: 1,
-                              ),
-                            ),
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 40,
-                                  getTitlesWidget: (value, _) => Text(
-                                    value.toStringAsFixed(0),
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ),
-                              ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: (value, _) {
-                                    return RotatedBox(
-                                      quarterTurns: 1,
-                                      child: Text(
-                                        'Day ${value.toInt() + 1}',
-                                        style: const TextStyle(fontSize: 10),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            ),
-                            borderData: FlBorderData(show: false),
+                            gridData: FlGridData(show: true),
+                            titlesData: FlTitlesData(show: true),
+                            borderData: FlBorderData(show: true),
                             lineBarsData: [
                               LineChartBarData(
                                 spots: historicalDataPoints,
                                 isCurved: true,
-                                color: themeColor,
-                                barWidth: 4,
-                                dotData: FlDotData(show: false),
+                                color: Colors.blue,
+                                barWidth: 3,
                                 belowBarData: BarAreaData(show: false),
                               ),
                             ],
@@ -363,9 +413,6 @@ String baseCurrency = '';
                 ),
               ),
             ),
-bottomNavigationBar: BottomNavBar(currentIndex: 1), 
-
     );
   }
 }
-//2.9bam
