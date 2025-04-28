@@ -31,7 +31,7 @@ void initState() {
 }
 
 Future<void> getCurrencyData() async {
-  var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/USD');
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/USD');
   var response = await http.get(url);
   var data = jsonDecode(response.body);
 

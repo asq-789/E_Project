@@ -1,6 +1,5 @@
 import 'package:currensee/components/bottom_navbar.dart';
-import 'package:currensee/faqs.dart';
-import 'package:currensee/screens/home.dart';
+
 import 'package:flutter/material.dart';
 import 'package:currensee/components/my_appbar.dart';
 
@@ -12,7 +11,7 @@ class AboutUsPage extends StatefulWidget {
 }
 
 class _AboutUsPageState extends State<AboutUsPage> {
-  int _selectedIndex = 0;
+
   bool notificationsEnabled = false;
 
   @override

@@ -2,7 +2,6 @@ import 'package:currensee/about.dart';
 import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/faqs.dart';
 import 'package:currensee/screens/contactus.dart';
-import 'package:currensee/screens/home.dart';
 import 'package:currensee/userguide.dart';
 import 'package:flutter/material.dart';
 import 'package:currensee/components/my_appbar.dart';
@@ -16,82 +15,8 @@ class HelpPage extends StatefulWidget {
 
 class _HelpPageState extends State<HelpPage> {
      bool notificationsEnabled = false;
-  int _selectedIndex = 0;
+ 
 
-  void _onItemTapped(int index) {
-    if (index == 0) {
-      // Navigate to HomeScreen (Convert Page)
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
-
-  void _showSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Profile'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.history),
-                title: Text('History'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.notifications),
-                title: Text('Notifications'),
-                trailing: Switch(
-                  value: notificationsEnabled,
-                  onChanged: (bool value) {
-                    setState(() {
-                      notificationsEnabled = value;
-                    });
-                  },
-                ),
-                onTap: () {
-                  setState(() {
-                    notificationsEnabled = !notificationsEnabled;
-                  });
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.help),
-                title: Text('Help Center'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.logout),
-                title: Text('Logout'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

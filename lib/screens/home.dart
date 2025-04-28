@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getcurrencies() async {
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/USD');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/USD');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (amountController.text.isEmpty) return;
     amount = double.tryParse(amountController.text) ?? 0.0;
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -342,7 +342,7 @@ Container(
       ),
       SizedBox(height: 10),
       FutureBuilder(
-        future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency')),
+        future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency')),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));

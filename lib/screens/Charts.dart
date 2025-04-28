@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/screens/currencyhistory.dart';
+import 'package:currensee/screens/rate_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,7 +19,7 @@ class Charts extends StatefulWidget {
 
 class _ChartsState extends State<Charts> {
   String fromCurrency = 'USD';
-  String toCurrency = 'EUR';
+  String toCurrency = 'PKR';
   double exchangeRate = 0.0;
   List<MapEntry<String, double>> filteredCurrencies = [];
   List<FlSpot> historicalDataPoints = [];
@@ -25,18 +28,66 @@ class _ChartsState extends State<Charts> {
   String selectedCurrency = '';
   TextEditingController searchController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCurrencyData().then((ratesData) {
-      if (baseCurrency.isNotEmpty) {
-        fetchRates(baseCurrency);
-      }
+void checkRateAlerts() {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('alerts')
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        double targetRate = doc['targetRate'];
+        String from = doc['fromCurrency'];  
+        String to = doc['toCurrency'];    
+
+        if (exchangeRate >= targetRate) {
+          showAlertNotification(from, to, targetRate);
+        }
+      });
     });
-    hitAPI();
   }
+}
+
+
+void showAlertNotification(String fromCurrency, String toCurrency, double targetRate) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Rate Alert',style:TextStyle(color:Color(0xFF388E3C) ) ),
+        content: Text('The rate of $fromCurrency → $toCurrency has reached $targetRate'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); 
+            },
+            child: Text('OK',style: TextStyle(color: Color(0xFF388E3C)),),
+          ),
+          
+        ],
+      );
+    },
+  );
+}
+@override
+void initState() {
+  super.initState();
+  fetchCurrencies();
+  fetchCurrencyData().then((ratesData) {
+    if (baseCurrency.isNotEmpty) {
+      fetchRates(baseCurrency);
+    }
+  });
+  hitAPI();
+  Timer.periodic(Duration(minutes: 1), (timer) {
+    checkRateAlerts();
+  });
+}
+
 Future<void> fetchRates(String base) async {
-  var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$base');
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$base');
   var response = await http.get(url);
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
@@ -90,6 +141,23 @@ Future<void> hitAPI() async {
     print('Failed to fetch historical data');
   }
 }
+List<String> currencies = [];
+
+Future<void> fetchCurrencies() async {
+  var url = Uri.parse('https://api.exchangerate-api.com/v4/latest/USD');
+  var response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    setState(() {
+      currencies = data['rates'].keys.toList();
+    });
+  } else {
+    print('Failed to load currencies');
+  }
+}
+
+
 
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -103,7 +171,7 @@ Future<void> hitAPI() async {
     selectedCurrency = currency;
     searchController.text = baseCurrency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 
@@ -111,7 +179,7 @@ Future<void> hitAPI() async {
   }
 
   Future<void> fetchExchangeRate() async {
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -137,7 +205,7 @@ Future<void> hitAPI() async {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Set Target Rate'),
+          title: const Text('Set Target Rate',style: TextStyle(color: Color(0xFF388E3C)),),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -145,7 +213,9 @@ Future<void> hitAPI() async {
               TextField(
                 controller: targetRateController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Target Rate'),
+                decoration: const InputDecoration(labelText: 'Target Rate',
+                labelStyle: TextStyle(color: Color(0xFF388E3C)),
+                ),
               ),
             ],
           ),
@@ -154,22 +224,32 @@ Future<void> hitAPI() async {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: const Text('Cancel',style: TextStyle(color: Color(0xFF388E3C)),),
             ),
-            TextButton(
-              onPressed: () async {
-                final targetRate = double.tryParse(targetRateController.text);
-                if (targetRate != null) {
-                  await saveAlertToFirebase(targetRate);
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a valid target rate')),
-                  );
-                }
-              },
-              child: const Text('Set'),
-            ),
+           TextButton(
+  style: TextButton.styleFrom(
+    backgroundColor: Color(0xFF388E3C), 
+    foregroundColor: Colors.white,      
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), 
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12), 
+    ),
+   
+  ),
+  onPressed: () async {
+    final targetRate = double.tryParse(targetRateController.text);
+    if (targetRate != null) {
+      await saveAlertToFirebase(targetRate);
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid target rate')),
+      );
+    }
+  },
+  child: const Text('Set'),
+),
+
           ],
         );
       },
@@ -212,6 +292,15 @@ Future<void> hitAPI() async {
       appBar: AppBar(
         title: const Text('Currency Charts'),
         actions: [
+           IconButton(
+            icon: Icon(Icons.notifications_active),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RateAlerts()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             tooltip: 'Currency History',
@@ -228,7 +317,7 @@ Future<void> hitAPI() async {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -242,7 +331,7 @@ Future<void> hitAPI() async {
               const SizedBox(height: 20),
               Text(
                 '1 $fromCurrency = ${exchangeRate.toStringAsFixed(2)} $toCurrency',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Color(0xFF388E3C),fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -349,7 +438,7 @@ Future<void> hitAPI() async {
               ),
               const SizedBox(height: 16),
               if (historicalDataPoints.isEmpty)
-                const Center(child: CircularProgressIndicator())
+                const Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
               else
                 SizedBox(
                   width: chartWidth,
@@ -378,8 +467,7 @@ Future<void> hitAPI() async {
     );
   }
 
- Widget buildCurrencyDropdown(bool isFromCurrency) {
-  List<String> currencies = ['USD', 'EUR', 'PKR', 'INR', 'GBP'];
+Widget buildCurrencyDropdown(bool isFromCurrency) {
   return DropdownButton<String>(
     value: isFromCurrency ? fromCurrency : toCurrency,
     isExpanded: true,
@@ -397,7 +485,11 @@ Future<void> hitAPI() async {
           toCurrency = newValue!;
         }
         fetchExchangeRate();
+        hitAPI(); 
       });
     },
   );
-}}
+}
+ }
+
+ 
