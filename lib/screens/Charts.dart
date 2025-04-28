@@ -15,24 +15,15 @@ class Charts extends StatefulWidget {
 }
 
 class _ChartsState extends State<Charts> {
-  TextEditingController searchController = TextEditingController();
-  TextEditingController alertRateController = TextEditingController(); // For setting alert
-  TextEditingController alertCurrencyController = TextEditingController(); // For currency selection
-
-  Map<String, double> currencyRates = {};
-  List<String> availableCurrencies = [];
-  String selectedCurrency = '';
-  double selectedRate = 1.0;
-
-  double? alertRate; // For the target rate in the alert
-  String? alertCurrency; // For the target currency in the alert
-
-  String baseCurrency = '';
-  Map<String, dynamic>? rates;
+  String fromCurrency = 'USD';
+  String toCurrency = 'EUR';
+  double exchangeRate = 0.0;
+  List<MapEntry<String, double>> filteredCurrencies = [];
   List<FlSpot> historicalDataPoints = [];
-
-  bool isCurrencyCardVisible = false;
-  bool isCrossButtonHovered = false;
+  Color themeColor = Colors.green;
+  String baseCurrency = '';
+  String selectedCurrency = '';
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -44,6 +35,61 @@ class _ChartsState extends State<Charts> {
     });
     hitAPI();
   }
+Future<void> fetchRates(String base) async {
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$base');
+  var response = await http.get(url);
+  if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    Map<String, dynamic> rates = data['conversion_rates'];
+    if (rates != null) {
+      Map<String, double> parsedRates = rates.map((key, value) => MapEntry(key, value.toDouble()));
+      setState(() {
+        // Store the parsedRates and update available currencies here
+        exchangeRate = parsedRates[toCurrency] ?? 0.0;
+        filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
+            .entries
+            .where((e) => ['USD', 'EUR', 'PKR', 'INR', 'GBP'].contains(e.key))
+            .map((e) => MapEntry(e.key, (e.value as num).toDouble()))
+            .toList();
+      });
+    } else {
+      print("Error: No conversion rates available.");
+    }
+  } else {
+    print('Failed to load exchange rate');
+  }
+}
+
+Future<void> hitAPI() async {
+  final response = await http.get(
+    Uri.parse("https://api.exchangerate.host/historical?access_key=4ad007e6d6703362a5dfc278358a7f00&date=2005-02-01"),
+  );
+
+  if (response.statusCode == 200) {
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data['quotes'] != null) {
+        List<FlSpot> spots = [];
+        int index = 0;
+        data['quotes'].forEach((key, value) {
+          spots.add(FlSpot(index.toDouble(), value.toDouble()));
+          index++;
+        });
+
+        setState(() {
+          historicalDataPoints = spots;
+        });
+      } else {
+        print("Error: No historical data found.");
+      }
+    } catch (e) {
+      print('Error decoding response: $e');
+    }
+  } else {
+    print('Failed to fetch historical data');
+  }
+}
 
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -64,176 +110,103 @@ class _ChartsState extends State<Charts> {
     return data['conversion_rates'];
   }
 
-  Future<void> fetchRates(String base) async {
-    var url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$base');
-    var response = await http.get(url);
-    var data = jsonDecode(response.body);
-
-    Map<String, dynamic> rates = data['conversion_rates'];
-    Map<String, double> parsedRates = rates.map((key, value) => MapEntry(key, value.toDouble()));
-
-    setState(() {
-      currencyRates = parsedRates;
-      availableCurrencies = rates.keys.toList();
-    });
-  }
-
-  void handleCurrencySelection(String value) {
-    setState(() {
-      selectedCurrency = value;
-      selectedRate = currencyRates[value] ?? 1.0;
-      isCurrencyCardVisible = true;
-    });
-  }
-
-  Future<void> hitAPI() async {
-    final response = await http.get(
-      Uri.parse("https://api.exchangerate.host/historical?access_key=4ad007e6d6703362a5dfc278358a7f00&date=2005-02-01"),
-    );
+  Future<void> fetchExchangeRate() async {
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/e0190f187a9c913d9f63e7e4/latest/$fromCurrency');
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      try {
-        final data = jsonDecode(response.body);
-
-        if (data['quotes'] != null) {
-          List<FlSpot> spots = [];
-          int index = 0;
-          data['quotes'].forEach((key, value) {
-            spots.add(FlSpot(index.toDouble(), value.toDouble()));
-            index++;
-          });
-
-          setState(() {
-            rates = data['quotes'];
-            historicalDataPoints = spots;
-          });
-        }
-      } catch (e) {
-        print('Error decoding response: $e');
-      }
+      final data = json.decode(response.body);
+      setState(() {
+        exchangeRate = data['conversion_rates'][toCurrency] ?? 0.0;
+        filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
+            .entries
+            .where((e) => ['USD', 'EUR', 'PKR', 'INR', 'GBP'].contains(e.key))
+            .map((e) => MapEntry(e.key, (e.value as num).toDouble()))
+            .toList();
+      });
+    } else {
+      print('Failed to load exchange rate');
     }
   }
 
-// Set alert
-void showSetAlertDialog() {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Set Alert'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Autocomplete widget for selecting currency
-            Autocomplete<String>( 
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                return availableCurrencies
-                    .where((currency) => currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                    .toList();
-              },
-              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Enter Currency (e.g., USD, EUR)',
-                  ),
-                );
-              },
-              onSelected: (String value) {
-                alertCurrencyController.text = value;
-                setState(() {
-                  alertCurrency = value.toUpperCase();
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: alertRateController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: 'Enter target rate',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (alertCurrencyController.text.isNotEmpty && alertRateController.text.isNotEmpty) {
-                setState(() {
-                  alertRate = double.tryParse(alertRateController.text);
-                  alertCurrency = alertCurrencyController.text.toUpperCase();
-                });
 
-                // Save alert to Firestore (inside the user's alerts sub-collection)
-                final uid = FirebaseAuth.instance.currentUser?.uid;
-                if (uid != null) {
-                  // Reference to the user's 'alerts' sub-collection
-                  FirebaseFirestore.instance.collection('users').doc(uid).collection('alerts').add({
-                    'currency': alertCurrency,
-                    'rate': alertRate,
-                    'createdAt': FieldValue.serverTimestamp(), // Save the current timestamp
-                  }).then((_) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Alert set and saved successfully!')),
-                    );
-                  }).catchError((e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  });
+  Future<void> showSetAlertDialog() async {
+    final targetRateController = TextEditingController();
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Set Target Rate'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Set your target rate for $fromCurrency to $toCurrency'),
+              TextField(
+                controller: targetRateController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Target Rate'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final targetRate = double.tryParse(targetRateController.text);
+                if (targetRate != null) {
+                  await saveAlertToFirebase(targetRate);
+                  Navigator.of(context).pop();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('User not authenticated!')),
+                    const SnackBar(content: Text('Please enter a valid target rate')),
                   );
                 }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter both currency and target rate!')),
-                );
-              }
-            },
-            child: const Text('Set'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-  // Check alert
-  void checkAlert() {
-    if (alertRate != null && alertCurrency != null) {
-      if (selectedCurrency.toUpperCase() == alertCurrency!.toUpperCase() && selectedRate >= alertRate!) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Alert! $alertCurrency has reached $alertRate'),
-            backgroundColor: Colors.green,
-          ),
+              },
+              child: const Text('Set'),
+            ),
+          ],
         );
-        alertRate = null; // Reset alert after triggered
+      },
+    );
+  }
+
+  Future<void> saveAlertToFirebase(double targetRate) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final alertsCollection = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('alerts');
+
+      try {
+        await alertsCollection.add({
+          'fromCurrency': fromCurrency,
+          'toCurrency': toCurrency,
+          'targetRate': targetRate,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Alert successfully set!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to set alert')),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var filteredCurrencies = currencyRates.entries.toList();
-    filteredCurrencies.sort((a, b) => b.value.compareTo(a.value));
-    if (filteredCurrencies.length > 10) {
-      filteredCurrencies = filteredCurrencies.sublist(0, 10);
-    }
-
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double chartWidth = screenWidth;
-    double chartHeight = screenHeight * 0.35;
-
-    const themeColor = Color(0xFF388E3C);
+    double chartWidth = MediaQuery.of(context).size.width;
+    double chartHeight = 200;
 
     return Scaffold(
       appBar: AppBar(
@@ -250,262 +223,181 @@ void showSetAlertDialog() {
             },
           ),
         ],
-        backgroundColor: themeColor,
+        backgroundColor: const Color(0xFF388E3C),
         foregroundColor: Colors.white,
       ),
-      body: currencyRates.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Exchange Rates - Top 10 Currencies',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: buildCurrencyDropdown(true)),
+                  const Text(' = '),
+                  Expanded(child: buildCurrencyDropdown(false)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                '1 $fromCurrency = ${exchangeRate.toStringAsFixed(2)} $toCurrency',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: chartWidth,
+                height: chartHeight,
+                child: LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (_) => FlLine(
+                        color: themeColor.withOpacity(0.2),
+                        strokeWidth: 1,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Autocomplete<String>(
-                            optionsBuilder: (TextEditingValue textEditingValue) {
-                              return availableCurrencies
-                                  .where((currency) => currency.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                                  .toList();
-                            },
-                            fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                              return TextField(
-                                controller: controller,
-                                focusNode: focusNode,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Select Currency',
-                                ),
-                              );
-                            },
-                            onSelected: handleCurrencySelection,
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          getTitlesWidget: (value, _) => Text(
+                            value.toStringAsFixed(0),
+                            style: const TextStyle(fontSize: 10),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        if (alertRate != null)
-                          Text(
-                            'Target Rate: $alertRate',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: themeColor,
-                            ),
-                          )
-                        else
-                          ElevatedButton(
-                            onPressed: showSetAlertDialog,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: themeColor,
-                            ),
-                            child: const Text('Set Alert'),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    if (isCurrencyCardVisible)
-                      Container(
-                        height: 150,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [BoxShadow(blurRadius: 4, color: Colors.grey)],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: MouseRegion(
-                                onEnter: (_) {
-                                  setState(() {
-                                    isCrossButtonHovered = true;
-                                  });
-                                },
-                                onExit: (_) {
-                                  setState(() {
-                                    isCrossButtonHovered = false;
-                                  });
-                                },
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.close,
-                                    color: isCrossButtonHovered ? Colors.red : Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isCurrencyCardVisible = false;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                            Text(
-                              'Currency: $selectedCurrency',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Exchange Rate: ${selectedRate.toStringAsFixed(4)}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Base Currency: $baseCurrency',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      width: chartWidth,
-                      decoration: BoxDecoration(
-                        color: themeColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Base Currency: $baseCurrency',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Exchange Rates relative to $baseCurrency',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: chartWidth,
-                      height: chartHeight,
-                      child: LineChart(
-                        LineChartData(
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: false,
-                            getDrawingHorizontalLine: (_) => FlLine(
-                              color: themeColor.withOpacity(0.2),
-                              strokeWidth: 1,
-                            ),
-                          ),
-                          titlesData: FlTitlesData(
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 40,
-                                getTitlesWidget: (value, _) => Text(
-                                  value.toStringAsFixed(0),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, _) {
+                            if (value.toInt() < filteredCurrencies.length) {
+                              return RotatedBox(
+                                quarterTurns: 1,
+                                child: Text(
+                                  filteredCurrencies[value.toInt()].key,
                                   style: const TextStyle(fontSize: 10),
                                 ),
-                              ),
-                            ),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, _) {
-                                  if (value.toInt() < filteredCurrencies.length) {
-                                    return RotatedBox(
-                                      quarterTurns: 1,
-                                      child: Text(
-                                        filteredCurrencies[value.toInt()].key,
-                                        style: const TextStyle(fontSize: 10),
-                                      ),
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                            ),
-                            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          ),
-                          borderData: FlBorderData(show: false),
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: List.generate(
-                                filteredCurrencies.length,
-                                (i) {
-                                  final entry = filteredCurrencies[i];
-                                  return FlSpot(i.toDouble(), entry.value);
-                                },
-                              ),
-                              isCurved: true,
-                              color: themeColor,
-                              barWidth: 4,
-                              dotData: FlDotData(show: false),
-                              belowBarData: BarAreaData(show: false),
-                            ),
-                          ],
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
                         ),
                       ),
+                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     ),
-                    const SizedBox(height: 32),
-                    const Text(
-                      'Historical Data - 2005-02-01',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    if (historicalDataPoints.isEmpty)
-                      const Center(child: CircularProgressIndicator())
-                    else
-                      SizedBox(
-                        width: chartWidth,
-                        height: chartHeight,
-                        child: LineChart(
-                          LineChartData(
-                            gridData: FlGridData(show: true),
-                            titlesData: FlTitlesData(show: true),
-                            borderData: FlBorderData(show: true),
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: historicalDataPoints,
-                                isCurved: true,
-                                color: themeColor,
-                                belowBarData: BarAreaData(show: false),
-                              ),
-                            ],
-                          ),
+                    borderData: FlBorderData(show: false),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: List.generate(
+                          filteredCurrencies.length,
+                          (i) {
+                            final entry = filteredCurrencies[i];
+                            return FlSpot(i.toDouble(), entry.value);
+                          },
                         ),
+                        isCurved: true,
+                        color: themeColor,
+                        barWidth: 4,
+                        dotData: FlDotData(show: false),
+                        belowBarData: BarAreaData(show: false),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-      bottomNavigationBar:  BottomNavBar(currentIndex: 1),
+              const SizedBox(height: 30),
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: showSetAlertDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF388E3C),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(90),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Create Alert",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+              const SizedBox(height: 32),
+              const Text(
+                'Historical Data - 2005-02-01',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              if (historicalDataPoints.isEmpty)
+                const Center(child: CircularProgressIndicator())
+              else
+                SizedBox(
+                  width: chartWidth,
+                  height: chartHeight,
+                  child: LineChart(
+                    LineChartData(
+                      gridData: FlGridData(show: true),
+                      titlesData: FlTitlesData(show: true),
+                      borderData: FlBorderData(show: true),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: historicalDataPoints,
+                          isCurved: true,
+                          color: themeColor,
+                          belowBarData: BarAreaData(show: false),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
-}
+
+ Widget buildCurrencyDropdown(bool isFromCurrency) {
+  List<String> currencies = ['USD', 'EUR', 'PKR', 'INR', 'GBP'];
+  return DropdownButton<String>(
+    value: isFromCurrency ? fromCurrency : toCurrency,
+    isExpanded: true,
+    items: currencies.map((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }).toList(),
+    onChanged: (newValue) {
+      setState(() {
+        if (isFromCurrency) {
+          fromCurrency = newValue!;
+        } else {
+          toCurrency = newValue!;
+        }
+        fetchExchangeRate();
+      });
+    },
+  );
+}}
