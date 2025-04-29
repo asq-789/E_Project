@@ -1,3 +1,4 @@
+import 'package:currensee/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -207,7 +208,7 @@ class CustomDrawer extends StatelessWidget {
   onPressed: () {
     Navigator.of(context).pop();
     FirebaseAuth.instance.signOut();
-    Navigator.restorablePopAndPushNamed(context, "/login");
+    Navigator.pushReplacement(context,MaterialPageRoute(builder:(context)=>Login()));
   },
   style: ElevatedButton.styleFrom(
     backgroundColor: Color(0xFF388E3C),
