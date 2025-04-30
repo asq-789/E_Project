@@ -416,7 +416,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
 
                     Container(
   decoration: BoxDecoration(
-                        color: Color.fromARGB(136, 161, 226, 166),
+    color: Color.fromARGB(255, 244, 255, 245),
     borderRadius: BorderRadius.circular(16),
     border: Border.all(color: Color(0xFF388E3C).withOpacity(0.2)),
   ),
@@ -434,15 +434,15 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                                           Navigator.pushNamed(context, '/Trend');
                                         },
                                         icon: Icon(Icons.arrow_forward, color: Color(0xFF388E3C)),
-                                        label: Text("View Digital Currencies", style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.w600)),
+                                        label: Text("View More", style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.w600)),
                                       ),
-                                    ), 
+                                    ), // Call the function to display market analysis card
     ],
   ),
 ),
 
                     SizedBox(height: 30),
-                    
+                    // Inside the body of your HomeScreen widget
  
                   ],
                 ),

@@ -17,7 +17,7 @@ class TrendspageState extends State<Trendspage> {
   List<dynamic> detailedCoins = [];
   bool isLoading = true;
   Map<String, dynamic>? marketData;
-  int selectedIndex = 0; // 0 for Coins, 1 for Market Analysis
+  int selectedIndex = 0; // 0 for Coins, 1 for Market Cap
   bool notificationsEnabled = false;
 
   @override
@@ -193,32 +193,28 @@ class TrendspageState extends State<Trendspage> {
         .map((entry) => FlSpot(entry.key.toDouble(), entry.value.toDouble()))
         .toList();
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double chartWidth = constraints.maxWidth > 120 ? 100 : constraints.maxWidth * 0.8;
-        double chartHeight = constraints.maxHeight > 70 ? 60 : constraints.maxHeight * 0.6;
-
-        return SizedBox(
-          height: chartHeight,
-          width: chartWidth,
-          child: LineChart(
-            LineChartData(
-              gridData: FlGridData(show: false),
-              titlesData: FlTitlesData(show: false),
-              borderData: FlBorderData(show: false),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: true,
-                  color: isUp ? Colors.green : Colors.red,
-                  belowBarData: BarAreaData(show: false),
-                  dotData: FlDotData(show: false),
-                ),
-              ],
+    return SizedBox(
+      height: 60,
+      width: 100,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(show: false),
+          titlesData: FlTitlesData(show: false),
+          borderData: FlBorderData(show: false),
+          
+          minX: 0,
+          maxX: sparklineData.length.toDouble() + 4, // fix: right-side buffer
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              color: isUp ? Colors.green : Colors.red,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -227,7 +223,7 @@ class TrendspageState extends State<Trendspage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
-         title: "Trends",
+        title: "Trends",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;
@@ -261,41 +257,42 @@ class TrendspageState extends State<Trendspage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                         ToggleButtons(
-  isSelected: [selectedIndex == 0, selectedIndex == 1, selectedIndex == 2],
-  onPressed: (index) {
-    setState(() {
-      selectedIndex = index;
-    });
-    // News page
-    if (index == 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MarketNewsPage()), 
-      );
-    }
-  },
-  selectedColor: Colors.white,
-  selectedBorderColor: Colors.green,
-  fillColor: Colors.green,
-  color: Colors.black,
-  borderRadius: BorderRadius.circular(8),
-  children: const [
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text('Coins'),
-    ),
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text('Market Analysis'),
-    ),
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text('News'),
-    ),
-  ],
-),
-
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ToggleButtons(
+                              isSelected: [selectedIndex == 0, selectedIndex == 1, selectedIndex == 2],
+                              onPressed: (index) {
+                                setState(() {
+                                  selectedIndex = index;
+                                });
+                                if (index == 2) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => MarketNewsPage()),
+                                  );
+                                }
+                              },
+                              selectedColor: Colors.white,
+                              selectedBorderColor: Colors.green,
+                              fillColor: Colors.green,
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(8),
+                              children: const [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text('Coins'),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text('Market Cap'),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text('News'),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -311,8 +308,7 @@ class TrendspageState extends State<Trendspage> {
                     ),
                   ],
                 ),
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
-
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }

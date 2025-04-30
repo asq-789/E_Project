@@ -17,7 +17,7 @@ void initState() {
 
   controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 3),
+    duration: const Duration(seconds: 2),
   )..addListener(() {
       setState(() {});
     });
@@ -84,7 +84,7 @@ void initState() {
                 ),
                 // Logo in the center
                 Image.asset(
-                  'public/assets/images/logogreen.png',
+                  'public/assets/images/bg.png',
                   height: 100,
                 ),
               ],
