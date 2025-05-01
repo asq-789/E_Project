@@ -18,7 +18,7 @@ class Charts extends StatefulWidget {
 }
 
 class _ChartsState extends State<Charts> {
-String fromCurrency = 'AFN';
+  String fromCurrency = 'USD';
   String toCurrency = 'PKR';
   double exchangeRate = 0.0;
   List<MapEntry<String, double>> filteredCurrencies = [];
@@ -28,134 +28,162 @@ String fromCurrency = 'AFN';
   String selectedCurrency = '';
   TextEditingController searchController = TextEditingController();
 
-  void checkRateAlerts() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('alerts')
-          .get()
-          .then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          double targetRate = doc['targetRate'];
-          String from = doc['fromCurrency'];  
-          String to = doc['toCurrency'];    
-
-          if (exchangeRate >= targetRate) {
-            showAlertNotification(from, to, targetRate);
-          }
-        });
-      });
+@override
+void initState() {
+  super.initState();
+  fetchCurrencies();
+  
+  // Fetch initial currency data (for default rate)
+  fetchCurrencyData().then((ratesData) {
+    if (baseCurrency.isNotEmpty) {
+      // Ensure this fetches the correct default rate on page load
+      fetchExchangeRate();
     }
-  }
+  });
 
-  void showAlertNotification(String fromCurrency, String toCurrency, double targetRate) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Rate Alert',style:TextStyle(color:Color(0xFF388E3C) ) ),
-          content: Text('The rate of $fromCurrency → $toCurrency has reached $targetRate'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-              },
-              child: Text('OK',style: TextStyle(color: Color(0xFF388E3C)),),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  hitAPI();
+  Timer.periodic(Duration(minutes: 1), (timer) {
+    checkRateAlerts();
+  });
+}
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCurrencies();
-    fetchCurrencyData().then((ratesData) {
-      if (baseCurrency.isNotEmpty) {
-        fetchRates(baseCurrency);
-      }
+Future<void> fetchExchangeRate() async {
+  final url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency');
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    setState(() {
+      // Ensure the rate gets updated with the correct value
+      exchangeRate = data['conversion_rates'][toCurrency] ?? 0.0;
+      filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
+          .entries
+          .where((e) => ['USD', 'EUR', 'PKR', 'INR', 'GBP'].contains(e.key))
+          .map((e) => MapEntry(e.key, (e.value as num).toDouble()))
+          .toList();
     });
-    hitAPI();
-    Timer.periodic(Duration(minutes: 1), (timer) {
-      checkRateAlerts();
+  } else {
+    print('Failed to load exchange rate');
+  }
+}
+
+void checkRateAlerts() {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('alerts')
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        double targetRate = doc['targetRate'];
+        String from = doc['fromCurrency'];  
+        String to = doc['toCurrency'];    
+
+        if (exchangeRate >= targetRate) {
+          showAlertNotification(from, to, targetRate);
+        }
+      });
     });
   }
+}
 
-  Future<void> fetchRates(String base) async {
-    var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$base');
-    var response = await http.get(url);
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      Map<String, dynamic> rates = data['conversion_rates'];
-      if (rates != null) {
-        Map<String, double> parsedRates = rates.map((key, value) => MapEntry(key, value.toDouble()));
+
+void showAlertNotification(String fromCurrency, String toCurrency, double targetRate) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Rate Alert',style:TextStyle(color:Color(0xFF388E3C) ) ),
+        content: Text('The rate of $fromCurrency → $toCurrency has reached $targetRate'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); 
+            },
+            child: Text('OK',style: TextStyle(color: Color(0xFF388E3C)),),
+          ),
+          
+        ],
+      );
+    },
+  );
+}
+
+
+Future<void> fetchRates(String base) async {
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$base');
+  var response = await http.get(url);
+  if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    Map<String, dynamic> rates = data['conversion_rates'];
+    if (rates != null) {
+      Map<String, double> parsedRates = rates.map((key, value) => MapEntry(key, value.toDouble()));
+      setState(() {
+        // Store the parsedRates and update available currencies here
+        exchangeRate = parsedRates[toCurrency] ?? 0.0;
+        filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
+            .entries
+            .where((e) => ['USD', 'EUR', 'PKR', 'INR', 'GBP'].contains(e.key))
+            .map((e) => MapEntry(e.key, (e.value as num).toDouble()))
+            .toList();
+      });
+    } else {
+      print("Error: No conversion rates available.");
+    }
+  } else {
+    print('Failed to load exchange rate');
+  }
+}
+
+Future<void> hitAPI() async {
+  final response = await http.get(
+    Uri.parse("https://api.exchangerate.host/historical?access_key=4ad007e6d6703362a5dfc278358a7f00&date=2005-02-01"),
+  );
+
+  if (response.statusCode == 200) {
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data['quotes'] != null) {
+        List<FlSpot> spots = [];
+        int index = 0;
+        data['quotes'].forEach((key, value) {
+          spots.add(FlSpot(index.toDouble(), value.toDouble()));
+          index++;
+        });
+
         setState(() {
-          // Store the parsedRates and update available currencies here
-          exchangeRate = parsedRates[toCurrency] ?? 0.0;
-          filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
-              .entries
-              .where((e) => ['USD', 'EUR', 'PKR', 'INR', 'GBP'].contains(e.key))
-              .map((e) => MapEntry(e.key, (e.value as num).toDouble()))
-              .toList();
+          historicalDataPoints = spots;
         });
       } else {
-        print("Error: No conversion rates available.");
+        print("Error: No historical data found.");
       }
-    } else {
-      print('Failed to load exchange rate');
+    } catch (e) {
+      print('Error decoding response: $e');
     }
+  } else {
+    print('Failed to fetch historical data');
   }
+}
+List<String> currencies = [];
 
-  Future<void> hitAPI() async {
-    final response = await http.get(
-      Uri.parse("https://api.exchangerate.host/historical?access_key=4ad007e6d6703362a5dfc278358a7f00&date=2005-02-01"),
-    );
+Future<void> fetchCurrencies() async {
+  var url = Uri.parse('https://api.exchangerate-api.com/v4/latest/USD');
+  var response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      try {
-        final data = jsonDecode(response.body);
-
-        if (data['quotes'] != null) {
-          List<FlSpot> spots = [];
-          int index = 0;
-          data['quotes'].forEach((key, value) {
-            spots.add(FlSpot(index.toDouble(), value.toDouble()));
-            index++;
-          });
-
-          setState(() {
-            historicalDataPoints = spots;
-          });
-        } else {
-          print("Error: No historical data found.");
-        }
-      } catch (e) {
-        print('Error decoding response: $e');
-      }
-    } else {
-      print('Failed to fetch historical data');
-    }
+  if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    setState(() {
+      currencies = data['rates'].keys.toList();
+    });
+  } else {
+    print('Failed to load currencies');
   }
+}
 
-  List<String> currencies = [];
 
-  Future<void> fetchCurrencies() async {
-    var url = Uri.parse('https://api.exchangerate-api.com/v4/latest/USD');
-    var response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      setState(() {
-        currencies = data['rates'].keys.toList();
-      });
-    } else {
-      print('Failed to load currencies');
-    }
-  }
 
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -176,24 +204,6 @@ String fromCurrency = 'AFN';
     return data['conversion_rates'];
   }
 
-  Future<void> fetchExchangeRate() async {
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        exchangeRate = data['conversion_rates'][toCurrency] ?? 0.0;
-        filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
-            .entries
-            .where((e) => ['USD', 'EUR', 'PKR', 'INR', 'GBP'].contains(e.key))
-            .map((e) => MapEntry(e.key, (e.value as num).toDouble()))
-            .toList();
-      });
-    } else {
-      print('Failed to load exchange rate');
-    }
-  }
 
   Future<void> showSetAlertDialog() async {
     final targetRateController = TextEditingController();
@@ -224,27 +234,29 @@ String fromCurrency = 'AFN';
               child: const Text('Cancel',style: TextStyle(color: Color(0xFF388E3C)),),
             ),
            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Color(0xFF388E3C), 
-                foregroundColor: Colors.white,      
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), 
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), 
-                ),
-              ),
-              onPressed: () async {
-                final targetRate = double.tryParse(targetRateController.text);
-                if (targetRate != null) {
-                  await saveAlertToFirebase(targetRate);
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter a valid target rate')),
-                  );
-                }
-              },
-              child: const Text('Set'),
-            ),
+  style: TextButton.styleFrom(
+    backgroundColor: Color(0xFF388E3C), 
+    foregroundColor: Colors.white,      
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), 
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12), 
+    ),
+   
+  ),
+  onPressed: () async {
+    final targetRate = double.tryParse(targetRateController.text);
+    if (targetRate != null) {
+      await saveAlertToFirebase(targetRate);
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid target rate')),
+      );
+    }
+  },
+  child: const Text('Set'),
+),
+
           ],
         );
       },
@@ -277,7 +289,6 @@ String fromCurrency = 'AFN';
       }
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -313,17 +324,52 @@ String fromCurrency = 'AFN';
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(child: buildCurrencyDropdown(true)),
-                  const Text(' = '),
-                  Expanded(child: buildCurrencyDropdown(false)),
-                ],
+  padding: const EdgeInsets.all(25),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Main Heading
+      Center(
+        child: Text(
+          "Currency Exchange ", 
+          style: TextStyle(
+            fontSize: 26,  
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF388E3C),  
+            shadows: [
+              Shadow(
+                offset: Offset(2, 2),
+                blurRadius: 4,
+                color: const Color.fromARGB(66, 114, 114, 113),
               ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+      SizedBox(height: 4),  
+
+      
+      Center(
+        child: Text(
+          "Get real-time exchange rates and monitor historical data",  // Subtitle or description
+          style: TextStyle(
+            fontSize: 15,
+            fontStyle: FontStyle.italic,
+            color: Colors.black54,  // A softer color for the subtitle
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+SizedBox(height: 20,),
+      // Rest of your code
+      Row(
+        children: [
+          Expanded(child: buildCurrencyDropdown(true)),
+          const Text(' = '),
+          Expanded(child: buildCurrencyDropdown(false)),
+        ],
+      ),
               const SizedBox(height: 20),
               Text(
                 '1 $fromCurrency = ${exchangeRate.toStringAsFixed(2)} $toCurrency',
@@ -426,13 +472,42 @@ String fromCurrency = 'AFN';
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-              const SizedBox(height: 32),
-              const Text(
-                'Historical Data ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+           
+              const SizedBox(height: 35),
+              Center(
+                child: Text(
+                  "Historical Data",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                    color: Color(0xFF388E3C), // Match your theme color
+                    shadows: [
+                      Shadow(
+                        offset: Offset(2, 2),
+                        blurRadius: 3,
+                        color: const Color.fromARGB(66, 114, 114, 113),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              const SizedBox(height: 16),
+SizedBox(height: 4,),
+Center(
+  child: Text(
+    "Data for 2005-02-01. See how the rates evolved.",
+    style: TextStyle(
+      fontSize: 15,
+      fontStyle: FontStyle.italic,
+      color: Colors.black54, 
+    ),
+    textAlign: TextAlign.center,
+  ),
+),
+
+           
+              const SizedBox(height: 30),
               if (historicalDataPoints.isEmpty)
                 const Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
               else
@@ -463,26 +538,29 @@ String fromCurrency = 'AFN';
     );
   }
 
-  Widget buildCurrencyDropdown(bool isFromCurrency) {
-    return DropdownButton<String>(
-      value: isFromCurrency ? fromCurrency : toCurrency,
-      isExpanded: true,
-      items: currencies.map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: (newValue) {
-        setState(() {
-          if (isFromCurrency) {
-            fromCurrency = newValue!;
-          } else {
-            toCurrency = newValue!;
-          }
-          fetchRates(fromCurrency); 
-        });
-      },
-    );
-  }
+Widget buildCurrencyDropdown(bool isFromCurrency) {
+  return DropdownButton<String>(
+    value: isFromCurrency ? fromCurrency : toCurrency,
+    isExpanded: true,
+    items: currencies.map((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }).toList(),
+    onChanged: (newValue) {
+      setState(() {
+        if (isFromCurrency) {
+          fromCurrency = newValue!;
+        } else {
+          toCurrency = newValue!;
+        }
+        fetchExchangeRate();
+        hitAPI(); 
+      });
+    },
+  );
 }
+ }
+
+ 

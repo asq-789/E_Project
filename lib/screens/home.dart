@@ -141,7 +141,7 @@ Map<String, dynamic>? marketData;
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text("Conversion Result", style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text("Conversion Result", style: TextStyle(color: Color(0xFF388E3C),fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -161,7 +161,6 @@ Map<String, dynamic>? marketData;
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Conversion saved!")));
               },
-              icon: Icon(Icons.save),
               label: Text("Save"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF388E3C),
@@ -197,10 +196,10 @@ Widget buildMarketAnalysis() {
   double btcDominance = marketData!['market_cap_percentage']['btc'];
 
   return Card(
-    margin: const EdgeInsets.all(15),
-    elevation: 2,
+    // margin: const EdgeInsets.all(15),
+    elevation: 4,
     child: Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -315,7 +314,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Center(child: Text("Welcome to Currensee! 💱", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C), shadows: [Shadow(offset: Offset(2, 2), blurRadius: 3, color: Color.fromARGB(66, 114, 114, 113))]), textAlign: TextAlign.center)),
                     Center(child: Text("Ready to convert some currencies?", style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]))),
                     SizedBox(height: 30),
@@ -382,30 +381,53 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                                 Map<String, dynamic> rates = data['conversion_rates'];
                                 List<String> topList = ['USD', 'EUR', 'GBP', 'PKR', 'INR'];
 
-                                return Column(
-                                  children: [
-                                    ...topList.map((code) => Card(
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                          elevation: 4,
-                                          margin: EdgeInsets.symmetric(vertical: 5),
-                                          child: ListTile(
-                                            title: Text("1 $fromCurrency = ${rates[code].toStringAsFixed(2)} $code", style: TextStyle(fontWeight: FontWeight.w600)),
-                                            trailing: Icon(Icons.star_border, color: Colors.grey),
-                                          ),
-                                        )),
-                                    SizedBox(height: 10),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: TextButton.icon(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context, '/currencies');
-                                        },
-                                        icon: Icon(Icons.arrow_forward, color: Color(0xFF388E3C)),
-                                        label: Text("View More", style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.w600)),
-                                      ),
-                                    ),
-                                  ],
-                                );
+                               return Column(
+  children: [
+    ...topList.map((code) => Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 4,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          child: ListTile(
+            title: Text(
+              "1 $fromCurrency = ${rates[code].toStringAsFixed(2)} $code",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            trailing: IconButton(
+              icon: Icon(
+                likedCurrencies.contains(code) ? Icons.star : Icons.star_border,
+                color: likedCurrencies.contains(code) ? Color(0xFF388E3C): Colors.grey,
+              ),
+              onPressed: () {
+                setState(() {
+                  if (likedCurrencies.contains(code)) {
+                    likedCurrencies.remove(code);
+                  } else {
+                    likedCurrencies.add(code);
+                  }
+                });
+
+                // Optional: Save to Firestore here if needed
+              },
+            ),
+          ),
+        )),
+    SizedBox(height: 10),
+    Align(
+      alignment: Alignment.centerRight,
+      child: TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, '/currencies');
+        },
+        icon: Icon(Icons.arrow_forward, color: Color(0xFF388E3C)),
+        label: Text(
+          "View More",
+          style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.w600),
+        ),
+      ),
+    ),
+  ],
+);
+
                               }
                             },
                           ),
@@ -427,6 +449,8 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
       Center(child: Text("Market Overview", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C)))),
       SizedBox(height: 12),
       buildMarketAnalysis(),
+            SizedBox(height: 15),
+
         Align(
                                       alignment: Alignment.centerRight,
                                       child: TextButton.icon(
@@ -443,13 +467,150 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
 
                     SizedBox(height: 30),
                     
- 
+   NewsletterSection(),
                   ],
                 ),
+              
+
               ),
              // Container();
             ),
       bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
+  }
+}
+
+
+//NewsletterSection
+class NewsletterSection extends StatefulWidget {
+  @override
+  _NewsletterSectionState createState() => _NewsletterSectionState();
+}
+
+class _NewsletterSectionState extends State<NewsletterSection> {
+  final TextEditingController emailController = TextEditingController();
+  String? errorText;
+
+  final Color themeColor = Color(0xFF388E3C);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Newsletter Subscription Heading
+        Text(
+          'Subscribe To Our Newsletter',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+            color: themeColor,
+            shadows: [
+              Shadow(
+                offset: Offset(2, 2),
+                blurRadius: 3,
+                color: Color.fromARGB(66, 114, 114, 113),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 8),
+    
+        // Subheading text
+        Text(
+          'Stay updated with the latest news and offers',
+          style: TextStyle(
+            fontSize: 16,
+            fontStyle: FontStyle.italic,
+            color: Colors.grey[600],
+          ),
+        ),
+        SizedBox(height: 12),
+    
+        Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          labelText: 'E-Mail',
+                          labelStyle: TextStyle(color: themeColor),
+                          prefixIcon: Icon(Icons.email, color: themeColor,size: 20,),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: themeColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: themeColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: themeColor, width: 2),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red, width: 2),
+                          ),
+                          errorText: errorText,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                    
+                      ),
+                      onPressed: () {
+                        String email = emailController.text.trim();
+                        String? error = _validateEmail(email);
+                        if (error == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Subscribed with $email')),
+                          );
+                          setState(() {
+                            errorText = null;
+                          });
+                          emailController.clear();
+                        } else {
+                          setState(() {
+                            errorText = error;
+                          });
+                        }
+                      },
+                      child: Text('Subscribe',style: TextStyle(color: Colors.white),),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String? _validateEmail(String email) {
+    if (email.isEmpty) {
+      return 'Please enter an email';
+    }
+    RegExp emailRegExp = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    if (!emailRegExp.hasMatch(email)) {
+      return 'Please enter a valid email';
+    }
+    return null;
   }
 }
