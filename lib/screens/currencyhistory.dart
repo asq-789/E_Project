@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-String selectedCurrency = "USD";
-
 class Currencyhistory extends StatefulWidget {
   const Currencyhistory({super.key});
 
@@ -22,9 +20,9 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
   Future<void> hitAPI() async {
     final fromDate = DateTime(2024, 4, 1);
     final toDate = DateTime(2024, 4, 10);
-    final base = selectedCurrency;
 
-    final url = Uri.parse("https://api.frankfurter.app/${DateFormat('yyyy-MM-dd').format(fromDate)}..${DateFormat('yyyy-MM-dd').format(toDate)}?from=$base");
+    final url = Uri.parse(
+        "https://api.frankfurter.app/${DateFormat('yyyy-MM-dd').format(fromDate)}..${DateFormat('yyyy-MM-dd').format(toDate)}");
 
     final response = await http.get(url);
 
@@ -80,34 +78,38 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 children: [
-                  // ✅ Heading Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Showing rates for past $numberOfDays days',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  // ✅ Heading
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.currency_exchange,
+                          size: 28,
+                          color: Color(0xFF388E3C),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Base: $selectedCurrency',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                        const SizedBox(width: 10),
+                        Text(
+                          'Recently Conversion Rates from past $numberOfDays days',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF388E3C),
+                            shadows: [
+                              Shadow(
+                                offset: const Offset(2.0, 2.0),
+                                blurRadius: 3.0,
+                                color: Colors.black.withOpacity(0.3),
+                              ),
+                            ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 10),
+
                   // ✅ List of rates
                   Expanded(
                     child: ListView(
@@ -122,6 +124,10 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: ExpansionTile(
+                            leading: const Icon(
+                              Icons.currency_exchange,
+                              color: Colors.green,
+                            ),
                             title: Text(
                               "Date: $date",
                               style: const TextStyle(
@@ -130,8 +136,19 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
                               ),
                             ),
                             children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8.0),
+                                child: Text(
+                                  "All conversion rates for this day:",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
                               SizedBox(
-                                height: 200, // Fixed scrollable height
+                                height: 200,
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: dailyRates.length,
@@ -139,9 +156,14 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
                                     String currency = dailyRates.keys.elementAt(index);
                                     double rate = dailyRates[currency].toDouble();
 
-                                    return ListTile(
-                                      title: Text(currency),
-                                      subtitle: Text('Rate: $rate'),
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                          title: Text(currency),
+                                          subtitle: Text('Rate: $rate'),
+                                        ),
+                                        const Divider(thickness: 1),
+                                      ],
                                     );
                                   },
                                 ),
@@ -155,7 +177,7 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
                 ],
               ),
             ),
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }

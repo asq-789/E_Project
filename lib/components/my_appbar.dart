@@ -1,4 +1,5 @@
 import 'package:currensee/screens/login.dart';
+import 'package:currensee/screens/rate_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -126,28 +127,40 @@ class CustomDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
+          // DrawerHeader with logo
           const DrawerHeader(
-  decoration: BoxDecoration(color: themeColor),
-  child: Center(
-    child: Text(
-      'Currensee',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 28,
-        fontStyle: FontStyle.italic,
-        fontWeight: FontWeight.bold,
-        shadows: [
-          Shadow(
-            offset: Offset(2, 2),
-            blurRadius: 3.0,
-            color: Colors.black45,
+            decoration: BoxDecoration(color: themeColor),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo Image
+                // Image.asset(
+                //    'public/assets/images/bg.png',
+                // ),
+                  SizedBox(height: 10), // Space between logo and text
+                  Text(
+                    'Currensee',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(2, 2),
+                          blurRadius: 3.0,
+                          color: Colors.black45,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
-    ),
-  ),
-),
 
+          // Drawer items
           _drawerItem(
             icon: Icons.person,
             text: 'Profile',
@@ -169,11 +182,11 @@ class CustomDrawer extends StatelessWidget {
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies())),
           ),
           _divider(),
-          SwitchListTile(
-            secondary: const Icon(Icons.notifications, color: themeColor),
-            title: const Text('Notifications'),
-            value: notificationsEnabled,
-            onChanged: onNotificationsChanged,
+          _drawerItem(
+            icon: Icons.arrow_circle_right_sharp,
+            text: 'Check Alerts ',
+            context: context,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RateAlerts())),
           ),
           _divider(),
           _drawerItem(
@@ -187,47 +200,53 @@ class CustomDrawer extends StatelessWidget {
             icon: Icons.logout,
             text: 'Logout',
             context: context,
-            onTap: (){
-              showDialog(context: context, 
-              builder: (BuildContext context){
-                return AlertDialog(
-                   shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        elevation: 10, 
-                  title: Text('Logout Confirmation',style: TextStyle(color: themeColor),),
-                  content: Text('Are you sure you want to Logout?'),
-                  actions: [
-                    TextButton(onPressed: 
-                    (){
-                      Navigator.of(context).pop();
-                    }, child: Text('Cancel',style: TextStyle(color: themeColor),)
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    
-                ElevatedButton(
-  onPressed: () {
-    Navigator.of(context).pop();
-    FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(context,MaterialPageRoute(builder:(context)=>Login()));
-  },
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Color(0xFF388E3C),
-    foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  child: const Text('Logout'),
-)
-
-                  ],
-                );
-              });
-            }
-            // onTap: () async {
-            //   await FirebaseAuth.instance.signOut();
-            //   Navigator.restorablePopAndPushNamed(context, "/login");
-            // },
+                    elevation: 10,
+                    title: Text(
+                      'Logout Confirmation',
+                      style: TextStyle(color: themeColor),
+                    ),
+                    content: Text('Are you sure you want to Logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: themeColor),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          FirebaseAuth.instance.signOut();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => Login()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF388E3C),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
@@ -251,6 +270,6 @@ class CustomDrawer extends StatelessWidget {
   }
 
   Widget _divider() {
-    return const Divider( height: 1);
+    return const Divider(height: 1);
   }
 }

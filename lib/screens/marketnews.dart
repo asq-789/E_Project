@@ -211,6 +211,7 @@ final List<Map<String, dynamic>> marketNews = [
   }
 ];
 
+
 class MarketNewsPage extends StatefulWidget {
   const MarketNewsPage({Key? key}) : super(key: key);
 
@@ -248,7 +249,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
     return Scaffold(
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
-         title: "Market News",
+        title: "Market News",
         onToggleNotifications: () {
           setState(() {
             notificationsEnabled = !notificationsEnabled;
@@ -270,14 +271,34 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "News",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 1, 22, 36),
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+           Row(
+  children: [
+    const Icon(
+      Icons.newspaper_rounded,
+      color: Color.fromARGB(255, 1, 19, 31),
+    ),
+    const SizedBox(width: 8),
+    Text(
+      "Top Stories",
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        fontStyle: FontStyle.italic,
+                color: Color.fromARGB(255, 4, 107, 26),
+        shadows: [
+          Shadow(
+            offset: Offset(1.5, 1.5),
+            blurRadius: 3.0,
+            color: Colors.black26,
+          ),
+        ],
+      ),
+    ),
+  ],
+),
+
+
+
                 // Toggle Buttons for Articles and Trends
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -289,21 +310,20 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                       });
                     },
                     selectedColor: Colors.white,
-                            selectedBorderColor: Colors.green,
-                            fillColor: Colors.green,
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(8),
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Text('News'),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Text('Trends'),
-                              ),
-                            ],
-                    
+                    selectedBorderColor: Colors.green,
+                    fillColor: Colors.green,
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8),
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('News'),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('Trends'),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -321,14 +341,14 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                             return Card(
                               margin: const EdgeInsets.all(10),
                               elevation: 5,
-                              color: Theme.of(context).cardColor, // Updated to theme color
+                              color: Colors.white, // White card background
                               child: ListTile(
                                 title: Text(
                                   news['title'],
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).textTheme.headlineLarge!.color, // Updated to theme color
+                                    color: Theme.of(context).textTheme.headlineLarge!.color,
                                   ),
                                 ),
                                 subtitle: Text(news['description']),
@@ -336,9 +356,24 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('Rate: ${news['rate']}'),
-                                    Text('Currency: ${news['currency']}'),
-                                    Text('Date: ${news['date']}'),
+                                    Text(
+                                      'Rate: ${news['rate']}',
+                                      style: TextStyle(
+                                       color: Colors.redAccent, // A softer red accent color
+                                      ),
+                                    ),
+                                    Text(
+                                      'Currency: ${news['currency']}',
+                                      style: TextStyle(
+                                        color: Colors.blue, // Different color for currency
+                                      ),
+                                    ),
+                                    Text(
+                                      'Date: ${news['date']}',
+                                      style: TextStyle(
+                                        color: Colors.black87, // Slightly darker color for date
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 onTap: () {
@@ -368,8 +403,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
               : Container(), // This part won't be visible since it's handled by navigation directly to Trendspage
         ],
       ),
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
-
+      bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
     );
   }
 }
@@ -378,7 +412,7 @@ void main() {
   runApp(MaterialApp(
     theme: ThemeData(
       primaryColor: Colors.blue, // Set the primary color for the app
-      scaffoldBackgroundColor: Colors.grey[100], // Set background color for the scaffold
+      scaffoldBackgroundColor: Color(0xFFF1F1F1), // Soft light gray background
       textTheme: TextTheme(
         headlineLarge: TextStyle(color: Colors.black), // Text style for titles
         bodyMedium: TextStyle(color: Colors.black87), // Body text style

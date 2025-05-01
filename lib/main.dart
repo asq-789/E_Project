@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.indigo),
     // home: HomeScreen(),
     home:  isLoggedIn ? HomeScreen() : Login(),
-// initialRoute: '/Currensee',
+ initialRoute: '/Currensee',
     routes: {
      '/Currensee': (context) => Currensee(),
        '/login': (context) =>  Login(),

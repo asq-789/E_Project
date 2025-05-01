@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:currensee/components/bottom_navbar.dart';
+import 'package:currensee/components/my_appbar.dart';
 import 'package:currensee/screens/currencyhistory.dart';
 import 'package:currensee/screens/marketnews.dart';
 import 'package:currensee/screens/rate_alert.dart';
@@ -28,6 +29,8 @@ class _ChartsState extends State<Charts> {
   String baseCurrency = '';
   String selectedCurrency = '';
   TextEditingController searchController = TextEditingController();
+bool hasShownAlert = false;
+  bool notificationsEnabled = false;
 
 @override
 void initState() {
@@ -92,20 +95,50 @@ void checkRateAlerts() {
 
 
 void showAlertNotification(String fromCurrency, String toCurrency, double targetRate) {
+  if (hasShownAlert) return;
+
+  hasShownAlert = true;
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Rate Alert',style:TextStyle(color:Color(0xFF388E3C) ) ),
-        content: Text('The rate of $fromCurrency → $toCurrency has reached $targetRate'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 8,
+        backgroundColor: Colors.white,
+        title: Row(
+          children: const [
+            Icon(Icons.notifications_active, color: Color(0xFF388E3C)),
+            SizedBox(width: 10),
+            Text(
+              'Rate Alert',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Color(0xFF388E3C),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'The rate of $fromCurrency → $toCurrency has reached $targetRate',
+          style: const TextStyle(fontSize: 16),
+        ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); 
+              Navigator.of(context).pop();
             },
-            child: Text('OK',style: TextStyle(color: Color(0xFF388E3C)),),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF388E3C),
+              ),
+            ),
           ),
-          
         ],
       );
     },
@@ -290,6 +323,117 @@ Future<void> fetchCurrencies() async {
       }
     }
   }
+  
+void showNotification(BuildContext context) {
+  FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser?.uid)
+      .collection('alerts')
+      .get()
+      .then((querySnapshot) {
+    List<String> alertsList = [];
+    querySnapshot.docs.forEach((doc) {
+      String alertMessage =
+          '${doc['fromCurrency']} → ${doc['toCurrency']} reached ${doc['targetRate']}';
+      alertsList.add(alertMessage);
+    });
+
+    if (alertsList.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            backgroundColor: Colors.white,
+            title: Row(
+              children: [
+                Icon(Icons.notifications_active, color: Colors.green),
+                SizedBox(width: 8),
+                Text(
+                  'Rate Alerts',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 28, 130, 35),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                  ),
+                ),
+              ],
+            ),
+            content: Container(
+              width: 300,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Updated Reminder Message
+                    Center(
+                      child: Text(
+                        "Your set exchange rate targets have been met!", // Updated reminder message
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+            color: Colors.black54,  // A softer color for the subtitle
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 10),  // Add space between reminder and alerts list
+                    // Alerts List
+                    ...alertsList.map(
+                      (alert) => Card(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                        child: ListTile(
+                          leading: Icon(Icons.check_circle, color: Colors.green),
+                          title: Text(
+                            alert,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ).toList(),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Dismiss',
+                  style: TextStyle(
+                    color: Color(0xFF1B5E20),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('You have no active rate alerts!'),
+          backgroundColor: Color(0xFF388E3C),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      );
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -298,36 +442,46 @@ Future<void> fetchCurrencies() async {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Currency Charts'),
-        actions: [ IconButton(
-    icon: const Icon(Icons.trending_up, color: Colors.white),
-    onPressed: () {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const MarketNewsPage()));
-    },
-  ),
-           IconButton(
-            icon: Icon(Icons.notifications_active),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RateAlerts()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: 'Currency History',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Currencyhistory()),
-              );
-            },
-          ),
-        ],
-        backgroundColor: const Color(0xFF388E3C),
-        foregroundColor: Colors.white,
+    appBar: AppBar(
+  title: const Text('Currency Tracker'),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.trending_up, color: Colors.white),
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const MarketNewsPage()));
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.history),
+      tooltip: 'Currency History',
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Currencyhistory()),
+        );
+      },
+    ),
+IconButton(
+  icon: const Icon(Icons.notifications),
+  tooltip: 'Show Target Rates',
+  onPressed: () {
+    showNotification(context); // Pass the context here
+  },
+),
+
+
+
+  ],
+  backgroundColor: const Color(0xFF388E3C),
+  foregroundColor: Colors.white,
+),
+ drawer: CustomDrawer(
+        notificationsEnabled: notificationsEnabled,
+        onNotificationsChanged: (bool value) {
+          setState(() {
+            notificationsEnabled = value;
+          });
+        },
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -372,7 +526,8 @@ Future<void> fetchCurrencies() async {
         ),
       ),
 SizedBox(height: 20,),
-      // Rest of your code
+      // Rest of your code 
+      //dropdown
     Row(
   children: [
     Expanded(child: buildCurrencyDropdown(true)),

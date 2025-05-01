@@ -59,7 +59,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: "Convert"),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Charts"),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Rates Tracker"),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Currency List"),
           BottomNavigationBarItem(icon: Icon(Icons.contact_mail), label: "Contact Us"),
           BottomNavigationBarItem(icon: Icon(Icons.feedback), label: "Feedback"),

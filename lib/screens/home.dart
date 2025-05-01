@@ -446,7 +446,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Center(child: Text("Market Overview", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C)))),
+      Center(child: Text("Degital Currency", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C)))),
       SizedBox(height: 12),
       buildMarketAnalysis(),
             SizedBox(height: 15),
