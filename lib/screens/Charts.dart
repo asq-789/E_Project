@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/screens/currencyhistory.dart';
+import 'package:currensee/screens/marketnews.dart';
 import 'package:currensee/screens/rate_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -296,9 +297,15 @@ Future<void> fetchCurrencies() async {
     double chartHeight = 200;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Currency Charts'),
-        actions: [
+        actions: [ IconButton(
+    icon: const Icon(Icons.trending_up, color: Colors.white),
+    onPressed: () {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const MarketNewsPage()));
+    },
+  ),
            IconButton(
             icon: Icon(Icons.notifications_active),
             onPressed: () {
@@ -328,11 +335,14 @@ Future<void> fetchCurrencies() async {
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // Main Heading
+      // Main Heading 
+      SizedBox(height: 10,),
       Center(
+       
         child: Text(
           "Currency Exchange ", 
           style: TextStyle(
+            fontStyle: FontStyle.italic,
             fontSize: 26,  
             fontWeight: FontWeight.bold,
             color: Color(0xFF388E3C),  
@@ -363,13 +373,16 @@ Future<void> fetchCurrencies() async {
       ),
 SizedBox(height: 20,),
       // Rest of your code
-      Row(
-        children: [
-          Expanded(child: buildCurrencyDropdown(true)),
-          const Text(' = '),
-          Expanded(child: buildCurrencyDropdown(false)),
-        ],
-      ),
+    Row(
+  children: [
+    Expanded(child: buildCurrencyDropdown(true)),
+    SizedBox(width: 10),
+    Icon(Icons.compare_arrows,color:  Color(0xFF388E3C), ),
+    SizedBox(width: 10),
+    Expanded(child: buildCurrencyDropdown(false)),
+  ],
+),
+
               const SizedBox(height: 20),
               Text(
                 '1 $fromCurrency = ${exchangeRate.toStringAsFixed(2)} $toCurrency',

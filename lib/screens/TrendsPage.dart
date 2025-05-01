@@ -269,7 +269,7 @@ class TrendspageState extends State<Trendspage> {
                     children: [
                       Container(
                         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -278,12 +278,13 @@ class TrendspageState extends State<Trendspage> {
                     const Text(
             "Digital Currensee",
             style: TextStyle(
-              color: Color.fromARGB(255, 1, 22, 36),
+            
               fontSize: 22,
+               fontStyle: FontStyle.italic,
+    color: Color(0xFF388E3C),
               fontWeight: FontWeight.bold,
             ),
                     ),
-                SizedBox(width: 60,),
                     ToggleButtons(
             isSelected: [selectedIndex == 0, selectedIndex == 1],
             onPressed: (index) {

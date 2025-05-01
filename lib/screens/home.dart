@@ -514,7 +514,7 @@ class _NewsletterSectionState extends State<NewsletterSection> {
             ],
           ),
         ),
-        SizedBox(height: 8),
+        SizedBox(height: 4),
     
         // Subheading text
         Text(
