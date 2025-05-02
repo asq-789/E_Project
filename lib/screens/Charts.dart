@@ -72,6 +72,8 @@ Future<void> fetchExchangeRate() async {
 }
 
 void checkRateAlerts() {
+  if (!notificationsEnabled) return; // Skip if toggle is off
+
   final user = FirebaseAuth.instance.currentUser;
   if (user != null) {
     FirebaseFirestore.instance
@@ -342,89 +344,91 @@ void showNotification(BuildContext context) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            backgroundColor: Colors.white,
-            title: Row(
-              children: [
-                Icon(Icons.notifications_active, color: Colors.green),
-                SizedBox(width: 8),
-                Text(
-                  'Rate Alerts',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 28, 130, 35),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
+          final screenWidth = MediaQuery.of(context).size.width;
+
+          return LayoutBuilder(builder: (context, constraints) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              backgroundColor: Colors.white,
+              titlePadding: const EdgeInsets.all(16),
+              title: Row(
+                children: [
+                  const Icon(Icons.notifications_active, color: Colors.green),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Rate Alerts',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 28, 130, 35),
+                        fontWeight: FontWeight.bold,
+                        fontSize: screenWidth < 350 ? 18 : 22,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            content: Container(
-              width: 300,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Updated Reminder Message
-                    Center(
-                      child: Text(
-                        "Your set exchange rate targets have been met!", // Updated reminder message
+                ],
+              ),
+              content: SizedBox(
+                width: screenWidth < 400 ? screenWidth * 0.85 : 300,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Your set exchange rate targets have been met!",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
-            color: Colors.black54,  // A softer color for the subtitle
+                          color: Colors.black54,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    ),
-                    SizedBox(height: 10),  // Add space between reminder and alerts list
-                    // Alerts List
-                    ...alertsList.map(
-                      (alert) => Card(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                        child: ListTile(
-                          leading: Icon(Icons.check_circle, color: Colors.green),
-                          title: Text(
-                            alert,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
+                      const SizedBox(height: 10),
+                      ...alertsList.map(
+                        (alert) => Card(
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                          child: ListTile(
+                            leading: const Icon(Icons.check_circle, color: Colors.green),
+                            title: Text(
+                              alert,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ).toList(),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Dismiss',
-                  style: TextStyle(
-                    color: Color(0xFF1B5E20),
-                    fontWeight: FontWeight.bold,
+                    ],
                   ),
                 ),
               ),
-            ],
-          );
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    'Dismiss',
+                    style: TextStyle(
+                      color: Color(0xFF1B5E20),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          });
         },
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('You have no active rate alerts!'),
-          backgroundColor: Color(0xFF388E3C),
+          backgroundColor: const Color(0xFF388E3C),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -434,6 +438,7 @@ void showNotification(BuildContext context) {
     }
   });
 }
+
 
   @override
   Widget build(BuildContext context) {
@@ -475,14 +480,14 @@ IconButton(
   backgroundColor: const Color(0xFF388E3C),
   foregroundColor: Colors.white,
 ),
- drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
-      ),
+drawer: CustomDrawer(
+      notificationsEnabled: notificationsEnabled,
+      onNotificationsChanged: (bool value) {
+        setState(() {
+          notificationsEnabled = value;
+        });
+      },
+    ),
       body: SingleChildScrollView(
         child: Padding(
   padding: const EdgeInsets.all(25),

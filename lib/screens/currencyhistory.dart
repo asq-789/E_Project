@@ -72,6 +72,7 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
           });
         },
       ),
+      
       body: rates == null
           ? const Center(child: CircularProgressIndicator())
           : Padding(

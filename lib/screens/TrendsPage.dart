@@ -267,59 +267,286 @@ class TrendspageState extends State<Trendspage> {
                 : ListView(
                     padding: const EdgeInsets.only(bottom: 20),
                     children: [
-                      Container(
-                        child: SingleChildScrollView(
-        
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//     LayoutBuilder(
+//   builder: (context, constraints) {
+//     bool isMobile = constraints.maxWidth < 600;  // You can adjust this breakpoint
+
+//     return Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+//       child: isMobile
+//           // Mobile Layout
+//           ? Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 // Heading on top for mobile
+//                 const Text(
+//                   "Digital Currensee",
+//                   style: TextStyle(
+//                     fontSize: 22,
+//                     fontStyle: FontStyle.italic,
+//                     color: Color(0xFF388E3C),
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 10),
+//                 // Toggle Buttons below the heading
+//                 ToggleButtons(
+//                   isSelected: [selectedIndex == 0, selectedIndex == 1],
+//                   onPressed: (index) {
+//                     setState(() {
+//                       selectedIndex = index;
+//                     });
+//                     if (index == 1) {
+//                       Navigator.push(
+//                         context,
+//                         MaterialPageRoute(builder: (context) => MarketNewsPage()),
+//                       );
+//                     }
+//                   },
+//                   selectedColor: Colors.white,
+//                   selectedBorderColor: Colors.green,
+//                   fillColor: Colors.green,
+//                   color: Colors.black,
+//                   borderRadius: BorderRadius.circular(8),
+//                   constraints: const BoxConstraints(
+//                     minHeight: 40, // Adjust for mobile button height
+//                     minWidth: 100, // Adjust for mobile button width
+//                   ),
+//                   children: const [
+//                     Padding(
+//                       padding: EdgeInsets.symmetric(horizontal: 15),
+//                       child: Text('Coins'),
+//                     ),
+//                     Padding(
+//                       padding: EdgeInsets.symmetric(horizontal: 15),
+//                       child: Text('News'),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             )
+//           // Desktop or larger screen layout
+//           : Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 // Toggle Buttons on the left for larger screens
+//                 Flexible(
+//                   flex: 2,
+//                   child: ToggleButtons(
+//                     isSelected: [selectedIndex == 0, selectedIndex == 1],
+//                     onPressed: (index) {
+//                       setState(() {
+//                         selectedIndex = index;
+//                       });
+//                       if (index == 1) {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(builder: (context) => MarketNewsPage()),
+//                         );
+//                       }
+//                     },
+//                     selectedColor: Colors.white,
+//                     selectedBorderColor: Colors.green,
+//                     fillColor: Colors.green,
+//                     color: Colors.black,
+//                     borderRadius: BorderRadius.circular(8),
+//                     constraints: const BoxConstraints(
+//                       minHeight: 40, // Adjust button size for desktop
+//                       minWidth: 120,
+//                     ),
+//                     children: const [
+//                       Padding(
+//                         padding: EdgeInsets.symmetric(horizontal: 15),
+//                         child: Text('Coins'),
+//                       ),
+//                       Padding(
+//                         padding: EdgeInsets.symmetric(horizontal: 15),
+//                         child: Text('News'),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 // Heading on the right side for larger screens
+//                 Flexible(
+//                   flex: 1,
+//                   child: FittedBox(
+//                     fit: BoxFit.scaleDown,
+//                     alignment: Alignment.centerRight,
+//                     child: const Text(
+//                       "Digital Currensee",
+//                       style: TextStyle(
+//                         fontSize: 22,
+//                         fontStyle: FontStyle.italic,
+//                         color: Color(0xFF388E3C),
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//     );
+//   },
+// ),
+  LayoutBuilder(
+  builder: (context, constraints) {
+    bool isMobile = constraints.maxWidth < 400;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                    const Text(
-            "Digital Currensee",
-            style: TextStyle(
-            
-              fontSize: 22,
-               fontStyle: FontStyle.italic,
-    color: Color(0xFF388E3C),
-              fontWeight: FontWeight.bold,
-            ),
+                // Heading for mobile
+                Row(
+                  children: const [
+                    Icon(
+                      Icons.newspaper_rounded,
+                      color: Color.fromARGB(255, 1, 19, 31),
                     ),
-                    ToggleButtons(
-            isSelected: [selectedIndex == 0, selectedIndex == 1],
-            onPressed: (index) {
-              setState(() {
-                selectedIndex = index;
-              });
-              if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MarketNewsPage()),
-                );
-              }
-            },
-            selectedColor: Colors.white,
-            selectedBorderColor: Colors.green,
-            fillColor: Colors.green,
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(8),
-            children: const [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Text('Coins'),
-              ),
-            
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Text('News'),
-              ),
-            ],
+                    SizedBox(width: 4),
+                    Text(
+                      "Crypto",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                        color: Color.fromARGB(255, 4, 107, 26),
+                        overflow: TextOverflow.ellipsis,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(1.5, 1.5),
+                            blurRadius: 3.0,
+                            color: Colors.black26,
+                          ),
+                        ],
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // Toggle Buttons for mobile
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ToggleButtons(
+                    isSelected: [selectedIndex == 0, selectedIndex == 1],
+                    onPressed: (index) {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                      if (index == 1) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MarketNewsPage()),
+                        );
+                      }
+                    },
+                    selectedColor: Colors.white,
+                    selectedBorderColor: Colors.green,
+                    fillColor: Colors.green,
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8),
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text('Coins'),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text('News'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Toggle Buttons
+                Flexible(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ToggleButtons(
+                      isSelected: [selectedIndex == 0, selectedIndex == 1],
+                      onPressed: (index) {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                        if (index == 1) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MarketNewsPage()),
+                          );
+                        }
+                      },
+                      selectedColor: Colors.white,
+                      selectedBorderColor: Colors.green,
+                      fillColor: Colors.green,
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(6),
+                      constraints: const BoxConstraints(
+                        minHeight: 32,
+                        minWidth: 60,
+                      ),
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Text('Coins'),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Text('News'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Space between toggle and heading
+                const SizedBox(width: 20),
+
+                // Heading
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.newspaper_rounded,
+                          color: Color.fromARGB(255, 1, 19, 31),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          "Crypto",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            color: Color.fromARGB(255, 4, 107, 26),
+                            overflow: TextOverflow.ellipsis,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(1.5, 1.5),
+                                blurRadius: 3.0,
+                                color: Colors.black26,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ),
-         ),
+    );
+  },
+),
+
                       buildMarketAnalysis(),
                       ...detailedCoins.map((coin) => buildCoinTile(coin)).toList(),
                     ],

@@ -266,42 +266,47 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
       ),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        LayoutBuilder(
+  builder: (context, constraints) {
+    bool isMobile = constraints.maxWidth < 400;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-           Row(
-  children: [
-    const Icon(
-      Icons.newspaper_rounded,
-      color: Color.fromARGB(255, 1, 19, 31),
-    ),
-    const SizedBox(width: 8),
-    Text(
-      "Top Stories",
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        fontStyle: FontStyle.italic,
-                color: Color.fromARGB(255, 4, 107, 26),
-        shadows: [
-          Shadow(
-            offset: Offset(1.5, 1.5),
-            blurRadius: 3.0,
-            color: Colors.black26,
-          ),
-        ],
-      ),
-    ),
-  ],
-),
-
-
-
-                // Toggle Buttons for Articles and Trends
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                // Heading
+                Row(
+                  children: const [
+                    Icon(
+                      Icons.newspaper_rounded,
+                      color: Color.fromARGB(255, 1, 19, 31),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      "Top Stories",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                        color: Color.fromARGB(255, 4, 107, 26),
+                        overflow: TextOverflow.ellipsis,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(1.5, 1.5),
+                            blurRadius: 3.0,
+                            color: Colors.black26,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // Toggle Buttons
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
                   child: ToggleButtons(
                     isSelected: [selectedIndex == 0, selectedIndex == 1],
                     onPressed: (index) {
@@ -316,19 +321,100 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                     borderRadius: BorderRadius.circular(8),
                     children: const [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
                         child: Text('News'),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
                         child: Text('Trends'),
                       ),
                     ],
                   ),
                 ),
               ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Toggle Buttons
+                Flexible(
+                  flex: 2,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ToggleButtons(
+                      isSelected: [selectedIndex == 0, selectedIndex == 1],
+                      onPressed: (index) {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                      },
+                      selectedColor: Colors.white,
+                      selectedBorderColor: Colors.green,
+                      fillColor: Colors.green,
+                      color: Colors.black,
+                       borderRadius: BorderRadius.circular(6),
+  constraints: const BoxConstraints(
+    minHeight: 32,
+    minWidth: 60,
+  ),
+                    //  borderRadius: BorderRadius.circular(8),
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Text('News'),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Text('Trends'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Heading
+                Flexible(
+                  flex: 1,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.newspaper_rounded,
+                          color: Color.fromARGB(255, 1, 19, 31),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          "Top Stories",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            color: Color.fromARGB(255, 4, 107, 26),
+                            overflow: TextOverflow.ellipsis,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(1.5, 1.5),
+                                blurRadius: 3.0,
+                                color: Colors.black26,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
+    );
+  },
+),
+
+
+
           // Render Articles
           selectedIndex == 0
               ? Expanded(
@@ -338,65 +424,56 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                           itemCount: marketNews.length,
                           itemBuilder: (context, index) {
                             final news = marketNews[index];
-                            return Card(
-                              margin: const EdgeInsets.all(10),
-                              elevation: 5,
-                              color: Colors.white, // White card background
-                              child: ListTile(
-                                title: Text(
-                                  news['title'],
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).textTheme.headlineLarge!.color,
-                                  ),
-                                ),
-                                subtitle: Text(news['description']),
-                                trailing: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Rate: ${news['rate']}',
-                                      style: TextStyle(
-                                       color: Colors.redAccent, // A softer red accent color
-                                      ),
-                                    ),
-                                    Text(
-                                      'Currency: ${news['currency']}',
-                                      style: TextStyle(
-                                        color: Colors.blue, // Different color for currency
-                                      ),
-                                    ),
-                                    Text(
-                                      'Date: ${news['date']}',
-                                      style: TextStyle(
-                                        color: Colors.black87, // Slightly darker color for date
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text(news['title']),
-                                        content: Text(news['description']),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('Close'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            );
+                           return Card(
+  margin: const EdgeInsets.all(10),
+  elevation: 5,
+  color: Colors.white,
+  child: Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // News Title
+        Text(
+          news['title'] ?? 'No Title',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).textTheme.headlineLarge?.color ?? Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // News Description
+        Text(
+          news['description'] ?? 'No description',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 12),
+
+        // Rate, Currency, and Date
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Rate: ${news['rate'] ?? 'N/A'}',
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+            Text(
+              'Currency: ${news['currency'] ?? 'N/A'}',
+              style: const TextStyle(color: Colors.blue),
+            ),
+            Text(
+              'Date: ${news['date'] ?? 'N/A'}',
+              style: const TextStyle(color: Colors.black87),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ),
+);
+
                           },
                         ),
                 )

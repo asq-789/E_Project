@@ -13,6 +13,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool notificationsEnabled;
   final VoidCallback onToggleNotifications;
   final String title;
+ // bool notificationsEnabled = true;
 
   const CustomAppBar({
     super.key,
@@ -194,7 +195,20 @@ class CustomDrawer extends StatelessWidget {
             text: 'Help Center',
             context: context,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage())),
-          ),
+          ),_divider(),
+SwitchListTile(
+  title: const Text('Enable Notifications'),
+  secondary: const Icon(Icons.notifications_active, color: Color(0xFF388E3C)),
+  value: notificationsEnabled,
+  activeColor: Color(0xFF388E3C),        // Thumb color when ON
+  activeTrackColor: Color(0xFFC8E6C9),   // Track color when ON
+  inactiveThumbColor: Colors.grey,       // Thumb color when OFF
+  inactiveTrackColor: Colors.black26,    // Track color when OFF
+  onChanged: onNotificationsChanged,
+),
+
+
+_divider(),
           _divider(),
           _drawerItem(
             icon: Icons.logout,
