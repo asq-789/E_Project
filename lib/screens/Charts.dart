@@ -69,9 +69,22 @@ Future<void> fetchExchangeRate() async {
     print('Failed to load exchange rate');
   }
 }
+//notification
+void _updateNotificationPreference(bool value) async {
+  setState(() {
+    notificationsEnabled = value;
+  });
+
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .update({'notificationsEnabled': value});
+  }
+}
 
 void checkRateAlerts() {
-  if (!notificationsEnabled) return; // Skip if toggle is off
 
   final user = FirebaseAuth.instance.currentUser;
   if (user != null) {
@@ -145,6 +158,7 @@ void showAlertNotification(String fromCurrency, String toCurrency, double target
     },
   );
 }
+//alerts
 
 
 Future<void> fetchRates(String base) async {
@@ -324,8 +338,8 @@ Future<void> fetchCurrencies() async {
       }
     }
   }
-  
-void showNotification(BuildContext context) {
+  //Notification
+void showNotification(BuildContext context, double exchangeRate) {
   FirebaseFirestore.instance
       .collection('users')
       .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -333,10 +347,18 @@ void showNotification(BuildContext context) {
       .get()
       .then((querySnapshot) {
     List<String> alertsList = [];
+
     querySnapshot.docs.forEach((doc) {
-      String alertMessage =
-          '${doc['fromCurrency']} → ${doc['toCurrency']} reached ${doc['targetRate']}';
-      alertsList.add(alertMessage);
+      double targetRate = doc['targetRate'].toDouble(); // Ensure it's a double
+      String fromCurrency = doc['fromCurrency'];
+      String toCurrency = doc['toCurrency'];
+
+      // Check if the exchange rate meets or exceeds the target rate
+      if (exchangeRate >= targetRate) {
+        String alertMessage =
+            '$fromCurrency → $toCurrency reached $targetRate';
+        alertsList.add(alertMessage);
+      }
     });
 
     if (alertsList.isNotEmpty) {
@@ -469,7 +491,7 @@ IconButton(
   icon: const Icon(Icons.notifications),
   tooltip: 'Show Target Rates',
   onPressed: () {
-    showNotification(context); // Pass the context here
+showNotification(context, exchangeRate);
   },
 ),
 

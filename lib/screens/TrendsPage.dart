@@ -383,164 +383,90 @@ class TrendspageState extends State<Trendspage> {
 //     );
 //   },
 // ),
-  LayoutBuilder(
+ LayoutBuilder(
   builder: (context, constraints) {
     bool isMobile = constraints.maxWidth < 400;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: isMobile
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Heading for mobile
-                Row(
-                  children: const [
-                    Icon(
-                      Icons.newspaper_rounded,
-                      color: Color.fromARGB(255, 1, 19, 31),
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      "Crypto",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                        color: Color.fromARGB(255, 4, 107, 26),
-                        overflow: TextOverflow.ellipsis,
-                        shadows: [
-                          Shadow(
-                            offset: Offset(1.5, 1.5),
-                            blurRadius: 3.0,
-                            color: Colors.black26,
-                          ),
-                        ],
-                      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Toggle Buttons (left side, responsive)
+          Flexible(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ToggleButtons(
+                isSelected: [selectedIndex == 0, selectedIndex == 1],
+                onPressed: (index) {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                  if (index == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MarketNewsPage()),
+                    );
+                  }
+                },
+                selectedColor: Colors.white,
+                selectedBorderColor: Colors.green,
+                fillColor: Colors.green,
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(8),
+                constraints: const BoxConstraints(
+                  minHeight: 32,
+                  minWidth: 60,
+                ),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Text('Coins'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Text('News'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Heading (right side, fixed position)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(
+                Icons.newspaper_rounded,
+                color: Color.fromARGB(255, 1, 19, 31),
+              ),
+              SizedBox(width: 4),
+              Text(
+                "Crypto",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Color.fromARGB(255, 4, 107, 26),
+                  overflow: TextOverflow.ellipsis,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(1.5, 1.5),
+                      blurRadius: 3.0,
+                      color: Colors.black26,
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                // Toggle Buttons for mobile
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ToggleButtons(
-                    isSelected: [selectedIndex == 0, selectedIndex == 1],
-                    onPressed: (index) {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                      if (index == 1) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => MarketNewsPage()),
-                        );
-                      }
-                    },
-                    selectedColor: Colors.white,
-                    selectedBorderColor: Colors.green,
-                    fillColor: Colors.green,
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(8),
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Text('Coins'),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Text('News'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Toggle Buttons
-                Flexible(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ToggleButtons(
-                      isSelected: [selectedIndex == 0, selectedIndex == 1],
-                      onPressed: (index) {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                        if (index == 1) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MarketNewsPage()),
-                          );
-                        }
-                      },
-                      selectedColor: Colors.white,
-                      selectedBorderColor: Colors.green,
-                      fillColor: Colors.green,
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(6),
-                      constraints: const BoxConstraints(
-                        minHeight: 32,
-                        minWidth: 60,
-                      ),
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.0),
-                          child: Text('Coins'),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.0),
-                          child: Text('News'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Space between toggle and heading
-                const SizedBox(width: 20),
-
-                // Heading
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.newspaper_rounded,
-                          color: Color.fromARGB(255, 1, 19, 31),
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          "Crypto",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            color: Color.fromARGB(255, 4, 107, 26),
-                            overflow: TextOverflow.ellipsis,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(1.5, 1.5),
-                                blurRadius: 3.0,
-                                color: Colors.black26,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   },
 ),
+
 
                       buildMarketAnalysis(),
                       ...detailedCoins.map((coin) => buildCoinTile(coin)).toList(),

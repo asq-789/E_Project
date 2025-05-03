@@ -325,38 +325,42 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-           DrawerHeader(
-            decoration: BoxDecoration(color: themeColor),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                Image.asset("public/assets/images/bg.png"),
-                  SizedBox(height: 10),
-                  Text(
-                    'Currensee',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(2, 2),
-                          blurRadius: 3.0,
-                          color: Colors.black45,
-                        ),
-                      ],
-                    ),
+   return Drawer(
+  child: ListView(
+    padding: EdgeInsets.zero,
+    children: [
+      DrawerHeader(
+        decoration: BoxDecoration(color: themeColor),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Smaller logo
+            Image.asset(
+              "public/assets/images/bg.png",
+              width: 75,
+              height: 75,
+            ),
+            SizedBox(height: 8),
+            // App name
+            Text(
+              'Currensee',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 35,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    offset: Offset(1, 1),
+                    blurRadius: 2.0,
+                    color: Colors.black45,
                   ),
                 ],
               ),
             ),
-          ),
+          ],
+        ),
+      ),
 
           _drawerItem(
             icon: Icons.person,
