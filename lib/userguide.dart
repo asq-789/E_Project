@@ -29,12 +29,12 @@ class _UserGuidePageState extends State<UserGuidePage> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: SingleChildScrollView(
         child: Padding(

@@ -4,7 +4,6 @@ import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/components/my_appbar.dart';
 import 'package:currensee/screens/currencyhistory.dart';
 import 'package:currensee/screens/marketnews.dart';
-import 'package:currensee/screens/rate_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -52,7 +51,7 @@ void initState() {
 }
 
 Future<void> fetchExchangeRate() async {
-  final url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency');
+  final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -149,7 +148,7 @@ void showAlertNotification(String fromCurrency, String toCurrency, double target
 
 
 Future<void> fetchRates(String base) async {
-  var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$base');
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$base');
   var response = await http.get(url);
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
@@ -233,7 +232,7 @@ Future<void> fetchCurrencies() async {
     selectedCurrency = currency;
     searchController.text = baseCurrency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 
@@ -481,12 +480,12 @@ IconButton(
   foregroundColor: Colors.white,
 ),
 drawer: CustomDrawer(
-      notificationsEnabled: notificationsEnabled,
-      onNotificationsChanged: (bool value) {
-        setState(() {
-          notificationsEnabled = value;
-        });
-      },
+      // notificationsEnabled: notificationsEnabled,
+      // onNotificationsChanged: (bool value) {
+      //   setState(() {
+      //     notificationsEnabled = value;
+      //   });
+      // },
     ),
       body: SingleChildScrollView(
         child: Padding(
@@ -735,5 +734,3 @@ Widget buildCurrencyDropdown(bool isFromCurrency) {
   );
 }
  }
-
- 

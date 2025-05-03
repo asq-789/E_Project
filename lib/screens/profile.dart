@@ -31,7 +31,7 @@ void initState() {
 }
 
 Future<void> getCurrencyData() async {
-  var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/USD');
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/USD');
   var response = await http.get(url);
   var data = jsonDecode(response.body);
 
@@ -213,12 +213,12 @@ Widget build(BuildContext context) {
       },
     ),
     drawer: CustomDrawer(
-      notificationsEnabled: notificationsEnabled,
-      onNotificationsChanged: (bool value) {
-        setState(() {
-          notificationsEnabled = value;
-        });
-      },
+      // notificationsEnabled: notificationsEnabled,
+      // onNotificationsChanged: (bool value) {
+      //   setState(() {
+      //     notificationsEnabled = value;
+      //   });
+      // },
     ),
     body: isLoading
         ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))

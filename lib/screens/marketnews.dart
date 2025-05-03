@@ -257,12 +257,12 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: Column(
         children: [

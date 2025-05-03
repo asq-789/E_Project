@@ -251,12 +251,7 @@ class TrendspageState extends State<Trendspage> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+       
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

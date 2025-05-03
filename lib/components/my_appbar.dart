@@ -8,6 +8,7 @@ import 'package:currensee/screens/profile.dart';
 import 'package:currensee/screens/history.dart';
 import 'package:currensee/screens/liked_currencies.dart';
 import 'package:currensee/helppage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool notificationsEnabled;
@@ -110,36 +111,232 @@ Center(
   }
 }
 
-class CustomDrawer extends StatelessWidget {
-  final bool notificationsEnabled;
-  final ValueChanged<bool> onNotificationsChanged;
+// class CustomDrawer extends StatelessWidget {
+//   final bool notificationsEnabled;
+   
+//   final ValueChanged<bool> onNotificationsChanged;
 
-  const CustomDrawer({
-    super.key,
-    required this.notificationsEnabled,
-    required this.onNotificationsChanged,
-  });
+
+//   const CustomDrawer({
+//     super.key,
+//     required this.notificationsEnabled,
+//     required this.onNotificationsChanged,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     const themeColor = Color(0xFF388E3C);
+
+//     return Drawer(
+//       child: ListView(
+//         padding: EdgeInsets.zero,
+//         children: [
+//           // DrawerHeader with logo
+//           const DrawerHeader(
+//             decoration: BoxDecoration(color: themeColor),
+//             child: Center(
+//               child: Column(
+//                 mainAxisAlignment: MainAxisAlignment.center,
+//                 children: [
+//                   // Logo Image
+//                 // Image.asset(
+//                 //    'public/assets/images/bg.png',
+//                 // ),
+//                   SizedBox(height: 10), // Space between logo and text
+//                   Text(
+//                     'Currensee',
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontSize: 28,
+//                       fontStyle: FontStyle.italic,
+//                       fontWeight: FontWeight.bold,
+//                       shadows: [
+//                         Shadow(
+//                           offset: Offset(2, 2),
+//                           blurRadius: 3.0,
+//                           color: Colors.black45,
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+
+//           // Drawer items
+//           _drawerItem(
+//             icon: Icons.person,
+//             text: 'Profile',
+//             context: context,
+//             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Profile())),
+//           ),
+//           _divider(),
+//           _drawerItem(
+//             icon: Icons.history,
+//             text: 'History',
+//             context: context,
+//             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => History())),
+//           ),
+//           _divider(),
+//           _drawerItem(
+//             icon: Icons.favorite,
+//             text: 'Liked Currencies',
+//             context: context,
+//             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies())),
+//           ),
+//           _divider(),
+//           _drawerItem(
+//             icon: Icons.arrow_circle_right_sharp,
+//             text: 'Check Alerts ',
+//             context: context,
+//             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RateAlerts())),
+//           ),
+//           _divider(),
+//           _drawerItem(
+//             icon: Icons.help,
+//             text: 'Help Center',
+//             context: context,
+//             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage())),
+//           ),_divider(),
+// SwitchListTile(
+//   title: const Text('Enable Notifications'),
+//   secondary: const Icon(Icons.notifications_active, color: Color(0xFF388E3C)),
+//   value: notificationsEnabled,
+//   activeColor: Color(0xFF388E3C),        // Thumb color when ON
+//   activeTrackColor: Color(0xFFC8E6C9),   // Track color when ON
+//   inactiveThumbColor: Colors.grey,       // Thumb color when OFF
+//   inactiveTrackColor: Colors.black26,    // Track color when OFF
+//   onChanged: onNotificationsChanged,
+// ),
+
+
+// _divider(),
+//           _divider(),
+//           _drawerItem(
+//             icon: Icons.logout,
+//             text: 'Logout',
+//             context: context,
+//             onTap: () {
+//               showDialog(
+//                 context: context,
+//                 builder: (BuildContext context) {
+//                   return AlertDialog(
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(16),
+//                     ),
+//                     elevation: 10,
+//                     title: Text(
+//                       'Logout Confirmation',
+//                       style: TextStyle(color: themeColor),
+//                     ),
+//                     content: Text('Are you sure you want to Logout?'),
+//                     actions: [
+//                       TextButton(
+//                         onPressed: () {
+//                           Navigator.of(context).pop();
+//                         },
+//                         child: Text(
+//                           'Cancel',
+//                           style: TextStyle(color: themeColor),
+//                         ),
+//                       ),
+//                       ElevatedButton(
+//                         onPressed: () {
+//                           Navigator.of(context).pop();
+//                           FirebaseAuth.instance.signOut();
+//                           Navigator.pushReplacement(
+//                             context,
+//                             MaterialPageRoute(builder: (context) => Login()),
+//                           );
+//                         },
+//                         style: ElevatedButton.styleFrom(
+//                           backgroundColor: Color(0xFF388E3C),
+//                           foregroundColor: Colors.white,
+//                           shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(8),
+//                           ),
+//                         ),
+//                         child: const Text('Logout'),
+//                       ),
+//                     ],
+//                   );
+//                 },
+//               );
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _drawerItem({
+//     required IconData icon,
+//     required String text,
+//     required BuildContext context,
+//     required VoidCallback onTap,
+//   }) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 4.0),
+//       child: ListTile(
+//         leading: Icon(icon, color: const Color(0xFF388E3C)),
+//         title: Text(text),
+//         onTap: onTap,
+//       ),
+//     );
+//   }
+
+//   Widget _divider() {
+//     return const Divider(height: 1);
+//   }
+// }
+class CustomDrawer extends StatefulWidget {
+  const CustomDrawer({super.key});
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  static const themeColor = Color(0xFF388E3C);
+
+  bool notificationsEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationPreference();
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      notificationsEnabled = prefs.getBool('notificationsEnabled') ?? false;
+    });
+  }
+
+  Future<void> _updateNotificationPreference(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notificationsEnabled', value);
+    setState(() {
+      notificationsEnabled = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    const themeColor = Color(0xFF388E3C);
-
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          // DrawerHeader with logo
-          const DrawerHeader(
+           DrawerHeader(
             decoration: BoxDecoration(color: themeColor),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo Image
-                // Image.asset(
-                //    'public/assets/images/bg.png',
-                // ),
-                  SizedBox(height: 10), // Space between logo and text
+                Image.asset("public/assets/images/bg.png"),
+                  SizedBox(height: 10),
                   Text(
                     'Currensee',
                     style: TextStyle(
@@ -161,82 +358,69 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
 
-          // Drawer items
           _drawerItem(
             icon: Icons.person,
             text: 'Profile',
-            context: context,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Profile())),
           ),
           _divider(),
           _drawerItem(
             icon: Icons.history,
             text: 'History',
-            context: context,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => History())),
           ),
           _divider(),
           _drawerItem(
             icon: Icons.favorite,
             text: 'Liked Currencies',
-            context: context,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LikedCurrrencies())),
           ),
           _divider(),
           _drawerItem(
             icon: Icons.arrow_circle_right_sharp,
-            text: 'Check Alerts ',
-            context: context,
+            text: 'Check Alerts',
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RateAlerts())),
           ),
           _divider(),
           _drawerItem(
             icon: Icons.help,
             text: 'Help Center',
-            context: context,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => HelpPage())),
-          ),_divider(),
-SwitchListTile(
-  title: const Text('Enable Notifications'),
-  secondary: const Icon(Icons.notifications_active, color: Color(0xFF388E3C)),
-  value: notificationsEnabled,
-  activeColor: Color(0xFF388E3C),        // Thumb color when ON
-  activeTrackColor: Color(0xFFC8E6C9),   // Track color when ON
-  inactiveThumbColor: Colors.grey,       // Thumb color when OFF
-  inactiveTrackColor: Colors.black26,    // Track color when OFF
-  onChanged: onNotificationsChanged,
-),
+          ),
+          _divider(),
 
+          // Notifications Toggle
+          SwitchListTile(
+            title: const Text('Enable Notifications'),
+            secondary: const Icon(Icons.notifications_active, color: themeColor),
+            value: notificationsEnabled,
+            activeColor: themeColor,
+            activeTrackColor: Color(0xFFC8E6C9),
+            inactiveThumbColor: Colors.grey,
+            inactiveTrackColor: Colors.black26,
+            onChanged: _updateNotificationPreference,
+          ),
 
-_divider(),
           _divider(),
           _drawerItem(
             icon: Icons.logout,
             text: 'Logout',
-            context: context,
             onTap: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     elevation: 10,
-                    title: Text(
+                    title: const Text(
                       'Logout Confirmation',
                       style: TextStyle(color: themeColor),
                     ),
-                    content: Text('Are you sure you want to Logout?'),
+                    content: const Text('Are you sure you want to Logout?'),
                     actions: [
                       TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(color: themeColor),
-                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancel', style: TextStyle(color: themeColor)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -248,11 +432,9 @@ _divider(),
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF388E3C),
+                          backgroundColor: themeColor,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: const Text('Logout'),
                       ),
@@ -270,13 +452,12 @@ _divider(),
   Widget _drawerItem({
     required IconData icon,
     required String text,
-    required BuildContext context,
     required VoidCallback onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF388E3C)),
+        leading: Icon(icon, color: themeColor),
         title: Text(text),
         onTap: onTap,
       ),

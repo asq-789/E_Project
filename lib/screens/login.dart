@@ -82,6 +82,9 @@ class _LoginState extends State<Login> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+  textDirection: TextDirection.ltr,
+  verticalDirection: VerticalDirection.down,
           children: [
             const SizedBox(height: 20),
             Container(
@@ -205,18 +208,21 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                     const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account? ", style: TextStyle(color: Colors.black)),
-                        const SizedBox(width: 5),
-                        GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, "/signup"),
-                          child: Text("Signup", style: TextStyle(color: Color.fromARGB(255, 64, 160, 69), fontWeight: FontWeight.bold)),
-                        ),
-                      ],
-                    ),
-                  ],
+              Wrap(
+  alignment: WrapAlignment.center,
+  spacing: 5.0,
+  children: [
+    Text("Don't have an account? ", style: TextStyle(color: Colors.black)),
+    GestureDetector(
+      onTap: () => Navigator.pushNamed(context, "/signup"),
+      child: Text(
+        "Signup",
+        style: TextStyle(color: Color.fromARGB(255, 64, 160, 69), fontWeight: FontWeight.bold),
+      ),
+    ),
+  ],
+),
+  ],
                 ),
               ),
             ),

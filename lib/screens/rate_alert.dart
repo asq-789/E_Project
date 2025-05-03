@@ -53,12 +53,12 @@ class _RateAlertsState extends State<RateAlerts> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: Padding(
         padding: const EdgeInsets.all(15),

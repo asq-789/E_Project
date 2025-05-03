@@ -31,12 +31,12 @@ class _HelpPageState extends State<HelpPage> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),  body:
        SingleChildScrollView(
         child: Padding(

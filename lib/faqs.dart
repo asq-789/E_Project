@@ -26,12 +26,12 @@ class _FaqPageState extends State<FaqPage> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: SingleChildScrollView(
         child: Column(

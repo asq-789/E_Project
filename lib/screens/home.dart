@@ -89,7 +89,7 @@ Map<String, dynamic>? marketData;
 
   Future<void> getcurrencies() async {
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/USD');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/USD');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -104,7 +104,7 @@ Map<String, dynamic>? marketData;
     if (amountController.text.isEmpty) return;
     amount = double.tryParse(amountController.text) ?? 0.0;
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -299,12 +299,12 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: currencies.isEmpty
           ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
@@ -370,7 +370,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                           Center(child: Text("Top Currencies", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C), shadows: [Shadow(offset: Offset(2, 2), blurRadius: 3, color: Color.fromARGB(66, 114, 114, 113))]))),
                           SizedBox(height: 10),
                           FutureBuilder(
-                            future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/$fromCurrency')),
+                            future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency')),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));
@@ -406,7 +406,6 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                   }
                 });
 
-                // Optional: Save to Firestore here if needed
               },
             ),
           ),
@@ -446,7 +445,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Center(child: Text("Degital Currency", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C)))),
+      Center(child: Text("Market Overview", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C)))),
       SizedBox(height: 12),
       buildMarketAnalysis(),
             SizedBox(height: 15),
@@ -566,13 +565,14 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 8),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: themeColor,
-                    
-                      ),
-                      onPressed: () {
+                    SizedBox(
+  height: 48,
+  child: ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: themeColor,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+    ),
+     onPressed: () {
                         String email = emailController.text.trim();
                         String? error = _validateEmail(email);
                         if (error == null) {
@@ -589,8 +589,12 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                           });
                         }
                       },
-                      child: Text('Subscribe',style: TextStyle(color: Colors.white),),
-                    ),
+                    
+    child: Text('Subscribe', style: TextStyle(color: Colors.white)),
+  ),
+),
+
+                 
                   ],
                 ),
               ],

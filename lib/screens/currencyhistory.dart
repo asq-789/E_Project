@@ -65,50 +65,56 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       
       body: rates == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
           : Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 children: [
                   // ✅ Heading
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.currency_exchange,
-                          size: 28,
-                          color: Color(0xFF388E3C),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          'Recently Conversion Rates from past $numberOfDays days',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF388E3C),
-                            shadows: [
-                              Shadow(
-                                offset: const Offset(2.0, 2.0),
-                                blurRadius: 3.0,
-                                color: Colors.black.withOpacity(0.3),
-                              ),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
+                Center(
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Icon(
+          Icons.currency_exchange,
+          size: 28,
+          color: Color(0xFF388E3C),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Recently Conversion Rates from past $numberOfDays days',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF388E3C),
+            shadows: [
+              Shadow(
+                offset: Offset(2.0, 2.0),
+                blurRadius: 3.0,
+                color: Colors.black.withOpacity(0.3),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+          softWrap: true,
+        ),
+      ],
+    ),
+  ),
+),
+
+
                   const SizedBox(height: 10),
 
                   // ✅ List of rates

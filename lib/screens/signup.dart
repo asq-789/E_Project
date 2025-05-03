@@ -19,7 +19,7 @@ class _SignupState extends State<Signup> {
   }
 
   Future<void> getData() async {
-    var url = Uri.parse('https://v6.exchangerate-api.com/v6/a2c638780d6ad08604e564f8/latest/USD');
+    var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/USD');
     var response = await http.get(url);
     var data = jsonDecode(response.body);
     setState(() {
@@ -327,17 +327,17 @@ Align(
 
               SizedBox(height: 30),
 
-             Row(
-  mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+  alignment: WrapAlignment.center,
   children: [
-    Text("Already have an account? ", style: TextStyle(color: Colors.black)),
-     SizedBox(width: 5,),
+    Text("Already have an account? "),
     GestureDetector(
       onTap: () => Navigator.pushNamed(context, "/login"),
       child: Text("Login", style: TextStyle(color: Color(0xFF388E3C), fontWeight: FontWeight.bold)),
-   ),
-                      ],
-                    ),
+    ),
+  ],
+)
+
                   ],
                 ),
               ),

@@ -93,12 +93,12 @@ sendFeedback() async {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: Form(
         key: _formKey,
@@ -166,34 +166,25 @@ Text(
                     value!.isEmpty ? 'Please enter your message' : null,
               ),
               SizedBox(height: 20),
-
-Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Column(
-      children: [
-     
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(5, (index) {
-            return IconButton(
-              icon: Icon(
-                Icons.star,
-                color: index < selectedStars ? Color(0xFF388E3C) : Colors.grey.shade300,
-              ),
-              onPressed: () {
-                setState(() {
-                  selectedStars = index + 1;
-                });
-              },
-            );
-          }),
-        ),
-      ],
-    ),
-  ],
-),
-SizedBox(height: 30),
+Wrap(
+  alignment: WrapAlignment.center,
+  spacing: 4,
+  children: List.generate(5, (index) {
+    return IconButton(
+      icon: Icon(
+        Icons.star,
+        color: index < selectedStars ? Color(0xFF388E3C) : Colors.grey.shade300,
+      ),
+      onPressed: () {
+        setState(() {
+          selectedStars = index + 1;
+        });
+      },
+    );
+  }),
+)
+,
+ SizedBox(height: 30),
      Container(
   decoration: BoxDecoration(
     boxShadow: [
@@ -329,26 +320,30 @@ return Container(
             ),
           ),
           SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Color(0xFF388E3C),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                    overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Color(0xFF388E3C),
+                  ),
                 ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                "Email: ${data['email'] ?? ''}",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+                SizedBox(height: 2),
+                Text(
+                  "Email: ${data['email'] ?? ''}",
+                    overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -367,28 +362,28 @@ return Container(
               ),
             ),
             SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Date: $formattedDate",
-                  style: TextStyle(
-                                       fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(
-                      Icons.star,
-                      size: 18,
-                      color: index < stars ? Color(0xFF388E3C) : Colors.grey.shade300,
-                    );
-                  }),
-                ),
-              ],
-            ),
-          ],
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Expanded(
+      child: Text(
+        "Date: $formattedDate",
+        style: TextStyle(fontSize: 12, color: Colors.grey),
+      ),
+    ),
+    Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (index) {
+        return Icon(
+          Icons.star,
+          size: 18,
+          color: index < stars ? Color(0xFF388E3C) : Colors.grey.shade300,
+        );
+      }),
+    ),
+  ],
+),
+],
         ),
       ),
     ],

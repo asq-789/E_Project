@@ -15,7 +15,6 @@ class History extends StatefulWidget {
 class _HistoryState extends State<History> {
   bool notificationsEnabled = false;
 
-  // Function to delete history item from Firestore
   Future<void> deleteHistoryItem(String documentId) async {
     try {
       await FirebaseFirestore.instance
@@ -48,12 +47,12 @@ class _HistoryState extends State<History> {
         },
       ),
       drawer: CustomDrawer(
-        notificationsEnabled: notificationsEnabled,
-        onNotificationsChanged: (bool value) {
-          setState(() {
-            notificationsEnabled = value;
-          });
-        },
+        // notificationsEnabled: notificationsEnabled,
+        // onNotificationsChanged: (bool value) {
+        //   setState(() {
+        //     notificationsEnabled = value;
+        //   });
+        // },
       ),
       body: Padding(
         padding: const EdgeInsets.all(25),
@@ -131,98 +130,101 @@ class _HistoryState extends State<History> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Column(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                       children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Amount:',
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            Text(
-                                              ' $amount',
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 8),
                                         Text(
-                                          '$fromCurrency → $toCurrency',
+                                          'Amount:',
                                           style: TextStyle(
+                                            color: Colors.black87,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                            color: Color(0xFF388E3C),
+                                            fontSize: 15,
                                           ),
                                         ),
-                                        SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Rate: ',
-                                              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-                                            ),
-                                            SizedBox(width: 4),
-                                            Text('$rate', style: TextStyle(color: Colors.black87)),
-                                          ],
-                                        ),
-                                        SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Row(
-                                                children: [
-                                                  Text('Total: ',
-                                                      style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-                                                  SizedBox(width: 4),
-                                                  Text('$total', style: TextStyle(color: Colors.black87)),
-                                                ],
-                                              ),
-                                            ),
-                                            Text(
-                                              formattedDate,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xFF388E3C),
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            ),
-                                          ],
+                                        SizedBox(width: 6),
+                                        Text(
+                                          '$amount',
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15,
+                                          ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          deleteHistoryItem(conversion.id);
-                                        },
-                                        icon: Icon(
-                                          Icons.close,
-                                          size: 18,
-                                          color: Colors.grey[500],
-                                        ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      '$fromCurrency → $toCurrency',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Color(0xFF388E3C),
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text.rich(
+                                      TextSpan(
+                                        text: 'Rate: ',
+                                        style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: '$rate',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text.rich(
+                                      TextSpan(
+                                        text: 'Total: ',
+                                        style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: '$total',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      formattedDate,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF388E3C),
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  deleteHistoryItem(conversion.id);
+                                },
+                                icon: Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.grey[500],
+                                ),
                               ),
                             ],
                           ),
@@ -236,7 +238,7 @@ class _HistoryState extends State<History> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }
