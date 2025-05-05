@@ -16,6 +16,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,  
   );
  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  
+  if (!prefs.containsKey('notificationsEnabled')) {
+    await prefs.setBool('notificationsEnabled', true);
+  }
+
    bool isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
   runApp(MyApp(isLoggedIn: isLoggedIn));
 

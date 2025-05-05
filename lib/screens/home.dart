@@ -1,13 +1,13 @@
-// ... [Your existing imports]
+
 import 'dart:convert';
 import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/components/my_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:currensee/screens/currencyhistory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -33,14 +33,32 @@ Map<String, dynamic>? marketData;
   final fromDate = DateTime(2024, 4, 1);
     final toDate = DateTime(2024, 4, 10);
   int numberOfDays = 0;
+ bool _hasCheckedAlerts = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasCheckedAlerts) {
+      _hasCheckedAlerts = true;
+      checkAlertsIfEnabled();
+    }
+  }
+  
   @override
   void initState() {
     super.initState();
     getcurrencies();
     fetchUserData();
     fetchMarketData();
-   
   }
+  void checkAlertsIfEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool('notificationsEnabled') ?? false;
+    if (enabled) {
+      AlertHelper.checkAndShowAlerts(context);
+    }
+  }
+
 
   Future<void> fetchUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -565,12 +583,13 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                         ),
                       ),
                     ),
+                    SizedBox(width: 2,),
                     SizedBox(
-  height: 48,
+  height: 38,
   child: ElevatedButton(
     style: ElevatedButton.styleFrom(
       backgroundColor: themeColor,
-      padding: EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 10),
     ),
      onPressed: () {
                         String email = emailController.text.trim();
@@ -590,7 +609,7 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                         }
                       },
                     
-    child: Text('Subscribe', style: TextStyle(color: Colors.white)),
+    child: Text('Subscribe', style: TextStyle(color: Colors.white,fontSize: 12)),
   ),
 ),
 

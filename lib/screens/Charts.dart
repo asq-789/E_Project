@@ -35,18 +35,17 @@ bool hasShownAlert = false;
 void initState() {
   super.initState();
   fetchCurrencies();
-  
-  // Fetch initial currency data (for default rate)
   fetchCurrencyData().then((ratesData) {
     if (baseCurrency.isNotEmpty) {
-      // Ensure this fetches the correct default rate on page load
       fetchExchangeRate();
     }
   });
 
   hitAPI();
+
+  // ✅ Call the helper here
   Timer.periodic(Duration(minutes: 1), (timer) {
-    checkRateAlerts();
+    AlertHelper.checkAndShowAlerts(context);
   });
 }
 
