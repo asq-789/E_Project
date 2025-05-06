@@ -147,64 +147,120 @@ class TrendspageState extends State<Trendspage> {
     ],
   );
 }
-
-  Widget buildCoinTile(dynamic coin) {
-    List<dynamic> prices = (coin['sparkline_in_7d']?['price'] ?? []) as List<dynamic>;
-    double startPrice = prices.isNotEmpty ? prices.first : 0;
-    double endPrice = prices.isNotEmpty ? prices.last : 0;
-    bool isUp = endPrice >= startPrice;
+Widget buildCoinTile(dynamic coin) {
+  List<dynamic> prices = (coin['sparkline_in_7d']?['price'] ?? []) as List<dynamic>;
+  double startPrice = prices.isNotEmpty ? prices.first : 0;
+  double endPrice = prices.isNotEmpty ? prices.last : 0;
+  bool isUp = endPrice >= startPrice;
 
   return Card(
-  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-  child: Padding(
-    padding: const EdgeInsets.all(10.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,  // <-- change from center to start
-      children: [
-        Image.network(
-          coin['image'],
-          width: 40,
-          height: 40,
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.error, size: 40);
-          },
-        ),
-        const SizedBox(width: 10),
-        Expanded(  // <-- make sure this wraps the text column
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "${coin['name']} (${coin['symbol'].toUpperCase()})",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text("Price: \$${coin['current_price'] ?? 'N/A'}"),
-              Text("24h Change: ${coin['price_change_percentage_24h']?.toStringAsFixed(2) ?? 'N/A'}%"),
-              Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2) ?? 'N/A'}%"),
-              Text("Market Cap: \$${coin['market_cap'] ?? 'N/A'}"),
-              Text("Rank: #${coin['market_cap_rank'] ?? 'N/A'}"),
-            ],
-          ),
-        ),
-        if (prices.isNotEmpty)
-          SizedBox(
-            width: 100,  // <-- give a fixed width to prevent squeezing others
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+    child: Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              coin['image'],
+              width: 40,
+              height: 40,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.error, size: 40);
+              },
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 5),
-                buildSparklineChart(prices, isUp),
+                Text(
+                  "${coin['name']} (${coin['symbol'].toUpperCase()})",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text("Price: \$${coin['current_price'] ?? 'N/A'}"),
+                Text("24h Change: ${coin['price_change_percentage_24h']?.toStringAsFixed(2) ?? 'N/A'}%"),
+                Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2) ?? 'N/A'}%"),
+                Text("Market Cap: \$${coin['market_cap'] ?? 'N/A'}"),
+                Text("Rank: #${coin['market_cap_rank'] ?? 'N/A'}"),
               ],
             ),
-          ),
-      ],
+            const SizedBox(width: 20),
+            if (prices.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 5),
+                  buildSparklineChart(prices, isUp),
+                ],
+              ),
+          ],
+        ),
+      ),
     ),
-  ),
-);
+  );
 }
+//   Widget buildCoinTile(dynamic coin) {
+//     List<dynamic> prices = (coin['sparkline_in_7d']?['price'] ?? []) as List<dynamic>;
+//     double startPrice = prices.isNotEmpty ? prices.first : 0;
+//     double endPrice = prices.isNotEmpty ? prices.last : 0;
+//     bool isUp = endPrice >= startPrice;
+
+//   return Card(
+//   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+//   child: Padding(
+//     padding: const EdgeInsets.all(10.0),
+//     child: Row(
+//       crossAxisAlignment: CrossAxisAlignment.start,  // <-- change from center to start
+//       children: [
+//         Image.network(
+//           coin['image'],
+//           width: 40,
+//           height: 40,
+//           errorBuilder: (context, error, stackTrace) {
+//             return const Icon(Icons.error, size: 40);
+//           },
+//         ),
+//         const SizedBox(width: 10),
+//         Expanded(  // <-- make sure this wraps the text column
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Text(
+//                 "${coin['name']} (${coin['symbol'].toUpperCase()})",
+//                 style: const TextStyle(fontWeight: FontWeight.bold),
+//                 maxLines: 1,
+//                 overflow: TextOverflow.ellipsis,
+//               ),
+//               Text("Price: \$${coin['current_price'] ?? 'N/A'}"),
+//               Text("24h Change: ${coin['price_change_percentage_24h']?.toStringAsFixed(2) ?? 'N/A'}%"),
+//               Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2) ?? 'N/A'}%"),
+//               Text("Market Cap: \$${coin['market_cap'] ?? 'N/A'}"),
+//               Text("Rank: #${coin['market_cap_rank'] ?? 'N/A'}"),
+//             ],
+//           ),
+//         ),
+//         if (prices.isNotEmpty)
+//           SizedBox(
+//             width: 100,  // <-- give a fixed width to prevent squeezing others
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+//                 const SizedBox(height: 5),
+//                 buildSparklineChart(prices, isUp),
+//               ],
+//             ),
+//           ),
+//       ],
+//     ),
+//   ),
+// );
+// }
+
 
   Widget buildSparklineChart(List<dynamic> sparklineData, bool isUp) {
     List<FlSpot> spots = sparklineData

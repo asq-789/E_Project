@@ -21,15 +21,15 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold( backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        notificationsEnabled: notificationsEnabled,
-         title: "Help Center",
-        onToggleNotifications: () {
-          setState(() {
-            notificationsEnabled = !notificationsEnabled;
-          });
-        },
-      ),
+      // appBar: CustomAppBar(
+      //   notificationsEnabled: notificationsEnabled,
+      //    title: "Help Center",
+      //   onToggleNotifications: () {
+      //     setState(() {
+      //       notificationsEnabled = !notificationsEnabled;
+      //     });
+      //   },
+      // ),
       drawer: CustomDrawer(
         // notificationsEnabled: notificationsEnabled,
         // onNotificationsChanged: (bool value) {
