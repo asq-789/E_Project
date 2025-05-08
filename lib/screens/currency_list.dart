@@ -41,7 +41,7 @@ class _CurrencyListState extends State<CurrencyList> {
     final currency = doc['baseCurrency'];
     baseCurrency = currency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 
@@ -75,14 +75,7 @@ class _CurrencyListState extends State<CurrencyList> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: FutureBuilder<Map<String, dynamic>>(

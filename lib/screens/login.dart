@@ -29,10 +29,24 @@ class _LoginState extends State<Login> {
         );
   prefs.setBool("isLoggedIn",true);
   print(prefs.getBool("isLoggedIn"));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful!')),
-        );
-
+           ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content:  Text(
+    'Login successful!',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
         Navigator.pushReplacementNamed(context, '/');
       } on FirebaseAuthException catch (e) {
         String errorMsg = e.code == 'user-not-found'

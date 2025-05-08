@@ -148,6 +148,23 @@ class TrendspageState extends State<Trendspage> {
   );
 }
 Widget buildCoinTile(dynamic coin) {
+  String formatMarketCap(dynamic cap) {
+  if (cap == null) return 'N/A';
+  double value = cap.toDouble();
+
+  if (value >= 1e12) {
+    return '${(value / 1e12).toStringAsFixed(2)} T';
+  } else if (value >= 1e9) {
+    return '${(value / 1e9).toStringAsFixed(2)} B';
+  } else if (value >= 1e6) {
+    return '${(value / 1e6).toStringAsFixed(2)} M';
+  } else if (value >= 1e3) {
+    return '${(value / 1e3).toStringAsFixed(2)} K';
+  } else {
+    return value.toStringAsFixed(2);
+  }
+}
+
   List<dynamic> prices = (coin['sparkline_in_7d']?['price'] ?? []) as List<dynamic>;
   double startPrice = prices.isNotEmpty ? prices.first : 0;
   double endPrice = prices.isNotEmpty ? prices.last : 0;
@@ -274,21 +291,53 @@ Widget buildCoinTile(dynamic coin) {
       width: 100,
       child: LineChart(
         LineChartData(
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          minX: 0,
-          maxX: spots.isNotEmpty ? spots.length.toDouble() - 1 : 0,
-          lineBarsData: [
-            LineChartBarData(
-              spots: spots,
-              isCurved: true,
-              color: isUp ? Colors.green : Colors.red,
-              belowBarData: BarAreaData(show: false),
-              dotData: FlDotData(show: false),
-            ),
-          ],
-        ),
+  gridData: FlGridData(show: false),
+  titlesData: FlTitlesData(show: false),
+  borderData: FlBorderData(show: false),
+  minX: 0,
+  maxX: spots.isNotEmpty ? spots.length.toDouble() - 1 : 0,
+  lineTouchData: LineTouchData(
+    touchTooltipData: LineTouchTooltipData(
+   
+      getTooltipItems: (touchedSpots) {
+        return touchedSpots.map((touchedSpot) {
+          return LineTooltipItem(
+            "\$${touchedSpot.y.toStringAsFixed(2)}",
+            const TextStyle(color: Colors.white),
+          );
+        }).toList();
+      },
+    ),
+    touchCallback: (FlTouchEvent event, LineTouchResponse? response) {},
+    handleBuiltInTouches: true,
+  ),
+  lineBarsData: [
+    LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      color: isUp ? Colors.green : Colors.red,
+      belowBarData: BarAreaData(show: false),
+      dotData: FlDotData(show: false),
+    ),
+  ],
+)
+
+        // LineChartData(
+        //   gridData: FlGridData(show: false),
+        //   titlesData: FlTitlesData(show: false),
+        //   borderData: FlBorderData(show: false),
+        //   minX: 0,
+        //   maxX: spots.isNotEmpty ? spots.length.toDouble() - 1 : 0,
+        //   lineBarsData: [
+        //     LineChartBarData(
+        //       spots: spots,
+        //       isCurved: true,
+        //       color: isUp ? Colors.green : Colors.red,
+        //       belowBarData: BarAreaData(show: false),
+        //       dotData: FlDotData(show: false),
+        //     ),
+        //   ],
+        // ),
       ),
     );
   }

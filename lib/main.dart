@@ -1,5 +1,5 @@
 import 'package:currensee/firebase_options.dart';
-import 'package:currensee/loaderpage.dart';
+import 'package:currensee/screens/loaderpage.dart';
 import 'package:currensee/screens/TrendsPage.dart';
 import 'package:currensee/screens/currency_list.dart';
 import 'package:currensee/screens/currencyhistory.dart';
@@ -37,14 +37,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Currensee',
       theme: ThemeData(primarySwatch: Colors.indigo),
-    // home: HomeScreen(),
     home:  isLoggedIn ? HomeScreen() : Login(),
  initialRoute: '/Currensee',
     routes: {
      '/Currensee': (context) => Currensee(),
-       '/login': (context) =>  isLoggedIn ?CurrencyList()  : Login(),
+       '/login': (context) =>  isLoggedIn ? HomeScreen()  : Login(),
         '/signup': (context) => Signup(),
-     
         '/currencies':(context)=> isLoggedIn ? CurrencyList() : Login(),
           '/help': (context) => HomeScreen(),   
            '/exchangeratehistory':(context) => isLoggedIn ? Currencyhistory() : Login(),

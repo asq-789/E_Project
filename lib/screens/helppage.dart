@@ -1,8 +1,8 @@
-import 'package:currensee/about.dart';
+import 'package:currensee/screens/about.dart';
 import 'package:currensee/components/bottom_navbar.dart';
-import 'package:currensee/faqs.dart';
+import 'package:currensee/screens/faqs.dart';
 import 'package:currensee/screens/contactus.dart';
-import 'package:currensee/userguide.dart';
+import 'package:currensee/screens/userguide.dart';
 import 'package:flutter/material.dart';
 import 'package:currensee/components/my_appbar.dart';
 
@@ -20,24 +20,18 @@ class _HelpPageState extends State<HelpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( backgroundColor: Colors.white,
-      // appBar: CustomAppBar(
-      //   notificationsEnabled: notificationsEnabled,
-      //    title: "Help Center",
-      //   onToggleNotifications: () {
-      //     setState(() {
-      //       notificationsEnabled = !notificationsEnabled;
-      //     });
-      //   },
-      // ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),  body:
+    return Scaffold( backgroundColor: Colors.white, 
+      appBar: CustomAppBar(
+        notificationsEnabled: notificationsEnabled,
+        title: "Help Center",
+        onToggleNotifications: () {
+          setState(() {
+            notificationsEnabled = !notificationsEnabled;
+          });
+        },
+      ),
+      drawer: CustomDrawer(),
+        body:
        SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(25),
@@ -96,7 +90,7 @@ class _HelpPageState extends State<HelpPage> {
           ),
         ),
       ),
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+bottomNavigationBar: BottomNavBar(currentIndex: 0), 
     );
   }
 }

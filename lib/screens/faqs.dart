@@ -1,5 +1,5 @@
 import 'package:currensee/components/bottom_navbar.dart';
-import 'package:currensee/components/my_appbar.dart'; // Importing custom appbar
+import 'package:currensee/components/my_appbar.dart'; 
 import 'package:flutter/material.dart';
 
 class FaqPage extends StatefulWidget {
@@ -25,14 +25,7 @@ class _FaqPageState extends State<FaqPage> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Column(
          

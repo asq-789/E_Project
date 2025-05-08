@@ -14,7 +14,6 @@ class RateAlerts extends StatefulWidget {
 class _RateAlertsState extends State<RateAlerts> {
   bool notificationsEnabled = false;
 
-  // Function to delete an alert
   Future<void> deleteAlert(String alertId) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -23,7 +22,7 @@ class _RateAlertsState extends State<RateAlerts> {
             .collection('users')
             .doc(user.uid)
             .collection('alerts')
-            .doc(alertId) // Delete the specific alert
+            .doc(alertId) 
             .delete();
       }
     } catch (e) {
@@ -52,14 +51,7 @@ class _RateAlertsState extends State<RateAlerts> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(15),
         child: StreamBuilder<QuerySnapshot>(
@@ -71,7 +63,7 @@ class _RateAlertsState extends State<RateAlerts> {
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return Center(child: Text('No alerts found.'));

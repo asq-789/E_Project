@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:currensee/components/bottom_navbar.dart';
 import 'package:currensee/components/my_appbar.dart';
@@ -8,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -107,7 +104,7 @@ Map<String, dynamic>? marketData;
 
   Future<void> getcurrencies() async {
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/USD');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/USD');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -122,7 +119,7 @@ Map<String, dynamic>? marketData;
     if (amountController.text.isEmpty) return;
     amount = double.tryParse(amountController.text) ?? 0.0;
     try {
-      var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency');
+      var url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$fromCurrency');
       var response = await http.get(url);
       var data = jsonDecode(response.body);
       setState(() {
@@ -177,8 +174,26 @@ Map<String, dynamic>? marketData;
               onPressed: () async {
                 await conversionsHistory();
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Conversion saved!")));
-              },
+      ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: const Text(
+      "Conversion saved!",
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
+
+                   },
               label: Text("Save"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF388E3C),
@@ -197,7 +212,7 @@ Future<void> fetchMarketData() async {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        marketData = data['data']; // Update marketData state
+        marketData = data['data']; 
       });
     }
   } catch (e) {
@@ -207,14 +222,13 @@ Future<void> fetchMarketData() async {
 
 @override
 Widget buildMarketAnalysis() {
-  if (marketData == null) return const SizedBox(); // Return an empty widget if no data is available
+  if (marketData == null) return const SizedBox(); 
 
   double marketCap = marketData!['total_market_cap']['usd'];
   double marketCapChange = marketData!['market_cap_change_percentage_24h_usd'];
   double btcDominance = marketData!['market_cap_percentage']['btc'];
 
   return Card(
-    // margin: const EdgeInsets.all(15),
     elevation: 4,
     child: Padding(
       padding: const EdgeInsets.all(18),
@@ -272,21 +286,18 @@ Widget buildMarketAnalysis() {
 }
 Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String fromCurrency, String toCurrency) async {
   try {
-    // Build the API URL with date range and currency pair
     final url = Uri.parse(
       "https://api.frankfurter.app/${DateFormat('yyyy-MM-dd').format(startDate)}..${DateFormat('yyyy-MM-dd').format(endDate)}?from=$fromCurrency&to=$toCurrency"
     );
-
-    // Make the HTTP request
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);  // Decode the JSON response
-      final ratesMap = data["rates"];  // Get the rates data
+      final data = jsonDecode(response.body); 
+      final ratesMap = data["rates"];  
 
       setState(() {
-        rates = ratesMap;  // Save the rates data
-        numberOfDays = ratesMap.length;  // Get the number of days
+        rates = ratesMap;  
+        numberOfDays = ratesMap.length; 
       });
 
       print("Fetched all currency rates: $rates");
@@ -294,7 +305,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
       print("Failed to fetch historical data: ${response.statusCode}");
     }
   } catch (e) {
-    print("Error fetching data: $e");  // Handle any errors
+    print("Error fetching data: $e");  
   }
 }
 
@@ -316,14 +327,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: currencies.isEmpty
           ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
           : SingleChildScrollView(
@@ -359,7 +363,26 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                     ElevatedButton(
                       onPressed: () {
                         if (amountController.text.isEmpty || double.tryParse(amountController.text) == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please enter a valid amount")));
+                         ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: const Text(
+      "Please enter a valid amount",
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
+
+                         
                           return;
                         }
                         getRateAndConvert();
@@ -374,7 +397,6 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                       child: Text("Convert", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                     SizedBox(height: 30),
-                    /// --- Top Currencies Container ---
                     Container(
                       decoration: BoxDecoration(
                         color: Color.fromARGB(136, 161, 226, 166),
@@ -388,7 +410,7 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                           Center(child: Text("Top Currencies", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Color(0xFF388E3C), shadows: [Shadow(offset: Offset(2, 2), blurRadius: 3, color: Color.fromARGB(66, 114, 114, 113))]))),
                           SizedBox(height: 10),
                           FutureBuilder(
-                            future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency')),
+                            future: http.get(Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$fromCurrency')),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));
@@ -490,15 +512,13 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
               
 
               ),
-             // Container();
+           
             ),
       bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }
 
-
-//NewsletterSection
 class NewsletterSection extends StatefulWidget {
   @override
   _NewsletterSectionState createState() => _NewsletterSectionState();
@@ -514,7 +534,7 @@ class _NewsletterSectionState extends State<NewsletterSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Newsletter Subscription Heading
+      
         Text(
           'Subscribe To Our Newsletter',
           style: TextStyle(
@@ -533,7 +553,6 @@ class _NewsletterSectionState extends State<NewsletterSection> {
         ),
         SizedBox(height: 4),
     
-        // Subheading text
         Text(
           'Stay updated with the latest news and offers',
           style: TextStyle(
@@ -595,9 +614,24 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                         String email = emailController.text.trim();
                         String? error = _validateEmail(email);
                         if (error == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Subscribed with $email')),
-                          );
+                                ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content:  Text(
+    'Subscribed with $email',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
                           setState(() {
                             errorText = null;
                           });

@@ -31,7 +31,7 @@ void initState() {
 }
 
 Future<void> getCurrencyData() async {
-  var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/USD');
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/USD');
   var response = await http.get(url);
   var data = jsonDecode(response.body);
 
@@ -135,7 +135,6 @@ Future<void> getCurrencyData() async {
 }
 
 else {
-    // For username, email, phone
     showDialog(
       context: context,
       builder: (context) {
@@ -181,7 +180,7 @@ else {
                   });
                 }
 
-                Navigator.pop(context); // Close popup
+                Navigator.pop(context); 
               },
               child: Text('Update'),
             ),
@@ -212,14 +211,7 @@ Widget build(BuildContext context) {
         });
       },
     ),
-    drawer: CustomDrawer(
-      // notificationsEnabled: notificationsEnabled,
-      // onNotificationsChanged: (bool value) {
-      //   setState(() {
-      //     notificationsEnabled = value;
-      //   });
-      // },
-    ),
+    drawer: CustomDrawer(),
     body: isLoading
         ? Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
         : SingleChildScrollView(
@@ -279,7 +271,7 @@ Widget build(BuildContext context) {
               ],
             ),
           ),
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+bottomNavigationBar: BottomNavBar(currentIndex: 0), 
   );
 }
 }

@@ -64,14 +64,7 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       
       body: rates == null
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
@@ -79,7 +72,7 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 children: [
-                  // ✅ Heading
+               
                 Center(
   child: Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -117,7 +110,6 @@ class _CurrencyhistoryState extends State<Currencyhistory> {
 
                   const SizedBox(height: 10),
 
-                  // ✅ List of rates
                   Expanded(
                     child: ListView(
                       children: rates!.entries.map((entry) {

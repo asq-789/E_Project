@@ -19,7 +19,7 @@ class _SignupState extends State<Signup> {
   }
 
   Future<void> getData() async {
-    var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/USD');
+    var url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/USD');
     var response = await http.get(url);
     var data = jsonDecode(response.body);
     setState(() {
@@ -79,13 +79,63 @@ class _SignupState extends State<Signup> {
         Navigator.pushReplacementNamed(context, '/login');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("The password provided is too weak.")));
+                    ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content:  Text(
+    'The password provided is too weak.',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
         } else if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("The account already exists for that email.")));
+                          ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content:  Text(
+    'The account already exists for that email.',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("An error occurred")));
-      } finally {
+                    ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content:  Text(
+    'An error occured!',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);      } finally {
         setState(() => isLoading = false);
       }
     }

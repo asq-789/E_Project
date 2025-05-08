@@ -1,5 +1,4 @@
 import 'package:currensee/components/bottom_navbar.dart';
-
 import 'package:flutter/material.dart';
 import 'package:currensee/components/my_appbar.dart';
 
@@ -27,14 +26,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [

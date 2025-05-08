@@ -15,7 +15,6 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    // Animation controller for loader
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -23,7 +22,6 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
         setState(() {});
       });
 
-    // Fade-in animation for welcome text
     fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: controller, curve: Curves.easeIn),
     );
@@ -53,7 +51,7 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
       backgroundColor: const Color(0xFFE8F5E9),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(width * 0.1), // Add this line for dynamic padding (10% of screen width)
+          padding: EdgeInsets.all(width * 0.1), 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -80,18 +78,18 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
               FadeTransition(
                 opacity: fadeInAnimation,
                 child: const Text(
-  'Welcome to CurrenSee Converter',
+  'CurrenSee',
   style: TextStyle(
     fontSize: 25,
-    fontWeight: FontWeight.w900, // Use w900 for extra boldness
+    fontWeight: FontWeight.w900, 
     fontStyle: FontStyle.italic,
-    fontFamily: 'Times New Roman', // Use Times New Roman font
+    fontFamily: 'Times New Roman',
     color: Color(0xFF388E3C),
     shadows: [
       Shadow(
         offset: Offset(2.0, 2.0),
         blurRadius: 5.0,
-        color: Color.fromRGBO(0, 0, 0, 0.3), // Using Color.fromRGBO for opacity
+        color: Color.fromRGBO(0, 0, 0, 0.3), 
       ),
     ],
   ),

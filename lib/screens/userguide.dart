@@ -1,6 +1,4 @@
 import 'package:currensee/components/bottom_navbar.dart';
-import 'package:currensee/faqs.dart';
-import 'package:currensee/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:currensee/components/my_appbar.dart';
 
@@ -12,13 +10,12 @@ class UserGuidePage extends StatefulWidget {
 }
 
 class _UserGuidePageState extends State<UserGuidePage> {
-  int _selectedIndex = 0;
   bool notificationsEnabled = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Background safed clean
+      backgroundColor: Colors.white, 
       appBar: CustomAppBar(
         notificationsEnabled: notificationsEnabled,
         title: "User Guide",
@@ -28,14 +25,7 @@ class _UserGuidePageState extends State<UserGuidePage> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(25), 

@@ -27,14 +27,7 @@ class _LikedCurrrenciesState extends State<LikedCurrrencies> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
  body: SingleChildScrollView(
    child: Padding(
      padding: const EdgeInsets.all(25),
@@ -49,7 +42,7 @@ class _LikedCurrrenciesState extends State<LikedCurrrencies> {
                .snapshots(),
            builder: (context, snapshot) {
              if (snapshot.connectionState == ConnectionState.waiting) {
-               return const Center(child: CircularProgressIndicator());
+               return const Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));
              }
  
              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {

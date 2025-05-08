@@ -46,14 +46,7 @@ class _HistoryState extends State<History> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(25),
         child: Column(

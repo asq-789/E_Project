@@ -38,9 +38,25 @@ sendFeedback() async {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Feedback sent successfully")),
-      );
+    ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: const Text(
+      "Feedback sent successfully",
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
+
       fullnameController.clear();
       emailController.clear();
       feedbackController.clear();
@@ -92,14 +108,7 @@ sendFeedback() async {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(

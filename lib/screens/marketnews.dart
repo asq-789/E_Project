@@ -3,7 +3,6 @@ import 'package:currensee/components/my_appbar.dart';
 import 'package:currensee/screens/TrendsPage.dart';
 import 'package:flutter/material.dart';
 
-// Articles and news
 final List<Map<String, dynamic>> marketNews = [
   {
     "title": "USD to EUR Exchange Rate Drops",
@@ -145,7 +144,7 @@ final List<Map<String, dynamic>> marketNews = [
     "rate": 1185.50,
     "date": "2025-04-08"
   },
-  // Adding 10 more articles
+
   {
     "title": "JPY Gains Amid Market Recovery",
     "description": "The Japanese Yen has gained strength following a strong market recovery, as investors start taking more risks in Asia.",
@@ -221,7 +220,7 @@ class MarketNewsPage extends StatefulWidget {
 
 class _MarketNewsPageState extends State<MarketNewsPage> {
   bool isLoading = true;
-  int selectedIndex = 0; // 0 for Articles, 1 for Trends
+  int selectedIndex = 0; 
   bool notificationsEnabled = false;
 
   @override
@@ -236,7 +235,6 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Automatically navigate to Trendspage if Trends tab is selected
     if (selectedIndex == 1) {
       Future.delayed(Duration.zero, () {
         Navigator.push(
@@ -256,14 +254,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: Column(
         children: [
         LayoutBuilder(
@@ -304,7 +295,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Toggle Buttons
+              
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: ToggleButtons(
@@ -337,7 +328,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Toggle Buttons
+    
                 Flexible(
                   flex: 2,
                   child: SingleChildScrollView(
@@ -358,7 +349,6 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
     minHeight: 32,
     minWidth: 60,
   ),
-                    //  borderRadius: BorderRadius.circular(8),
                       children: const [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12.0),
@@ -373,7 +363,7 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                   ),
                 ),
 
-                // Heading
+        
                 Flexible(
                   flex: 1,
                   child: FittedBox(
@@ -414,12 +404,10 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
 ),
 
 
-
-          // Render Articles
           selectedIndex == 0
               ? Expanded(
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)))
                       : ListView.builder(
                           itemCount: marketNews.length,
                           itemBuilder: (context, index) {
@@ -444,14 +432,12 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
         ),
         const SizedBox(height: 8),
 
-        // News Description
         Text(
           news['description'] ?? 'No description',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 12),
 
-        // Rate, Currency, and Date
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -477,10 +463,10 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
                           },
                         ),
                 )
-              : Container(), // This part won't be visible since it's handled by navigation directly to Trendspage
+              : Container(),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+      bottomNavigationBar: BottomNavBar(currentIndex: 0), 
     );
   }
 }
@@ -488,14 +474,14 @@ class _MarketNewsPageState extends State<MarketNewsPage> {
 void main() {
   runApp(MaterialApp(
     theme: ThemeData(
-      primaryColor: Colors.blue, // Set the primary color for the app
-      scaffoldBackgroundColor: Color(0xFFF1F1F1), // Soft light gray background
+      primaryColor: Colors.blue, 
+      scaffoldBackgroundColor: Color(0xFFF1F1F1), 
       textTheme: TextTheme(
-        headlineLarge: TextStyle(color: Colors.black), // Text style for titles
-        bodyMedium: TextStyle(color: Colors.black87), // Body text style
+        headlineLarge: TextStyle(color: Colors.black), 
+        bodyMedium: TextStyle(color: Colors.black87), 
       ),
-      cardColor: Colors.white, // Card background color
-      buttonTheme: ButtonThemeData(buttonColor: Colors.blue), // Button color
+      cardColor: Colors.white, 
+      buttonTheme: ButtonThemeData(buttonColor: Colors.blue), 
     ),
     home: MarketNewsPage(),
   ));

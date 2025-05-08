@@ -43,20 +43,18 @@ void initState() {
 
   hitAPI();
 
-  // ✅ Call the helper here
   Timer.periodic(Duration(minutes: 1), (timer) {
     AlertHelper.checkAndShowAlerts(context);
   });
 }
 
 Future<void> fetchExchangeRate() async {
-  final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency');
+  final url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$fromCurrency');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     setState(() {
-      // Ensure the rate gets updated with the correct value
       exchangeRate = data['conversion_rates'][toCurrency] ?? 0.0;
       filteredCurrencies = (data['conversion_rates'] as Map<String, dynamic>)
           .entries
@@ -68,7 +66,6 @@ Future<void> fetchExchangeRate() async {
     print('Failed to load exchange rate');
   }
 }
-//notification
 void _updateNotificationPreference(bool value) async {
   setState(() {
     notificationsEnabled = value;
@@ -157,11 +154,11 @@ void showAlertNotification(String fromCurrency, String toCurrency, double target
     },
   );
 }
-//alerts
+
 
 
 Future<void> fetchRates(String base) async {
-  var url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$base');
+  var url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$base');
   var response = await http.get(url);
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
@@ -245,7 +242,7 @@ Future<void> fetchCurrencies() async {
     selectedCurrency = currency;
     searchController.text = baseCurrency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 
@@ -326,10 +323,25 @@ Future<void> fetchCurrencies() async {
           'targetRate': targetRate,
           'timestamp': FieldValue.serverTimestamp(),
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Alert successfully set!')),
-        );
+  SnackBar(
+    content: const Text(
+      "Alert created successfully",
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
+
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to set alert')),
@@ -337,7 +349,7 @@ Future<void> fetchCurrencies() async {
       }
     }
   }
-  //Notification
+
 void showNotification(BuildContext context, double exchangeRate) {
   FirebaseFirestore.instance
       .collection('users')
@@ -348,11 +360,10 @@ void showNotification(BuildContext context, double exchangeRate) {
     List<String> alertsList = [];
 
     querySnapshot.docs.forEach((doc) {
-      double targetRate = doc['targetRate'].toDouble(); // Ensure it's a double
+      double targetRate = doc['targetRate'].toDouble(); 
       String fromCurrency = doc['fromCurrency'];
       String toCurrency = doc['toCurrency'];
 
-      // Check if the exchange rate meets or exceeds the target rate
       if (exchangeRate >= targetRate) {
         String alertMessage =
             '$fromCurrency → $toCurrency reached $targetRate';
@@ -500,21 +511,14 @@ showNotification(context, exchangeRate);
   backgroundColor: const Color(0xFF388E3C),
   foregroundColor: Colors.white,
 ),
-drawer: CustomDrawer(
-      // notificationsEnabled: notificationsEnabled,
-      // onNotificationsChanged: (bool value) {
-      //   setState(() {
-      //     notificationsEnabled = value;
-      //   });
-      // },
-    ),
+drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Padding(
   padding: const EdgeInsets.all(25),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // Main Heading 
+   
       SizedBox(height: 10,),
       Center(
        
@@ -541,18 +545,17 @@ drawer: CustomDrawer(
       
       Center(
         child: Text(
-          "Get real-time exchange rates and monitor historical data",  // Subtitle or description
+          "Get real-time exchange rates and monitor historical data",  
           style: TextStyle(
             fontSize: 15,
             fontStyle: FontStyle.italic,
-            color: Colors.black54,  // A softer color for the subtitle
+            color: Colors.black54,
           ),
           textAlign: TextAlign.center,
         ),
       ),
 SizedBox(height: 20,),
-      // Rest of your code 
-      //dropdown
+    
     Row(
   children: [
     Expanded(child: buildCurrencyDropdown(true)),
@@ -674,7 +677,7 @@ SizedBox(height: 20,),
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic,
-                    color: Color(0xFF388E3C), // Match your theme color
+                    color: Color(0xFF388E3C), 
                     shadows: [
                       Shadow(
                         offset: Offset(2, 2),

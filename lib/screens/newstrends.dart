@@ -93,25 +93,25 @@ Widget buildMarketAnalysis() {
 
   return Container(
     margin: const EdgeInsets.all(15),
-    padding: const EdgeInsets.all(10),  // You can adjust the padding as needed
+    padding: const EdgeInsets.all(10),  
     decoration: BoxDecoration(
-      color: Colors.white,  // Background color of the container
-      borderRadius: BorderRadius.circular(12),  // Rounded corners
+      color: Colors.white, 
+      borderRadius: BorderRadius.circular(12),  
       boxShadow: [
         BoxShadow(
           color: Colors.grey.withOpacity(0.3),
           spreadRadius: 2,
           blurRadius: 4,
-          offset: const Offset(0, 3),  // Shadow direction
+          offset: const Offset(0, 3), 
         ),
       ],
     ),
     child: Card(
       elevation: 2,
-      margin: EdgeInsets.zero,  // Remove margin from card to use the container's margin
+      margin: EdgeInsets.zero,  
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: SingleChildScrollView(  // Make the entire Column scrollable
+        child: SingleChildScrollView( 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
@@ -175,7 +175,7 @@ Widget buildMarketAnalysis() {
   child: Padding(
     padding: const EdgeInsets.all(10.0),
     child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,  // <-- change from center to start
+      crossAxisAlignment: CrossAxisAlignment.start,  
       children: [
         Image.network(
           coin['image'],
@@ -186,7 +186,7 @@ Widget buildMarketAnalysis() {
           },
         ),
         const SizedBox(width: 10),
-        Expanded(  // <-- make sure this wraps the text column
+        Expanded( 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -206,7 +206,7 @@ Widget buildMarketAnalysis() {
         ),
         if (prices.isNotEmpty)
           SizedBox(
-            width: 100,  // <-- give a fixed width to prevent squeezing others
+            width: 100,  
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -266,14 +266,7 @@ Widget buildMarketAnalysis() {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer( ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: isLoading

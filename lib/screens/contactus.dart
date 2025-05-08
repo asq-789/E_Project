@@ -42,7 +42,24 @@ class _ContactScreenState extends State<ContactScreen> {
           'subject': subject,
           'message': message,
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Message sent successfully")));
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: const Text(
+      "Message sent successfully",
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: const Color(0xFF388E3C),
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(20),
+        right: Radius.circular(20),
+      ),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    duration: const Duration(seconds: 2),
+  ),
+);
         fullnameController.clear();
         emailController.clear();
         subjectController.clear();
@@ -89,14 +106,7 @@ class _ContactScreenState extends State<ContactScreen> {
           });
         },
       ),
-      drawer: CustomDrawer(
-        // notificationsEnabled: notificationsEnabled,
-        // onNotificationsChanged: (bool value) {
-        //   setState(() {
-        //     notificationsEnabled = value;
-        //   });
-        // },
-      ),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(25),
         child: Form(

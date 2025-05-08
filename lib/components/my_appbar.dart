@@ -10,7 +10,7 @@ import 'package:currensee/screens/marketnews.dart';
 import 'package:currensee/screens/profile.dart';
 import 'package:currensee/screens/history.dart';
 import 'package:currensee/screens/liked_currencies.dart';
-import 'package:currensee/helppage.dart';
+import 'package:currensee/screens/helppage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,8 +53,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     _fetchBaseCurrency().then((_) {
       fetchCurrencyData().then((ratesData) {
         if (baseCurrency.isNotEmpty) {
-          // Ensure this fetches the correct default rate on page load
-          // fetchExchangeRate();
+         
           CurrencyApiHelper.fetchExchangeRate(fromCurrency, toCurrency);
 
         }
@@ -74,7 +73,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     selectedCurrency = currency;
     searchController.text = baseCurrency;
 
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$currency');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$currency');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
 
@@ -176,7 +175,7 @@ static Future<void> markAlertAsShown(String alertId) async {
   final alertId = doc.id;
 
   if (await hasAlertBeenShown(alertId)) {
-    continue; // Skip if already shown
+    continue; 
   }
 
   double targetRate = doc['targetRate'];
@@ -188,7 +187,7 @@ static Future<void> markAlertAsShown(String alertId) async {
   if (currentRate != null && currentRate >= targetRate) {
     showAlertPopup(context, from, to, targetRate);
     await markAlertAsShown(alertId);
-    break; // Optional: show one at a time
+    break; 
   }
 }
  }
@@ -257,40 +256,59 @@ class _CustomDrawerState extends State<CustomDrawer> {
   child: ListView(
     padding: EdgeInsets.zero,
     children: [
-      DrawerHeader(
-        decoration: BoxDecoration(color: themeColor),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Smaller logo
-            Image.asset(
-              "public/assets/images/bg.png",
-              width: 75,
-              height: 75,
-            ),
-            SizedBox(height: 8),
-            // App name
-            Text(
-              'Currensee',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 35,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    offset: Offset(1, 1),
-                    blurRadius: 2.0,
-                    color: Colors.black45,
-                  ),
-                ],
-              ),
+ DrawerHeader(
+  decoration: BoxDecoration(color: themeColor),
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Container(
+        padding: EdgeInsets.all(5), 
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white, 
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 8,
+              spreadRadius: 2,
+              offset: Offset(0, 4),
             ),
           ],
         ),
+        child: ClipOval(
+          child: Image.asset(
+            "public/assets/images/bg.png",
+            width: 65, 
+            height: 65,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
+      SizedBox(height: 8),
+      FittedBox(
+  fit: BoxFit.scaleDown,
+  child: Text(
+    'Currensee',
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 33,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.bold,
+      shadows: [
+        Shadow(
+          offset: Offset(1, 1),
+          blurRadius: 2.0,
+          color: Colors.black45,
+        ),
+      ],
+    ),
+  ),
+)
 
-          _drawerItem(
+    ],
+  ),
+),
+_drawerItem(
             icon: Icons.person,
             text: 'Profile',
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Profile())),
@@ -321,7 +339,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
           _divider(),
 
-          // Notifications Toggle
+       
           SwitchListTile(
             title: const Text('Enable Notifications'),
             secondary: const Icon(Icons.notifications_active, color: themeColor),

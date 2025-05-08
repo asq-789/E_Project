@@ -33,7 +33,6 @@ getProducts()async{
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (snapshot.hasData) {
-              // Ensuring the data is correctly cast to a Map<String, dynamic>
               var data = snapshot.data as Map<String, dynamic>;
               var products = data['data'] as List<dynamic>;
               return ListView.builder(
@@ -43,7 +42,6 @@ getProducts()async{
                   return ListTile(
                     title: Text(product['title'].toString()),
                     subtitle: Text(product['description'].toString()),
-                   // leading: Image.network(product['images'][0]),
                   );
                 },
               );
@@ -53,7 +51,7 @@ getProducts()async{
           },
         ),
       ),
-bottomNavigationBar: BottomNavBar(currentIndex: 0), // Home
+bottomNavigationBar: BottomNavBar(currentIndex: 0), 
     );
   }
 }
