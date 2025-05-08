@@ -355,9 +355,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         child: const Text('Cancel', style: TextStyle(color: themeColor)),
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: ()async {
                           Navigator.of(context).pop();
                           FirebaseAuth.instance.signOut();
+                                final SharedPreferences prefs = await SharedPreferences.getInstance();
+   
+  prefs.setBool("isLoggedIn",false);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => Login()),

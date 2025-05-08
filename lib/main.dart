@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
  initialRoute: '/Currensee',
     routes: {
      '/Currensee': (context) => Currensee(),
-       '/login': (context) =>  Login(),
+       '/login': (context) =>  isLoggedIn ?CurrencyList()  : Login(),
         '/signup': (context) => Signup(),
      
         '/currencies':(context)=> isLoggedIn ? CurrencyList() : Login(),
