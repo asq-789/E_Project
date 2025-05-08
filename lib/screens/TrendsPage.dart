@@ -149,21 +149,21 @@ class TrendspageState extends State<Trendspage> {
 }
 Widget buildCoinTile(dynamic coin) {
   String formatMarketCap(dynamic cap) {
-  if (cap == null) return 'N/A';
-  double value = cap.toDouble();
+    if (cap == null) return 'N/A';
+    double value = cap.toDouble();
 
-  if (value >= 1e12) {
-    return '${(value / 1e12).toStringAsFixed(2)} T';
-  } else if (value >= 1e9) {
-    return '${(value / 1e9).toStringAsFixed(2)} B';
-  } else if (value >= 1e6) {
-    return '${(value / 1e6).toStringAsFixed(2)} M';
-  } else if (value >= 1e3) {
-    return '${(value / 1e3).toStringAsFixed(2)} K';
-  } else {
-    return value.toStringAsFixed(2);
+    if (value >= 1e12) {
+      return '${(value / 1e12).toStringAsFixed(2)} T';
+    } else if (value >= 1e9) {
+      return '${(value / 1e9).toStringAsFixed(2)} B';
+    } else if (value >= 1e6) {
+      return '${(value / 1e6).toStringAsFixed(2)} M';
+    } else if (value >= 1e3) {
+      return '${(value / 1e3).toStringAsFixed(2)} K';
+    } else {
+      return value.toStringAsFixed(2);
+    }
   }
-}
 
   List<dynamic> prices = (coin['sparkline_in_7d']?['price'] ?? []) as List<dynamic>;
   double startPrice = prices.isNotEmpty ? prices.first : 0;
@@ -176,108 +176,52 @@ Widget buildCoinTile(dynamic coin) {
       padding: const EdgeInsets.all(10.0),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              coin['image'],
-              width: 40,
-              height: 40,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.error, size: 40);
-              },
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${coin['name']} (${coin['symbol'].toUpperCase()})",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text("Price: \$${coin['current_price'] ?? 'N/A'}"),
-                Text("24h Change: ${coin['price_change_percentage_24h']?.toStringAsFixed(2) ?? 'N/A'}%"),
-                Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2) ?? 'N/A'}%"),
-                Text("Market Cap: \$${coin['market_cap'] ?? 'N/A'}"),
-                Text("Rank: #${coin['market_cap_rank'] ?? 'N/A'}"),
-              ],
-            ),
-            const SizedBox(width: 20),
-            if (prices.isNotEmpty)
+        child: IntrinsicWidth( // ensures children can define their own width
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                coin['image'],
+                width: 40,
+                height: 40,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.error, size: 40);
+                },
+              ),
+              const SizedBox(width: 10),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 5),
-                  buildSparklineChart(prices, isUp),
+                  Text(
+                    "${coin['name']} (${coin['symbol'].toUpperCase()})",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text("Price: \$${coin['current_price'] ?? 'N/A'}"),
+                  Text("24h Change: ${coin['price_change_percentage_24h']?.toStringAsFixed(2) ?? 'N/A'}%"),
+                  Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2) ?? 'N/A'}%"),
+                  Text("Market Cap: \$${formatMarketCap(coin['market_cap'])}"),
+                  Text("Rank: #${coin['market_cap_rank'] ?? 'N/A'}"),
                 ],
               ),
-          ],
+              const SizedBox(width: 20),
+              if (prices.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 5),
+                    buildSparklineChart(prices, isUp),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     ),
   );
 }
-//   Widget buildCoinTile(dynamic coin) {
-//     List<dynamic> prices = (coin['sparkline_in_7d']?['price'] ?? []) as List<dynamic>;
-//     double startPrice = prices.isNotEmpty ? prices.first : 0;
-//     double endPrice = prices.isNotEmpty ? prices.last : 0;
-//     bool isUp = endPrice >= startPrice;
-
-//   return Card(
-//   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-//   child: Padding(
-//     padding: const EdgeInsets.all(10.0),
-//     child: Row(
-//       crossAxisAlignment: CrossAxisAlignment.start,  // <-- change from center to start
-//       children: [
-//         Image.network(
-//           coin['image'],
-//           width: 40,
-//           height: 40,
-//           errorBuilder: (context, error, stackTrace) {
-//             return const Icon(Icons.error, size: 40);
-//           },
-//         ),
-//         const SizedBox(width: 10),
-//         Expanded(  // <-- make sure this wraps the text column
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Text(
-//                 "${coin['name']} (${coin['symbol'].toUpperCase()})",
-//                 style: const TextStyle(fontWeight: FontWeight.bold),
-//                 maxLines: 1,
-//                 overflow: TextOverflow.ellipsis,
-//               ),
-//               Text("Price: \$${coin['current_price'] ?? 'N/A'}"),
-//               Text("24h Change: ${coin['price_change_percentage_24h']?.toStringAsFixed(2) ?? 'N/A'}%"),
-//               Text("7d Change: ${coin['price_change_percentage_7d_in_currency']?.toStringAsFixed(2) ?? 'N/A'}%"),
-//               Text("Market Cap: \$${coin['market_cap'] ?? 'N/A'}"),
-//               Text("Rank: #${coin['market_cap_rank'] ?? 'N/A'}"),
-//             ],
-//           ),
-//         ),
-//         if (prices.isNotEmpty)
-//           SizedBox(
-//             width: 100,  // <-- give a fixed width to prevent squeezing others
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.center,
-//               children: [
-//                 const Text("7D Trend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-//                 const SizedBox(height: 5),
-//                 buildSparklineChart(prices, isUp),
-//               ],
-//             ),
-//           ),
-//       ],
-//     ),
-//   ),
-// );
-// }
-
 
   Widget buildSparklineChart(List<dynamic> sparklineData, bool isUp) {
     List<FlSpot> spots = sparklineData
@@ -322,22 +266,7 @@ Widget buildCoinTile(dynamic coin) {
   ],
 )
 
-        // LineChartData(
-        //   gridData: FlGridData(show: false),
-        //   titlesData: FlTitlesData(show: false),
-        //   borderData: FlBorderData(show: false),
-        //   minX: 0,
-        //   maxX: spots.isNotEmpty ? spots.length.toDouble() - 1 : 0,
-        //   lineBarsData: [
-        //     LineChartBarData(
-        //       spots: spots,
-        //       isCurved: true,
-        //       color: isUp ? Colors.green : Colors.red,
-        //       belowBarData: BarAreaData(show: false),
-        //       dotData: FlDotData(show: false),
-        //     ),
-        //   ],
-        // ),
+       
       ),
     );
   }
@@ -367,127 +296,7 @@ Widget buildCoinTile(dynamic coin) {
                 : ListView(
                     padding: const EdgeInsets.only(bottom: 20),
                     children: [
-//     LayoutBuilder(
-//   builder: (context, constraints) {
-//     bool isMobile = constraints.maxWidth < 600;  // You can adjust this breakpoint
 
-//     return Container(
-//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-//       child: isMobile
-//           // Mobile Layout
-//           ? Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 // Heading on top for mobile
-//                 const Text(
-//                   "Digital Currensee",
-//                   style: TextStyle(
-//                     fontSize: 22,
-//                     fontStyle: FontStyle.italic,
-//                     color: Color(0xFF388E3C),
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 10),
-//                 // Toggle Buttons below the heading
-//                 ToggleButtons(
-//                   isSelected: [selectedIndex == 0, selectedIndex == 1],
-//                   onPressed: (index) {
-//                     setState(() {
-//                       selectedIndex = index;
-//                     });
-//                     if (index == 1) {
-//                       Navigator.push(
-//                         context,
-//                         MaterialPageRoute(builder: (context) => MarketNewsPage()),
-//                       );
-//                     }
-//                   },
-//                   selectedColor: Colors.white,
-//                   selectedBorderColor: Colors.green,
-//                   fillColor: Colors.green,
-//                   color: Colors.black,
-//                   borderRadius: BorderRadius.circular(8),
-//                   constraints: const BoxConstraints(
-//                     minHeight: 40, // Adjust for mobile button height
-//                     minWidth: 100, // Adjust for mobile button width
-//                   ),
-//                   children: const [
-//                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 15),
-//                       child: Text('Coins'),
-//                     ),
-//                     Padding(
-//                       padding: EdgeInsets.symmetric(horizontal: 15),
-//                       child: Text('News'),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             )
-//           // Desktop or larger screen layout
-//           : Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 // Toggle Buttons on the left for larger screens
-//                 Flexible(
-//                   flex: 2,
-//                   child: ToggleButtons(
-//                     isSelected: [selectedIndex == 0, selectedIndex == 1],
-//                     onPressed: (index) {
-//                       setState(() {
-//                         selectedIndex = index;
-//                       });
-//                       if (index == 1) {
-//                         Navigator.push(
-//                           context,
-//                           MaterialPageRoute(builder: (context) => MarketNewsPage()),
-//                         );
-//                       }
-//                     },
-//                     selectedColor: Colors.white,
-//                     selectedBorderColor: Colors.green,
-//                     fillColor: Colors.green,
-//                     color: Colors.black,
-//                     borderRadius: BorderRadius.circular(8),
-//                     constraints: const BoxConstraints(
-//                       minHeight: 40, // Adjust button size for desktop
-//                       minWidth: 120,
-//                     ),
-//                     children: const [
-//                       Padding(
-//                         padding: EdgeInsets.symmetric(horizontal: 15),
-//                         child: Text('Coins'),
-//                       ),
-//                       Padding(
-//                         padding: EdgeInsets.symmetric(horizontal: 15),
-//                         child: Text('News'),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 // Heading on the right side for larger screens
-//                 Flexible(
-//                   flex: 1,
-//                   child: FittedBox(
-//                     fit: BoxFit.scaleDown,
-//                     alignment: Alignment.centerRight,
-//                     child: const Text(
-//                       "Digital Currensee",
-//                       style: TextStyle(
-//                         fontSize: 22,
-//                         fontStyle: FontStyle.italic,
-//                         color: Color(0xFF388E3C),
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//     );
-//   },
-// ),
  LayoutBuilder(
   builder: (context, constraints) {
     bool isMobile = constraints.maxWidth < 400;

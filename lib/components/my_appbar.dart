@@ -33,6 +33,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
+
 class _CustomAppBarState extends State<CustomAppBar> {
   String baseCurrency = "";
   String fromCurrency = 'USD';
@@ -59,7 +60,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
         }
       });
     });
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      AlertHelper.checkAndShowAlerts(context);
+    }); 
   }
+  
 
   Future<Map<String, dynamic>> fetchCurrencyData() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -146,16 +151,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
     );
   }
 }
+
 class AlertHelper {
   static Future<bool> hasAlertBeenShown(String alertId) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('shown_alert_$alertId') ?? false;
-}
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('shown_alert_$alertId') ?? false;
+  }
 
-static Future<void> markAlertAsShown(String alertId) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('shown_alert_$alertId', true);
-}
+  static Future<void> markAlertAsShown(String alertId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('shown_alert_$alertId', true);
+  }
 
   static Future<void> checkAndShowAlerts(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
@@ -171,49 +177,51 @@ static Future<void> markAlertAsShown(String alertId) async {
           .collection('alerts')
           .get();
 
-    for (var doc in alertDocs.docs) {
-  final alertId = doc.id;
+      for (var doc in alertDocs.docs) {
+        final alertId = doc.id;
 
-  if (await hasAlertBeenShown(alertId)) {
-    continue; 
-  }
+        if (await hasAlertBeenShown(alertId)) {
+          continue;
+        }
 
-  double targetRate = doc['targetRate'];
-  String from = doc['fromCurrency'];
-  String to = doc['toCurrency'];
+        double targetRate = doc['targetRate'];
+        String from = doc['fromCurrency'];
+        String to = doc['toCurrency'];
 
-  final currentRate = await CurrencyApiHelper.fetchExchangeRate(from, to);
+        final currentRate = await CurrencyApiHelper.fetchExchangeRate(from, to);
 
-  if (currentRate != null && currentRate >= targetRate) {
-    showAlertPopup(context, from, to, targetRate);
-    await markAlertAsShown(alertId);
-    break; 
-  }
-}
- }
+        if (currentRate != null && currentRate >= targetRate) {
+          showAlertPopup(context, from, to, targetRate);
+          await markAlertAsShown(alertId);
+          break;
+        }
+      }
+    }
   }
 
   static void showAlertPopup(BuildContext context, String from, String to, double rate) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: const [
-            Icon(Icons.notifications_active, color: Color(0xFF388E3C)),
-            SizedBox(width: 10),
-            Text('Rate Alert', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF388E3C))),
+    Future.delayed(Duration.zero, () {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: const [
+              Icon(Icons.notifications_active, color: Color(0xFF388E3C)),
+              SizedBox(width: 10),
+              Text('Rate Alert', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF388E3C))),
+            ],
+          ),
+          content: Text('The rate of $from → $to has reached $rate'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK', style: TextStyle(color: Color(0xFF388E3C))),
+            ),
           ],
         ),
-        content: Text('The rate of $from → $to has reached $rate'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK', style: TextStyle(color: Color(0xFF388E3C))),
-          ),
-        ],
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -423,7 +431,9 @@ _drawerItem(
 }
 class CurrencyApiHelper {
   static Future<double?> fetchExchangeRate(String fromCurrency, String toCurrency) async {
-    final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency');
+    //final url = Uri.parse('https://v6.exchangerate-api.com/v6/2f386b0f1eb2f3e88a4ec4a0/latest/$fromCurrency');
+      final url = Uri.parse('https://v6.exchangerate-api.com/v6/797d237e9f8275c429bf32bf/latest/$fromCurrency');
+
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
