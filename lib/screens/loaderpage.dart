@@ -28,7 +28,7 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
 
     controller.forward(); 
 
-    // Navigate to login after the animation completes
+   
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/login');
@@ -80,7 +80,7 @@ class _CurrenseeState extends State<Currensee> with TickerProviderStateMixin {
                 child: const Text(
   'CurrenSee',
   style: TextStyle(
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: FontWeight.w900, 
     fontStyle: FontStyle.italic,
     fontFamily: 'Times New Roman',

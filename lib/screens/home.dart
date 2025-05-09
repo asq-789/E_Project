@@ -132,23 +132,34 @@ Map<String, dynamic>? marketData;
     }
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(fontWeight: FontWeight.w500, color: Color(0xFF388E3C)),
-      prefixIcon: Icon(icon, color: Color(0xFF388E3C)),
-      filled: true,
-      fillColor: Colors.grey[100],
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color(0xFF388E3C), width: 2),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[400]!),
-      ),
-    );
-  }
+  InputDecoration _inputDecoration(
+  String label,
+  IconData icon, {
+  double iconSize = 20,
+}) {
+  return InputDecoration(
+    labelText: label,
+    labelStyle: TextStyle(
+      fontWeight: FontWeight.w500,
+      color: Color(0xFF388E3C),
+    ),
+    prefixIcon: Icon(
+      icon,
+      size: iconSize,
+      color: Color(0xFF388E3C),
+    ),
+    filled: true,
+    fillColor: Colors.grey[100],
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Color(0xFF388E3C), width: 2),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey[400]!),
+    ),
+  );
+}
 
   void _showConversionPopup() {
     showDialog(
@@ -345,17 +356,31 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                     Row(children: [
                       Expanded(child: DropdownButtonFormField<String>(
                         value: currencies.contains(fromCurrency) ? fromCurrency : null,
-                        decoration: _inputDecoration("From", Icons.arrow_downward),
-                        items: combinedCurrencies.map((currency) => DropdownMenuItem(value: currency, child: Text(currency))).toList(),
-                        onChanged: (newValue) => setState(() => fromCurrency = newValue!),
+                        decoration: _inputDecoration("From", Icons.arrow_downward , iconSize: 16,),
+                        items: combinedCurrencies.map((currency) => DropdownMenuItem(value: currency, child: Text(currency,style: TextStyle(fontSize: 15)))).toList(),
+                       selectedItemBuilder: (BuildContext context) {
+    return combinedCurrencies.map((currency) {
+      return Text(
+        currency,
+        style: TextStyle(fontSize: 15), 
+        overflow: TextOverflow.ellipsis,
+      );
+    }).toList();
+  }, onChanged: (newValue) => setState(() => fromCurrency = newValue!),
                       )),
-                      SizedBox(width: 10),
-                      Icon(Icons.swap_horiz, color: Colors.grey),
-                      SizedBox(width: 10),
-                      Expanded(child: DropdownButtonFormField<String>(
+                     
+                    SizedBox(
+      width: 22,
+      child: Center(
+        child: Icon(Icons.swap_vert, color: Colors.grey, size: 20),
+      ),
+    ),
+                  
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
                         value: currencies.contains(toCurrency) ? toCurrency : null,
-                        decoration: _inputDecoration("To", Icons.arrow_upward),
-                        items: combinedCurrencies.map((currency) => DropdownMenuItem(value: currency, child: Text(currency, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w500)))).toList(),
+                        decoration: _inputDecoration("To", Icons.arrow_upward, iconSize: 16,),
+                        items: combinedCurrencies.map((currency) => DropdownMenuItem(value: currency, child: Text(currency, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15,)))).toList(),
                         onChanged: (newValue) => setState(() => toCurrency = newValue!),
                       )),
                     ]),
@@ -414,9 +439,9 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Center(child: CircularProgressIndicator(color: Color(0xFF388E3C)));
-                              } else if (snapshot.hasError || !snapshot.hasData) {
-                                return Text("Failed to load top currencies", style: TextStyle(color: Colors.red));
-                              } else {
+                              }else if (snapshot.hasError || !snapshot.hasData) {
+                                return Text("Failed to load top currencies", style: TextStyle(color: Color.fromARGB(255, 117, 117, 116)));}
+                                 else {
                                 var data = jsonDecode(snapshot.data!.body);
                                 Map<String, dynamic> rates = data['conversion_rates'];
                                 List<String> topList = ['USD', 'EUR', 'GBP', 'PKR', 'INR'];
@@ -437,17 +462,31 @@ Future<void> fetchCurrencyHistory(DateTime startDate, DateTime endDate, String f
                 likedCurrencies.contains(code) ? Icons.star : Icons.star_border,
                 color: likedCurrencies.contains(code) ? Color(0xFF388E3C): Colors.grey,
               ),
-              onPressed: () {
-                setState(() {
-                  if (likedCurrencies.contains(code)) {
-                    likedCurrencies.remove(code);
-                  } else {
-                    likedCurrencies.add(code);
-                  }
-                });
+         onPressed: () async {
+  setState(() {
+    if (likedCurrencies.contains(code)) {
+      likedCurrencies.remove(code);  
+    } else {
+      likedCurrencies.add(code); 
+    }
+  });
 
-              },
-            ),
+
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({
+        'likedCurrencies': likedCurrencies,
+      }, SetOptions(merge: true));  
+    } catch (e) {
+      print("Error saving liked currencies: $e");
+    }
+  }
+},
+  ),
           ),
         )),
     SizedBox(height: 10),
